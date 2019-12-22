@@ -1,9 +1,7 @@
 // Libraries GPS
-#include <Adafruit_GPS.h>
-#define GPSSerial Serial2
-Adafruit_GPS GPS(&GPSSerial);
-#define GPSECHO false
-#include <TinyGPS++.h>
+#include "TinyGPS.h"
+TinyGPS gps;
+#define GPS_SERIAL Serial2
 
 #include <SD.h>
 #include <Servo.h>
@@ -23,7 +21,6 @@ int portant_VMG = 150;
 
 int pos1 = 80 - 10;
 int pos3 = 80 + 10;
-
 
 int ledPin = 13;                  // LED test pin
 int current_mode = 0;
@@ -70,6 +67,12 @@ int index_buffer_lignes = 0;
 int taille_buffer_lignes = 10;
 String lines_buffer[10];
 
+long lat, lon;
+unsigned long fix_age, time, date, speed, course;
+unsigned long chars;
+unsigned short sentences, failed_checksum;
+unsigned long hdop;
+
 // fonction de data logging
 void datalog(String var_name, int value){
 
@@ -81,7 +84,7 @@ void datalog(String var_name, int value){
             line += ";";
         }
         lines_buffer[index_buffer_lignes] = line;
-        Serial.println(line);
+        Serial1.println(line);
         index_buffer_lignes ++;
         //buf[sizeof(var_name_log)];  // reset buffer
     }
@@ -93,7 +96,7 @@ void datalog(String var_name, int value){
           line += var_name_log[i];
           line += ";";
       }
-      Serial.println(line);
+      Serial1.println(line);
       myFile.println(line);
       myFile.close();
     }
@@ -178,10 +181,10 @@ boolean test_couloir(int largeur){
   // calcul de l'axe du parcours
   float axe_parcours;
   if (index_wpt < (sizeof(wp_lat)/sizeof(float))-1){
-    axe_parcours = TinyGPSPlus::courseTo(wp_lat[index_wpt], wp_lon[index_wpt], wp_lat[index_wpt+1], wp_lon[index_wpt+1]);
+    axe_parcours = TinyGPS::course_to(wp_lat[index_wpt], wp_lon[index_wpt], wp_lat[index_wpt+1], wp_lon[index_wpt+1]);
   }
   else {
-    axe_parcours = TinyGPSPlus::courseTo(wp_lat[index_wpt], wp_lon[index_wpt], wp_lat[0], wp_lon[0]);
+    axe_parcours = TinyGPS::course_to(wp_lat[index_wpt], wp_lon[index_wpt], wp_lat[0], wp_lon[0]);
   }
 
   int ecart = abs(sin(((axe_parcours - angleToWaypoint)*180.0)/PI) * distanceToWaypoint);
@@ -241,7 +244,7 @@ void mode_autonome(){
     first_loop = false;
     commande_barre(50); // on se met au près le temps d'avoir une bonne mesure du cap
     reglage_aile_auto(50);
-    Serial.println("Début de mode autonome");
+    Serial1.println("Début de mode autonome");
   }
 
   if (millis() - timer2 > interval_calcul){  // calcul toutes les 10 secondes
@@ -303,57 +306,63 @@ void mode_autonome(){
 }
 
 void lecture_gps(){
-  char c = GPS.read();
-  if (GPSECHO)
-    if (c) Serial.print(c);
-  if (GPS.newNMEAreceived()) {
-     if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
-      return; // we can fail to parse a sentence in which case we should just wait for another
-  }
 
   if (timer > millis()) timer = millis();
-
   if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
-    if (GPS.fix) {
-      datalog("Vitesse",(int)(GPS.speed*100));
-      datalog("Cap",(int) GPS.angle);
-      //datalog("Nb_satellites",(int)GPS.satellites);      // /!\ semble tout faire bugger ?!!!!
-      datalog("Latittude",(int)(GPS.latitudeDegrees*100000));
-      datalog("Longitude",(int)(GPS.longitudeDegrees*100000));
-      datalog("Heures", GPS.hour);
-      datalog("Minutes", GPS.minute);
-      datalog("Secondes", GPS.seconds);
+  
+    char c = GPS_SERIAL.read();
+    if (gps.encode(c))
+    {
+      // process new gps info here
+      
+      // retrieves +/- lat/long in 100000ths of a degree
+      gps.get_position(&lat, &lon, &fix_age);
+      
+      // time in hhmmsscc, date in ddmmyy
+      gps.get_datetime(&date, &time, &fix_age);
+      
+      // returns speed in 100ths of a knot
+      speed = gps.speed();
+      
+      // course in 100ths of a degree
+      course = gps.course();
 
-      datalog("HDOP",GPS.HDOP*100);  // multiplié par 100 pour rester en int avec une bonne précision
-      if(GPS.HDOP > 0 && GPS.HDOP < 100){ // vérification la validité des données reçues avant de les exploiter
+      hdop = gps.hdop();
+
+      datalog("Vitesse",(int)(speed*100));
+      datalog("Cap",(int) course);
+      datalog("Latittude",(int)(lat));
+      datalog("Longitude",(int)(lon));
+      datalog("Date", (int)(date));
+      datalog("Time", (int)(time));
+
+      datalog("HDOP",(int)(hdop*100));  // multiplié par 100 pour rester en int avec une bonne précision
+      
+      if(hdop > 0 && hdop < 100){ // vérification la validité des données reçues avant de les exploiter
         // Calcul du prochain waypoint si waypoint en cours atteint
-        distanceToWaypoint = (float)TinyGPSPlus::distanceBetween(GPS.latitudeDegrees, GPS.longitudeDegrees,wp_lat[index_wpt], wp_lon[index_wpt]);
-        angleToWaypoint = TinyGPSPlus::courseTo(GPS.latitudeDegrees, GPS.longitudeDegrees, wp_lat[index_wpt], wp_lon[index_wpt]);
+        distanceToWaypoint = (float)TinyGPS::distance_between(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
+        angleToWaypoint = TinyGPS::course_to(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
         if (next_point(distanceToWaypoint)){
-          distanceToWaypoint = (float)TinyGPSPlus::distanceBetween(GPS.latitudeDegrees, GPS.longitudeDegrees,wp_lat[index_wpt], wp_lon[index_wpt]);
-          angleToWaypoint = TinyGPSPlus::courseTo(GPS.latitudeDegrees, GPS.longitudeDegrees, wp_lat[index_wpt], wp_lon[index_wpt]);
+          distanceToWaypoint = (float)TinyGPS::distance_between(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
+          angleToWaypoint = TinyGPS::course_to(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
         }
         datalog("Wpt_angle",angleToWaypoint);
         datalog("Wpt_dst",distanceToWaypoint);
         datalog("Lat_next_point",int(wp_lat[index_wpt]*100000));
         datalog("Lon_next_point",int(wp_lon[index_wpt]*100000));
       }
+        
     }
   }
 }
 
 void setup() {
-  Serial.begin(115200);
+  Serial1.begin(115200);
   digitalWrite(13, HIGH);
   delay(5000);
   // initialisation GPS
-  GPS.begin(9600);
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // 1 Hz update rate
-  GPS.sendCommand(PGCMD_ANTENNA);
-  delay(1000);
-  GPSSerial.println(PMTK_Q_RELEASE);
+  Serial2.begin(9600);
 
   // declaration des ports
   //pinMode(A16, INPUT);   // sortie du filtre passe bas lié à la PWM du switch C
@@ -364,10 +373,10 @@ void setup() {
   barre.attach(3);
   aile.attach(2);
   if (!SD.begin(BUILTIN_SDCARD)) {
-    Serial.println("initialization carte SD : failed");
+    Serial1.println("initialization carte SD : failed");
   }
   else {
-    Serial.println("initialization carte SD : OK");
+    Serial1.println("initialization carte SD : OK");
   }
 
   // préparation du fichier txt
@@ -382,7 +391,7 @@ void loop() {
 
   if (millis() - timer_mesure > 1000){  // cadencement 1 Hz
     timer_mesure = millis();
-    cap_moyen = filtrage_cap((int)GPS.angle);
+    cap_moyen = filtrage_cap((int)course);
     datalog("Cap_moy",cap_moyen);
   }
 
@@ -413,7 +422,8 @@ void loop() {
     mode_semi_auto(angle1);
   }
 
-  if (GPS.fix){
+  int c = Serial2.read();
+  if (gps.encode(c)){
     if (millis() - timer4 > 1000 ) {  // témoin visuel sur la carte d'acroche des satelites.
       timer4 = millis();
       led_state = not(led_state);
@@ -440,3 +450,13 @@ void EchoPinISR_ch3() {
   else  // Gone LOW
   LastPulseTime_ch3 = micros() - startTime;
 }
+
+
+
+
+
+
+
+
+
+
