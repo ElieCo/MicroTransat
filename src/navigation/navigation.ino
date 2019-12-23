@@ -363,6 +363,7 @@ void setup() {
   Serial1.begin(9600);
 
   //switch on the led
+  pinMode(13, OUTPUT);       // Initialize LED pin
   digitalWrite(13, HIGH);
   delay(5000);
   
@@ -375,8 +376,6 @@ void setup() {
   // set interruption on ch3pin
   pinMode(ch3Pin, INPUT);
   attachInterrupt(ch3Pin, EchoPinISR_ch3, CHANGE);  // Pin 2 interrupt on any change
-
-  pinMode(13, OUTPUT);       // Initialize LED pin
 
   // init servo
   barre.attach(3);
