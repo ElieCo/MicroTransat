@@ -308,10 +308,8 @@ void mode_autonome(){
 
 void lecture_gps(){
 
-  if (timer > millis()) timer = millis();
-  if (millis() - timer > 2000) {
-    timer = millis(); // reset the timer
-  
+  if(GPS_SERIAL.available()){
+    
     char c = GPS_SERIAL.read();
     if (gps.encode(c))
     {
@@ -353,7 +351,6 @@ void lecture_gps(){
         datalog("Lat_next_point",int(wp_lat[index_wpt]*100000));
         datalog("Lon_next_point",int(wp_lon[index_wpt]*100000));
       }
-        
     }
   }
 }
