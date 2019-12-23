@@ -102,10 +102,11 @@ void datalog(String var_name, int value){
     }
     else {
         // 1) Trouver la position de la variable dans la trame csv
-        for (unsigned int index_var = 0; index_var < sizeof(var_name_log); index_var ++){
+        for (unsigned int index_var = 0; index_var < (sizeof(var_name_log)/sizeof(var_name_log[0])); index_var ++){
             if (var_name == var_name_log[index_var]){
             // 2) Ajouter la valeur dans la ligne
                 buf[index_var] = value;
+                break;
             }
         }
     }
