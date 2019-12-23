@@ -367,7 +367,7 @@ void setup() {
   delay(5000);
   
   // initialisation GPS
-  Serial2.begin(9600);
+  GPS_SERIAL.begin(9600);
 
   // declaration des ports
   //pinMode(A16, INPUT);   // sortie du filtre passe bas lié à la PWM du switch C
@@ -435,7 +435,7 @@ void loop() {
     mode_semi_auto(angle1);
   }
 
-  int c = Serial2.read();
+  int c = GPS_SERIAL.read();
   if (gps.encode(c)){
     if (millis() - timer4 > 1000 ) {  // témoin visuel sur la carte d'acroche des satelites.
       timer4 = millis();
