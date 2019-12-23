@@ -359,7 +359,7 @@ void lecture_gps(){
 
 void setup() {
   // init serial debug
-  Serial1.begin(115200);
+  Serial1.begin(9600);
 
   //switch on the led
   digitalWrite(13, HIGH);
