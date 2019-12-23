@@ -358,20 +358,30 @@ void lecture_gps(){
 }
 
 void setup() {
+  // init serial debug
   Serial1.begin(115200);
+
+  //switch on the led
   digitalWrite(13, HIGH);
   delay(5000);
+  
   // initialisation GPS
   Serial2.begin(9600);
 
   // declaration des ports
   //pinMode(A16, INPUT);   // sortie du filtre passe bas lié à la PWM du switch C
+
+  // set interruption on ch3pin
   pinMode(ch3Pin, INPUT);
   attachInterrupt(ch3Pin, EchoPinISR_ch3, CHANGE);  // Pin 2 interrupt on any change
 
   pinMode(13, OUTPUT);       // Initialize LED pin
+
+  // init servo
   barre.attach(3);
   aile.attach(2);
+
+  // init SD card
   if (!SD.begin(BUILTIN_SDCARD)) {
     Serial1.println("initialization carte SD : failed");
   }
@@ -382,11 +392,13 @@ void setup() {
   // préparation du fichier txt
   datalog("init", 0);
 
+  // switch off the led
   delay(1000);
   digitalWrite(13, LOW);
 }
 
 void loop() {
+  // Read GPS data
   lecture_gps();
 
   if (millis() - timer_mesure > 1000){  // cadencement 1 Hz
