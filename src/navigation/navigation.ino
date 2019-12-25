@@ -278,6 +278,17 @@ void mode_autonome(){
   }
 }
 
+void get_new_point(float actual_lat, float actual_lon, float bearing, float distance, float &new_lat, float &new_lon){
+  actual_lat = radians(actual_lat);
+  actual_lon = radians(actual_lon);
+  bearing = radians(bearing);
+  float R = 6371000;
+  new_lat = asin( sin(actual_lat) * cos(distance/R) + cos(actual_lat) * sin(distance/R) * cos(bearing) );
+  new_lon = actual_lon + atan2( sin(bearing) * sin(distance/R) * cos(actual_lat), cos(distance/R) - sin(actual_lat) * sin(new_lat));
+  new_lat = degrees(new_lat);
+  new_lon = degrees(new_lon);
+}
+
 void lecture_gps(){
 
   if(GPS_SERIAL.available()){
