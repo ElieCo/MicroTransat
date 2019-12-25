@@ -54,7 +54,8 @@ String lines_buffer[10];
 
 // GPS data
 long lat, lon;
-unsigned long fix_age, time, date, speed, course;
+unsigned long fix_age, time, date;
+float speed, course;
 unsigned long chars;
 unsigned short sentences, failed_checksum;
 unsigned long hdop;
@@ -70,7 +71,7 @@ void datalog(String var_name, int value){
             line += ";";
         }
         lines_buffer[index_buffer_lignes] = line;
-        Serial1.println(line);
+        // Serial1.println(line);
         index_buffer_lignes ++;
         //buf[sizeof(var_name_log)];  // reset buffer
     }
@@ -82,7 +83,7 @@ void datalog(String var_name, int value){
           line += var_name_log[i];
           line += ";";
       }
-      Serial1.println(line);
+      // Serial1.println(line);
       myFile.println(line);
       myFile.close();
     }
@@ -293,12 +294,24 @@ void lecture_gps(){
       gps.get_datetime(&date, &time, &fix_age);
       
       // returns speed in 100ths of a knot
-      speed = gps.speed();
+      speed = 0.51444444444*gps.speed()/100;
       
       // course in 100ths of a degree
-      course = gps.course();
+      course = float(gps.course())/100;
 
       hdop = gps.hdop();
+
+      /*
+      Serial1.print("lat: ");
+      Serial1.println(lat);
+      Serial1.print("lon: ");
+      Serial1.println(lon);
+      Serial1.print("course: ");
+      Serial1.println(course);
+      Serial1.print("speed: ");
+      Serial1.println(speed);
+      Serial1.println("====================");
+      */
 
       datalog("Vitesse",(int)(speed*100));
       datalog("Cap",(int) course);
