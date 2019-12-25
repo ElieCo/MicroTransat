@@ -184,7 +184,6 @@ boolean test_couloir(int largeur){
 
 // Reçois un angle et l'adapte à la commande de barre avant de l'appliquer.
 void commande_barre( int angle){
-  datalog("Angle_regulateur",angle);
   // L'entrée doit être comprise entre 0 et 360°. 0 correspond à face au vent
   if (angle <= 360 && angle >= 0){
     angle_regulateur = angle;
@@ -194,6 +193,7 @@ void commande_barre( int angle){
       angle = angle - 180;
     }
     barre.write(angle);
+    datalog("Angle_regulateur",angle);
   }
   else {
     datalog("Angle_regulateur",404);
