@@ -350,7 +350,7 @@ void lecture_gps(){
   }
 }
 
-void setup() {
+void navSetup() {
   // init serial debug
   Serial1.begin(9600);
 
@@ -382,7 +382,7 @@ void setup() {
   digitalWrite(ledPin, LOW);
 }
 
-void loop() {
+void navLoop() {
   // Read GPS data
   lecture_gps();
 
