@@ -53,7 +53,7 @@ int taille_buffer_lignes = 10;
 String lines_buffer[10];
 
 // GPS data
-long lat, lon;
+float lat, lon;
 unsigned long fix_age, time, date;
 float speed, course;
 unsigned long chars;
@@ -297,9 +297,12 @@ void lecture_gps(){
     if (gps.encode(c))
     {
       // process new gps info here
-      
-      // retrieves +/- lat/long in 100000ths of a degree
-      gps.get_position(&lat, &lon, &fix_age);
+
+      long _lat, _lon;
+      // retrieves +/- lat/long in 1000000ths of a degree
+      gps.get_position(&_lat, &_lon, &fix_age);
+      lat = _lat;
+      lon = _lon;
       
       // time in hhmmsscc, date in ddmmyy
       gps.get_datetime(&date, &time, &fix_age);
@@ -335,16 +338,16 @@ void lecture_gps(){
       
       if(hdop > 0 && hdop < 100){ // vérification la validité des données reçues avant de les exploiter
         // Calcul du prochain waypoint si waypoint en cours atteint
-        distanceToWaypoint = (float)TinyGPS::distance_between(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
-        angleToWaypoint = TinyGPS::course_to(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
+        distanceToWaypoint = (float)TinyGPS::distance_between(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
+        angleToWaypoint = TinyGPS::course_to(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
         if (next_point(distanceToWaypoint)){
-          distanceToWaypoint = (float)TinyGPS::distance_between(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
-          angleToWaypoint = TinyGPS::course_to(lat/100000, lon/100000, wp_lat[index_wpt], wp_lon[index_wpt]);
+          distanceToWaypoint = (float)TinyGPS::distance_between(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
+          angleToWaypoint = TinyGPS::course_to(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
         }
         datalog("Wpt_angle",angleToWaypoint);
         datalog("Wpt_dst",distanceToWaypoint);
-        datalog("Lat_next_point",int(wp_lat[index_wpt]*100000));
-        datalog("Lon_next_point",int(wp_lon[index_wpt]*100000));
+        datalog("Lat_next_point",int(wp_lat[index_wpt]*1000000));
+        datalog("Lon_next_point",int(wp_lon[index_wpt]*1000000));
       }
     }
   }
