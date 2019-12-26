@@ -22,11 +22,12 @@ void loop(){
   }
 
   // run tests in a loop
-  testNav_01();
+  // testNav_01();
+  testGPS();
 
 
   first_test_loop = false;
-  delay(1000);
+  // delay(1000);
 }
 
 bool testNav_01(){
@@ -70,5 +71,41 @@ bool testNav_02(){
     return true;
   else
     return false;
+}
+
+bool testGPS(){
+  
+  while (Serial2.available())
+  {
+    //Serial1.println("available");
+    int c = Serial2.read();
+    if (gps.encode(c))
+    {
+      // process new gps info here
+      long lat, lon;
+      unsigned long fix_age, time, date, speed, course;
+      unsigned long chars;
+      unsigned short sentences, failed_checksum;
+      unsigned long hdop;
+      
+      // retrieves +/- lat/long in 1000000ths of a degree
+      gps.get_position(&lat, &lon, &fix_age);
+      
+      // time in hhmmsscc, date in ddmmyy
+      gps.get_datetime(&date, &time, &fix_age);
+      
+      // returns speed in 100ths of a knot
+      speed = gps.speed();
+      
+      // course in 100ths of a degree
+      course = gps.course();
+
+      hdop = gps.hdop();
+
+      Serial1.println(lat);
+      Serial1.println(lon);
+      Serial1.println("====== PLOP ============");
+    }
+  }
 }
 
