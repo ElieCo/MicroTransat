@@ -113,12 +113,12 @@ bool testGPS(){
 
 bool testServoBar(){
   static int regulation_angle = 0;
-  static int step = 20;
+  static int step = 10;
   Serial1.print("regulation angle: ");
   Serial1.println(regulation_angle);
-  barre.write(regulation_angle);
+  barre.write(regulation_angle*(180.0/170.0));
   regulation_angle += step;
-  if(regulation_angle > 180 || regulation_angle < 0){
+  if(regulation_angle > 170 || regulation_angle < 0){
     step = -step;
     regulation_angle += 2*step;
   }
@@ -127,12 +127,12 @@ bool testServoBar(){
 
 bool testServoWing(){
   static int wing_angle = 0;
-  static int step = 20;
+  static int step = 10;
   Serial1.print("wing angle: ");
   Serial1.println(wing_angle);
-  aile.write(wing_angle);
+  aile.write(wing_angle*(180.0/170.0));
   wing_angle += step;
-  if(wing_angle > 180 || wing_angle < 0){
+  if(wing_angle > 170 || wing_angle < 0){
     step = -step;
     wing_angle += 2*step;
   }
