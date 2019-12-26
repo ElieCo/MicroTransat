@@ -23,11 +23,12 @@ void loop(){
 
   // run tests in a loop
   // testNav_01();
-  testGPS();
+  // testGPS();
+  testServoBar();
 
 
   first_test_loop = false;
-  // delay(1000);
+  delay(1000);
 }
 
 bool testNav_01(){
@@ -107,5 +108,19 @@ bool testGPS(){
       Serial1.println("====== PLOP ============");
     }
   }
+}
+
+bool testServoBar(){
+  static int regulation_angle = 0;
+  static int step = 20;
+  Serial1.print("regulation angle: ");
+  Serial1.println(regulation_angle);
+  barre.write(regulation_angle);
+  regulation_angle += step;
+  if(regulation_angle > 180 || regulation_angle < 0){
+    step = -step;
+    regulation_angle += 2*step;
+  }
+  
 }
 
