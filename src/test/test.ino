@@ -25,6 +25,7 @@ void loop(){
   // testNav_01();
   // testGPS();
   testServoBar();
+  testServoWing();
 
 
   first_test_loop = false;
@@ -120,6 +121,20 @@ bool testServoBar(){
   if(regulation_angle > 180 || regulation_angle < 0){
     step = -step;
     regulation_angle += 2*step;
+  }
+  
+}
+
+bool testServoWing(){
+  static int wing_angle = 0;
+  static int step = 20;
+  Serial1.print("regulation angle: ");
+  Serial1.println(wing_angle);
+  aile.write(wing_angle);
+  wing_angle += step;
+  if(wing_angle > 180 || wing_angle < 0){
+    step = -step;
+    wing_angle += 2*step;
   }
   
 }
