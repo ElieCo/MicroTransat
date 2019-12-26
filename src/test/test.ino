@@ -30,11 +30,11 @@ void loop(){
 }
 
 bool testNav_01(){
-  // first_loop = false;
-  timer2 = 0;
+  timer2 = millis() + interval_calcul + 1;
+  index_wpt = 0;
 
   if(first_test_loop){
-    initSimuMove(0, 50, interval_calcul);
+    initSimuMove(290, 50, interval_calcul);
     initSimuPos(47.731564, -3.393134);
     initSimuWaypoint(47.732344, -3.395307);
   }
@@ -42,9 +42,13 @@ bool testNav_01(){
   
   cap_moyen = course;
   angleToWaypoint = getSimuAngleToWaypoint();
+  distanceToWaypoint = getSimuDistanceToWaypoint();
 
   mode_autonome();
   datalog("push", 0);
+
+  Serial1.print("distance to waypoint: ");
+  Serial1.println(distanceToWaypoint);
 }
 
 bool testNav_02(){

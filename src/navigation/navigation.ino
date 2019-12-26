@@ -26,8 +26,8 @@ boolean hors_couloir = true;
 // liste points GPS
 float distanceToWaypoint;
 double angleToWaypoint;
-const float wp_lat[] = {48.431550, 48.430987};//{48.431643, 48.430960};// 0)quais 1) 100 mètres du quais NO
-const float wp_lon[] = {-4.615716, -4.614247};//{-4.614617, -4.615505};//
+float wp_lat[] = {48.431550, 48.430987};//{48.431643, 48.430960};// 0)quais 1) 100 mètres du quais NO
+float wp_lon[] = {-4.615716, -4.614247};//{-4.614617, -4.615505};//
 unsigned int index_wpt = 0;              // index dans la liste des wpt
 int seuil_valid_wpt = 25;
 
