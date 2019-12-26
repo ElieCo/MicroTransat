@@ -23,7 +23,7 @@ void loop(){
 
   // run tests in a loop
   testNav_01();
-  testGPS();
+  // testGPS();
   // testServoBar();
   // testServoWing();
 
@@ -32,7 +32,7 @@ void loop(){
 }
 
 bool testNav_01(){
-  static int test_interval = 10000;
+  static int test_interval = 1000;
   static int test_timer = millis() - test_interval;
   if(millis() - test_timer < test_interval)
     return false;
