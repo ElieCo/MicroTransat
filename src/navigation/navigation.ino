@@ -172,7 +172,7 @@ boolean test_couloir(int largeur){
     axe_parcours = TinyGPS::course_to(wp_lat[index_wpt], wp_lon[index_wpt], wp_lat[0], wp_lon[0]);
   }
 
-  int ecart = abs(sin(((axe_parcours - angleToWaypoint)*180.0)/PI) * distanceToWaypoint);
+  int ecart = abs(sin(radians(axe_parcours - angleToWaypoint)) * distanceToWaypoint);
   datalog("ecart_axe",ecart);
   if (ecart < largeur/2 && ecart != 0){  // quand on ne capte pas les satellites l'écart tombe a 0...
     return true;
@@ -260,17 +260,14 @@ void mode_autonome(){
     }
 
     // Test du couloir
-    boolean precence_couloir = test_couloir(60); //test_couloir() retourne true si le bateau est dans le couloir
-    datalog("Presence_couloir",precence_couloir);
-    if (not precence_couloir){
+    boolean presence_couloir = test_couloir(20); //test_couloir() retourne true si le bateau est dans le couloir
+    datalog("Presence_couloir",presence_couloir);
+    if (not presence_couloir){
       if (not hors_couloir){ // si on n'était pas déjà hors couloir on change la consigne pour retourner vers le couloir.
-        hors_couloir = true;
         nouvel_angle_regulateur = 360 - nouvel_angle_regulateur;
       }
     }
-    else {  // si on est dans le couloir :
-      hors_couloir = false;
-    }
+    hors_couloir = !presence_couloir;
 
     // application des consignes calculées sur les servos
     commande_barre(nouvel_angle_regulateur);
