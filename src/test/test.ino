@@ -22,17 +22,22 @@ void loop(){
   }
 
   // run tests in a loop
-  // testNav_01();
-  // testGPS();
-  testServoBar();
-  testServoWing();
+  testNav_01();
+  testGPS();
+  // testServoBar();
+  // testServoWing();
 
 
   first_test_loop = false;
-  delay(1000);
 }
 
 bool testNav_01(){
+  static int test_interval = 10000;
+  static int test_timer = millis() - test_interval;
+  if(millis() - test_timer < test_interval)
+    return false;
+  test_timer = millis();
+  
   timer2 = millis() + interval_calcul + 1;
   index_wpt = 0;
 
@@ -112,6 +117,12 @@ bool testGPS(){
 }
 
 bool testServoBar(){
+  static int test_interval = 1000;
+  static int test_timer = millis() - test_interval;
+  if(millis() - test_timer < test_interval)
+    return false;
+  test_timer = millis();
+  
   static int regulation_angle = 0;
   static int step = 10;
   Serial1.print("regulation angle: ");
@@ -126,6 +137,12 @@ bool testServoBar(){
 }
 
 bool testServoWing(){
+  static int test_interval = 1000;
+  static int test_timer = millis() - test_interval;
+  if(millis() - test_timer < test_interval)
+    return false;
+  test_timer = millis();
+  
   static int wing_angle = 0;
   static int step = 10;
   Serial1.print("wing angle: ");
