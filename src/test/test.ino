@@ -128,7 +128,7 @@ bool testServoBar(){
 bool testServoWing(){
   static int wing_angle = 0;
   static int step = 20;
-  Serial1.print("regulation angle: ");
+  Serial1.print("wing angle: ");
   Serial1.println(wing_angle);
   aile.write(wing_angle);
   wing_angle += step;
