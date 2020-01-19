@@ -10,6 +10,7 @@ void print(String s){
 
 void print(String s1, String s2){
   serialDebug.print(s1);
+  serialDebug.print(" ");
   serialDebug.println(s2);
 }
 
