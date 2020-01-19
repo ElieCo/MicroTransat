@@ -2,7 +2,8 @@
 
 class ServoBar : public ServoMotor
 {
-  void run(){
+ protected:
+  void go(){
     print("azertyuiop");
   }
 };

@@ -15,8 +15,8 @@ class Manager{
 
   void run(){
     if (isNotTimeToRun()) return;
-    
-    print("My name is: ", m_name);
+
+    go();
   }
 
   void initInterval(int interval){
@@ -28,6 +28,10 @@ class Manager{
   }
 
  protected:
+
+  void go(){
+    print("Manager start:", m_name);
+  }
 
   bool isNotTimeToRun(){
     if(millis() - m_timer > m_runInterval){
