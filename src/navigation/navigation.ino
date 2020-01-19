@@ -45,7 +45,7 @@ unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Heures","Minutes", "Secondes","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir", "Mode","Index_wpt", "Commentaire"};
+String var_name_log[] = {"Battery", "Heures","Minutes", "Secondes","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir", "Mode","Index_wpt", "Commentaire"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -114,6 +114,18 @@ int analyse_vent(int regulateur, int cap){
     estim += 360;
   }
   return estim;
+}
+
+void logBat(){
+  int value = analogRead(A14);
+  double input_voltage = double(value) * 5.0 / 1023;
+  double battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
+  datalog("Battery", battery_voltage * 100);
+
+  Serial1.print("Input value: ");
+  Serial1.println(input_voltage);
+  Serial1.print("Battery value: ");
+  Serial1.println(battery_voltage);
 }
 
 int filtrage_cap(int cap_instant){
@@ -390,6 +402,8 @@ void navLoop() {
 
   datalog("Mode", 1);
   mode_autonome();
+
+  logBat();
   
   // Cadencement du dataloggeur et informations complémentaires
   if (millis() - timer3 > interval_datalogging) {
