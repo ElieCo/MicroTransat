@@ -376,10 +376,6 @@ void navSetup() {
 
   // préparation du fichier txt
   datalog("init", 0);
-
-  // switch off the led
-  delay(500);
-  digitalWrite(ledPin, LOW);
 }
 
 void navLoop() {
