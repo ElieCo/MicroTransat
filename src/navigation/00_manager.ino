@@ -1,4 +1,5 @@
 
+class DataBase;
 
 class Manager{
 
@@ -20,7 +21,11 @@ class Manager{
 
   void initInterval(int interval){
     m_runInterval = interval;
+  }
 
+  void setDB(DataBase * db){
+    m_db = db;
+  }
 
  protected:
 
@@ -36,6 +41,7 @@ class Manager{
   String m_name;
   int m_timer;
   int m_runInterval;
+  DataBase * m_db;
   
 };
 
