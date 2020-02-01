@@ -13,8 +13,8 @@ Servo aile;
 int pres_VMG = 40;
 int portant_VMG = 150;
 
-int pos1 = 80 - 10;
-int pos3 = 80 + 10;
+int pos1 = 80 + 10;
+int pos3 = 80 - 10;
 
 int ledPin = 13;                  // LED test pin
 int navLigth = 33;
@@ -188,7 +188,7 @@ void commande_barre( int angle){
   // L'entrée doit être comprise entre 0 et 360°. 0 correspond à face au vent
   if (angle <= 360 && angle >= 0){
     angle_regulateur = angle;
-    angle = angle/2+90; // on s'adapte a la course du servo (180°)
+    angle = (int)(((float)angle)/3.8+90); // on s'adapte a la course du servo (180°)
     // centrage des valeurs autour de 90° (pour qu'un 0 en entrée corresponde au milieu de la course du servo : 90)
     if (angle > 180){
       angle = angle - 180;
