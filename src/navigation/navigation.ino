@@ -367,7 +367,7 @@ void navSetup() {
   GPS_SERIAL.begin(9600);
 
   // init servo
-  barre.attach(4);
+  barre.attach(7);
   aile.attach(5);
 
   // init SD card
