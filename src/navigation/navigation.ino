@@ -72,7 +72,7 @@ void datalog(String var_name, int value){
             line += ";";
         }
         lines_buffer[index_buffer_lignes] = line;
-        // Serial1.println(line);
+        // Serial.println(line);
         index_buffer_lignes ++;
         //buf[sizeof(var_name_log)];  // reset buffer
     }
@@ -84,7 +84,7 @@ void datalog(String var_name, int value){
           line += var_name_log[i];
           line += ";";
       }
-      // Serial1.println(line);
+      // Serial.println(line);
       myFile.println(line);
       myFile.close();
     }
@@ -123,10 +123,10 @@ void logBat(){
   double battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
   datalog("Battery", battery_voltage * 100);
 
-  Serial1.print("Input value: ");
-  Serial1.println(input_voltage);
-  Serial1.print("Battery value: ");
-  Serial1.println(battery_voltage);
+  Serial.print("Input value: ");
+  Serial.println(input_voltage);
+  Serial.print("Battery value: ");
+  Serial.println(battery_voltage);
 }
 
 int filtrage_cap(int cap_instant){
