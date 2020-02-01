@@ -221,7 +221,7 @@ void mode_autonome(){
     first_loop = false;
     commande_barre(50); // on se met au près le temps d'avoir une bonne mesure du cap
     reglage_aile_auto(50);
-    Serial1.println("Début de mode autonome");
+    Serial.println("Début de mode autonome");
   }
 
   if (millis() - timer2 > interval_calcul){  // calcul toutes les 10 secondes
@@ -312,18 +312,19 @@ void lecture_gps(){
       course = float(gps.course())/100;
 
       hdop = gps.hdop();
-
-      /*
-      Serial1.print("lat: ");
-      Serial1.println(lat);
-      Serial1.print("lon: ");
-      Serial1.println(lon);
-      Serial1.print("course: ");
-      Serial1.println(course);
-      Serial1.print("speed: ");
-      Serial1.println(speed);
-      Serial1.println("====================");
-      */
+      
+      Serial.print("time: ");
+      Serial.println(time);
+      Serial.print("lat: ");
+      Serial.println(lat);
+      Serial.print("lon: ");
+      Serial.println(lon);
+      Serial.print("course: ");
+      Serial.println(course);
+      Serial.print("speed: ");
+      Serial.println(speed);
+      Serial.println("====================");
+      
 
       datalog("Vitesse",(int)(speed*100));
       datalog("Cap",(int) course);
@@ -353,7 +354,7 @@ void lecture_gps(){
 
 void navSetup() {
   // init serial debug
-  Serial1.begin(9600);
+  Serial.begin(9600);
 
   //switch on the led
   pinMode(ledPin, OUTPUT);       // Initialize LED pin
@@ -371,10 +372,10 @@ void navSetup() {
 
   // init SD card
   if (!SD.begin(BUILTIN_SDCARD)) {
-    Serial1.println("initialization carte SD : failed");
+    Serial.println("initialization carte SD : failed");
   }
   else {
-    Serial1.println("initialization carte SD : OK");
+    Serial.println("initialization carte SD : OK");
   }
 
   // préparation du fichier txt
