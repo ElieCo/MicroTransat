@@ -17,6 +17,7 @@ int pos1 = 80 - 10;
 int pos3 = 80 + 10;
 
 int ledPin = 13;                  // LED test pin
+int navLigth = 33;
 int current_mode = 0;
 int angle_regulateur;
 int cap_moyen;
@@ -357,6 +358,8 @@ void navSetup() {
   //switch on the led
   pinMode(ledPin, OUTPUT);       // Initialize LED pin
   digitalWrite(ledPin, HIGH);
+  pinMode(navLigth, OUTPUT);       // Initialize mast LED
+  digitalWrite(navLigth, HIGH);
   delay(1000);
   
   // initialisation GPS
