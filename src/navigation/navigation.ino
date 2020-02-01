@@ -13,8 +13,8 @@ Servo aile;
 int pres_VMG = 40;
 int portant_VMG = 150;
 
-int pos1 = 80 + 10;
-int pos3 = 80 - 10;
+int pos1 = 90 + 10;
+int pos3 = 90 - 10;
 
 int ledPin = 13;                  // LED test pin
 int navLigth = 33;
@@ -72,7 +72,7 @@ void datalog(String var_name, int value){
             line += ";";
         }
         lines_buffer[index_buffer_lignes] = line;
-        // Serial.println(line);
+        Serial.println(line);
         index_buffer_lignes ++;
         //buf[sizeof(var_name_log)];  // reset buffer
     }
@@ -84,7 +84,7 @@ void datalog(String var_name, int value){
           line += var_name_log[i];
           line += ";";
       }
-      // Serial.println(line);
+      //Serial.println(line);
       myFile.println(line);
       myFile.close();
     }
@@ -122,11 +122,11 @@ void logBat(){
   double input_voltage = double(value) * 5.0 / 1023;
   double battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
   datalog("Battery", battery_voltage * 100);
-
+/*
   Serial.print("Input value: ");
   Serial.println(input_voltage);
   Serial.print("Battery value: ");
-  Serial.println(battery_voltage);
+  Serial.println(battery_voltage);*/
 }
 
 int filtrage_cap(int cap_instant){
@@ -271,7 +271,7 @@ void mode_autonome(){
         nouvel_angle_regulateur = pres_VMG;
       }
     }
-
+    /* /!\ A deplacer pour ne jamais mettre le bateau dans des angles non prévus
     // Test du couloir
     boolean presence_couloir = test_couloir(20); //test_couloir() retourne true si le bateau est dans le couloir
     datalog("Presence_couloir",presence_couloir);
@@ -281,6 +281,7 @@ void mode_autonome(){
       }
     }
     hors_couloir = !presence_couloir;
+    */
 
     // application des consignes calculées sur les servos
     commande_barre(nouvel_angle_regulateur);
@@ -318,7 +319,7 @@ void lecture_gps(){
       gps.get_datetime(&date, &time, &fix_age);
       
       // returns speed in 100ths of a knot
-      speed = 0.51444444444*gps.speed()/100;
+      speed = gps.speed()/100;
       
       // course in 100ths of a degree
       course = float(gps.course())/100;
@@ -331,6 +332,8 @@ void lecture_gps(){
       Serial.println(lat);
       Serial.print("lon: ");
       Serial.println(lon);
+      Serial.print("Hdop: ");
+      Serial.println(hdop);
       Serial.print("course: ");
       Serial.println(course);
       Serial.print("speed: ");
