@@ -13,10 +13,11 @@ Servo aile;
 int pres_VMG = 40;
 int portant_VMG = 150;
 
-int pos1 = 80 - 10;
-int pos3 = 80 + 10;
+int pos1 = 80 + 10;
+int pos3 = 80 - 10;
 
 int ledPin = 13;                  // LED test pin
+int navLigth = 33;
 int current_mode = 0;
 int angle_regulateur;
 int cap_moyen;
@@ -26,8 +27,8 @@ boolean hors_couloir = true;
 // liste points GPS
 float distanceToWaypoint;
 double angleToWaypoint;
-float wp_lat[] = {48.431550, 48.430987};//{48.431643, 48.430960};// 0)quais 1) 100 mètres du quais NO
-float wp_lon[] = {-4.615716, -4.614247};//{-4.614617, -4.615505};//
+float wp_lat[] = {47.731775, 47.731042};
+float wp_lon[] = {-3.394241, -3.393050};
 unsigned int index_wpt = 0;              // index dans la liste des wpt
 int seuil_valid_wpt = 25;
 
@@ -45,7 +46,7 @@ unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Battery", "Heures","Minutes", "Secondes","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir", "Mode","Index_wpt", "Commentaire"};
+String var_name_log[] = {"Time","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir", "Mode","Index_wpt", "Commentaire"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -199,7 +200,7 @@ void commande_barre( int angle){
   // L'entrée doit être comprise entre 0 et 360°. 0 correspond à face au vent
   if (angle <= 360 && angle >= 0){
     angle_regulateur = angle;
-    angle = angle/2+90; // on s'adapte a la course du servo (180°)
+    angle = (int)(((float)angle)/3.8+90); // on s'adapte a la course du servo (180°)
     // centrage des valeurs autour de 90° (pour qu'un 0 en entrée corresponde au milieu de la course du servo : 90)
     if (angle > 180){
       angle = angle - 180;
@@ -232,7 +233,7 @@ void mode_autonome(){
     first_loop = false;
     commande_barre(50); // on se met au près le temps d'avoir une bonne mesure du cap
     reglage_aile_auto(50);
-    Serial1.println("Début de mode autonome");
+    Serial.println("Début de mode autonome");
   }
 
   if (millis() - timer2 > interval_calcul){  // calcul toutes les 10 secondes
@@ -323,18 +324,19 @@ void lecture_gps(){
       course = float(gps.course())/100;
 
       hdop = gps.hdop();
-
-      /*
-      Serial1.print("lat: ");
-      Serial1.println(lat);
-      Serial1.print("lon: ");
-      Serial1.println(lon);
-      Serial1.print("course: ");
-      Serial1.println(course);
-      Serial1.print("speed: ");
-      Serial1.println(speed);
-      Serial1.println("====================");
-      */
+      
+      Serial.print("time: ");
+      Serial.println(time);
+      Serial.print("lat: ");
+      Serial.println(lat);
+      Serial.print("lon: ");
+      Serial.println(lon);
+      Serial.print("course: ");
+      Serial.println(course);
+      Serial.print("speed: ");
+      Serial.println(speed);
+      Serial.println("====================");
+      
 
       datalog("Vitesse",(int)(speed*100));
       datalog("Cap",(int) course);
@@ -364,11 +366,13 @@ void lecture_gps(){
 
 void navSetup() {
   // init serial debug
-  Serial1.begin(9600);
+  Serial.begin(9600);
 
   //switch on the led
   pinMode(ledPin, OUTPUT);       // Initialize LED pin
   digitalWrite(ledPin, HIGH);
+  pinMode(navLigth, OUTPUT);       // Initialize mast LED
+  digitalWrite(navLigth, HIGH);
   delay(1000);
   
   // initialisation GPS
@@ -380,10 +384,10 @@ void navSetup() {
 
   // init SD card
   if (!SD.begin(BUILTIN_SDCARD)) {
-    Serial1.println("initialization carte SD : failed");
+    Serial.println("initialization carte SD : failed");
   }
   else {
-    Serial1.println("initialization carte SD : OK");
+    Serial.println("initialization carte SD : OK");
   }
 
   // préparation du fichier txt
