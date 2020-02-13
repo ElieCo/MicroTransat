@@ -3,6 +3,10 @@
 TinyGPS gps;
 #define GPS_SERIAL Serial2
 
+// Librairie Lora
+#include <RH_RF95.h>
+RH_RF95<HardwareSerial> lora(Serial4);
+
 #include <SD.h>
 #include <Servo.h> 
 
@@ -72,6 +76,7 @@ void datalog(String var_name, int value){
             line += ";";
         }
         lines_buffer[index_buffer_lignes] = line;
+        sendLora(line);
         Serial.println(line);
         index_buffer_lignes ++;
         //buf[sizeof(var_name_log)];  // reset buffer
@@ -106,6 +111,16 @@ void datalog(String var_name, int value){
       myFile.close();
       index_buffer_lignes = 0;
     }
+}
+
+void sendLora(String line)
+{
+  uint8_t data[150];
+  line.getBytes(data, 150);
+
+  lora.send(data, sizeof(data));
+ 
+  lora.waitPacketSent();
 }
 
 // récupère l'angle du régulateur d'allure, le cap et en déduis la direction du vent.
@@ -393,6 +408,15 @@ void navSetup() {
     Serial.println("initialization carte SD : OK");
   }
 
+  // init module Lora 
+  if (!lora.init()) {
+        Serial.println("initialisation Lora : failed");
+  }
+  else {
+    Serial.println("initialization Lora : OK");
+    lora.setFrequency(434.0);
+  }
+    
   // préparation du fichier txt
   datalog("init", 0);
 }
