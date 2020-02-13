@@ -200,13 +200,13 @@ void commande_barre( int angle){
   // L'entrée doit être comprise entre 0 et 360°. 0 correspond à face au vent
   if (angle <= 360 && angle >= 0){
     angle_regulateur = angle;
+    datalog("Angle_regulateur",angle);
     angle = (int)(((float)angle)/3.8+90); // on s'adapte a la course du servo (180°)
     // centrage des valeurs autour de 90° (pour qu'un 0 en entrée corresponde au milieu de la course du servo : 90)
     if (angle > 180){
       angle = angle - 180;
     }
     barre.write(angle);
-    datalog("Angle_regulateur",angle);
   }
   else {
     datalog("Angle_regulateur",404);
@@ -350,7 +350,7 @@ void lecture_gps(){
 
       datalog("HDOP",(int)(hdop*100));  // multiplié par 100 pour rester en int avec une bonne précision
       
-      if(hdop > 0 && hdop < 100){ // vérification la validité des données reçues avant de les exploiter
+      if(hdop > 0 && hdop < 150){ // vérification la validité des données reçues avant de les exploiter
         // Calcul du prochain waypoint si waypoint en cours atteint
         distanceToWaypoint = (float)TinyGPS::distance_between(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
         angleToWaypoint = TinyGPS::course_to(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
