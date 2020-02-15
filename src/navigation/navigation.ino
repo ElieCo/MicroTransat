@@ -215,12 +215,10 @@ void commande_barre( int angle){
   // L'entrée doit être comprise entre 0 et 360°. 0 correspond à face au vent
   if (angle <= 360 && angle >= 0){
     angle_regulateur = angle;
-    datalog("Angle_regulateur",angle);
-    angle = (int)(((float)angle)/3.8+90); // on s'adapte a la course du servo (180°)
     // centrage des valeurs autour de 90° (pour qu'un 0 en entrée corresponde au milieu de la course du servo : 90)
-    if (angle > 180){
-      angle = angle - 180;
-    }
+    if (angle > 180) angle -= 360;
+    datalog("Angle_regulateur",angle);
+    angle = (-((float)angle)*(180.0/170.0)*(21.0/35.0)/2)+90; // on s'adapte a la course du servo (180°)
     barre.write(angle);
   }
   else {
