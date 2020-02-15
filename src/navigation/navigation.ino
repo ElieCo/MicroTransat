@@ -184,6 +184,7 @@ boolean next_point(float dist){  // unité : mètres
     else {
       index_wpt = 0;
     }
+    datalog("Index_wpt", index_wpt);
     return true;
   }
   return false;
