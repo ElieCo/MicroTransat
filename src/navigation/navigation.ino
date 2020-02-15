@@ -17,8 +17,8 @@ Servo aile;
 int pres_VMG = 40;
 int portant_VMG = 150;
 
-int pos1 = 90 + 10;
-int pos3 = 90 - 10;
+int pos1 = 90 - 10;
+int pos3 = 90 + 10;
 
 int ledPin = 13;                  // LED test pin
 int navLigth = 33;
