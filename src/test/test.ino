@@ -120,19 +120,22 @@ bool testGPS(){
 }
 
 bool testServoBar(){
-  static int test_interval = 1000;
+  static int test_interval = 3000;
   static int test_timer = millis() - test_interval;
   if(millis() - test_timer < test_interval)
     return false;
   test_timer = millis();
   
   static int regulation_angle = 0;
-  static int step = 10;
+  static int step = 45;
   Serial1.print("regulation angle: ");
-  Serial1.println(regulation_angle);
-  barre.write(regulation_angle*(180.0/170.0));
+  Serial1.print(regulation_angle);
+  double real_angle = (-regulation_angle*(180.0/170.0)*(21.0/35.0)/2)+90;
+  Serial1.print("    ");
+  Serial1.println(real_angle);
+  barre.write(real_angle);
   regulation_angle += step;
-  if(regulation_angle > 170 || regulation_angle < 0){
+  if(regulation_angle > 90.0 || regulation_angle < -90.0){
     step = -step;
     regulation_angle += 2*step;
   }
