@@ -39,7 +39,6 @@ bool testNav_01(){
   test_timer = millis();
   
   timer2 = millis() + interval_calcul + 1;
-  index_wpt = 0;
 
   if(first_test_loop){
     initSimuMove(290, 50, interval_calcul);
@@ -51,6 +50,10 @@ bool testNav_01(){
   cap_moyen = course;
   angleToWaypoint = getSimuAngleToWaypoint();
   distanceToWaypoint = getSimuDistanceToWaypoint();
+  if (next_point(distanceToWaypoint)){
+    angleToWaypoint = getSimuAngleToWaypoint();
+    distanceToWaypoint = getSimuDistanceToWaypoint();
+  }
 
   mode_autonome();
   datalog("push", 0);

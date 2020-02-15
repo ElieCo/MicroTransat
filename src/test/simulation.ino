@@ -1,7 +1,6 @@
 
 float simu_wind_direction;
 float simu_dt;
-float simu_waypoint_lat, simu_waypoint_lon = 0;
 
 void debug(String s){
   Serial1.println(s);
@@ -24,8 +23,6 @@ void initSimuPos(float _lat, float _lon){
 }
 
 void initSimuWaypoint(float wlat, float wlon){
-  simu_waypoint_lat = wlat;
-  simu_waypoint_lon = wlon;
   wp_lat[1] = wlat;
   wp_lon[1] = wlon;
 }
@@ -63,11 +60,11 @@ void simuMove(){
 }
 
 float getSimuAngleToWaypoint(){
-  return TinyGPS::course_to(lat/1000000, lon/1000000, simu_waypoint_lat, simu_waypoint_lon);
+  return TinyGPS::course_to(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
 }
 
 
 float getSimuDistanceToWaypoint(){
-  return TinyGPS::distance_between(lat/1000000, lon/1000000, simu_waypoint_lat, simu_waypoint_lon);
+  return TinyGPS::distance_between(lat/1000000, lon/1000000, wp_lat[index_wpt], wp_lon[index_wpt]);
 }
 
