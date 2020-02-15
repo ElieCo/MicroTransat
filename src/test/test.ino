@@ -42,8 +42,8 @@ bool testNav_01(){
 
   if(first_test_loop){
     initSimuMove(290, 50, interval_calcul);
-    initSimuPos(47.731564, -3.393134);
-    initSimuWaypoint(47.732344, -3.395307);
+    initSimuPos(47.731775, -3.394241);
+    initSimuWaypoint(47.731042, -3.393050);
   }
   simuMove();
   
