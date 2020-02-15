@@ -92,6 +92,8 @@ void datalog(String var_name, int value){
       //Serial.println(line);
       myFile.println(line);
       myFile.close();
+      sendLora(line);
+      Serial.println(line);
     }
     else {
         // 1) Trouver la position de la variable dans la trame csv
