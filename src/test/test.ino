@@ -1,4 +1,4 @@
-#include "/home/elie/Projets/MicroTransat/src/navigation/navigation.ino"
+#include "/home/elie/Projets/Bateau/MicroTransat/src/navigation/navigation.ino"
 
 bool first_test_loop;
 
