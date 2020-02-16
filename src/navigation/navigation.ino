@@ -24,6 +24,9 @@ int ledPin = 13;                  // LED test pin
 int navLigth = 33;
 int current_mode = 0;
 int angle_regulateur;
+int smooth_angle = 0;
+int speed_rotation = 90; // deg/s
+int smooth_period = 100; // ms
 int cap_moyen;
 boolean first_loop = true;
 boolean hors_couloir = true;
@@ -44,13 +47,14 @@ unsigned long timer1;           // timer
 unsigned long timer2;           // interval de calcul cible
 unsigned long timer3;           // Temp entre deux ligne du datalogguer
 unsigned long timer4;           // Clignotement de la led
+unsigned long smooth_timer = millis();
 uint32_t timer_mesure = millis();
 unsigned long timer6;
 unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Battery","Time","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir", "Mode","Index_wpt", "Commentaire"};
+String var_name_log[] = {"Battery","Time","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir", "Mode","Index_wpt", "Commentaire"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -213,22 +217,6 @@ boolean test_couloir(int largeur){
   }
 }
 
-// Reçois un angle et l'adapte à la commande de barre avant de l'appliquer.
-void commande_barre( int angle){
-  // L'entrée doit être comprise entre 0 et 360°. 0 correspond à face au vent
-  if (angle <= 360 && angle >= 0){
-    angle_regulateur = angle;
-    // centrage des valeurs autour de 90° (pour qu'un 0 en entrée corresponde au milieu de la course du servo : 90)
-    if (angle > 180) angle -= 360;
-    datalog("Angle_regulateur",angle);
-    angle = (-((float)angle)*(180.0/170.0)*(21.0/35.0)/2)+90; // on s'adapte a la course du servo (180°)
-    barre.write(angle);
-  }
-  else {
-    datalog("Angle_regulateur",404);
-  }
-}
-
 void reglage_aile_auto(int angle3){
   if (angle3 < 180){   // La position de l'aile dépend de l'angle du régulateur
     datalog("Pos_aile",1);
@@ -237,6 +225,53 @@ void reglage_aile_auto(int angle3){
   else {
     datalog("Pos_aile",3);
     aile.write(pos3);
+  }
+}
+
+void smooth_bar(){
+  
+  if (millis() - smooth_timer < smooth_period) {
+    return;
+  }
+  smooth_timer = millis();
+
+  int angle_reg_centered = angle_regulateur;
+  if (angle_reg_centered > 180) angle_reg_centered -= 360;
+  
+  if ( angle_reg_centered != smooth_angle ) {
+    
+    int step = speed_rotation*float(smooth_period)/1000.0;
+    
+    if ( angle_reg_centered > smooth_angle + step ) {
+      smooth_angle += step;
+    } else if ( angle_reg_centered < smooth_angle - step ) {
+      smooth_angle -= step;
+    } else {
+      smooth_angle = angle_reg_centered;
+    }
+    
+    datalog("Asserv_regulateur", smooth_angle);
+    int angle = (-((float)smooth_angle)*(180.0/170.0)*(21.0/35.0)/2)+90; // on s'adapte a la course du servo (180°)
+    barre.write(angle);
+
+    int wing_angle = smooth_angle;
+    if ( wing_angle < 0 ) wing_angle += 360;
+    
+    reglage_aile_auto(wing_angle);
+  }
+}
+
+// Reçois un angle et l'adapte à la commande de barre avant de l'appliquer.
+void commande_barre( int angle){
+  // L'entrée doit être comprise entre 0 et 360°. 0 correspond à face au vent
+  if (angle <= 360 && angle >= 0){
+    angle_regulateur = angle;
+    // centrage des valeurs autour de 90° (pour qu'un 0 en entrée corresponde au milieu de la course du servo : 90)
+    if (angle > 180) angle -= 360;
+    datalog("Angle_regulateur",angle);
+  }
+  else {
+    datalog("Angle_regulateur",404);
   }
 }
 
@@ -301,7 +336,6 @@ void mode_autonome(){
 
     // application des consignes calculées sur les servos
     commande_barre(nouvel_angle_regulateur);
-    reglage_aile_auto(nouvel_angle_regulateur);
   }
 }
 
@@ -434,6 +468,8 @@ void navLoop() {
 
   datalog("Mode", 1);
   mode_autonome();
+
+  smooth_bar();
 
   logBat();
   

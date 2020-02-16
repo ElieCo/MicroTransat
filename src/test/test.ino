@@ -32,6 +32,8 @@ void loop(){
 }
 
 bool testNav_01(){
+  smooth_bar();
+  
   static int test_interval = 1000;
   static int test_timer = millis() - test_interval;
   if(millis() - test_timer < test_interval)
