@@ -14,8 +14,8 @@ File myFile;
 Servo barre;
 Servo aile;
 
-int pres_VMG = 40;
-int portant_VMG = 150;
+int pres_VMG = 30;
+int portant_VMG = 130;
 
 int pos1 = 90 - 10;
 int pos3 = 90 + 10;
