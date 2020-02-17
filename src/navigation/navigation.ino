@@ -140,7 +140,7 @@ int analyse_vent(int regulateur, int cap){
 
 void logBat(){
   int value = analogRead(A14);
-  double input_voltage = double(value) * 5.0 / 1023;
+  double input_voltage = double(value) * 3.3 / 1023;
   double battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
   datalog("Battery", battery_voltage * 100);
 /*
@@ -284,7 +284,7 @@ void mode_autonome(){
     first_loop = false;
     commande_barre(50); // on se met au près le temps d'avoir une bonne mesure du cap
     reglage_aile_auto(50);
-    Serial.println("Début de mode autonome");
+    Serial.println("Debut de mode autonome");
   }
 
   if (millis() - timer2 > interval_calcul){  // calcul toutes les 10 secondes
@@ -427,6 +427,7 @@ void navSetup() {
   pinMode(navLigth, OUTPUT);       // Initialize mast LED
   digitalWrite(navLigth, HIGH);
   delay(1000);
+  pinMode(A14, INPUT);
   
   // initialisation GPS
   GPS_SERIAL.begin(9600);
