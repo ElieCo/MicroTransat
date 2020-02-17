@@ -54,7 +54,7 @@ unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Battery","Time","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir", "Mode","Index_wpt", "Commentaire"};
+String var_name_log[] = {"Battery","Time","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir","Index_wpt"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -464,14 +464,12 @@ void navLoop() {
     timer_mesure = millis();
     cap_moyen = filtrage_cap((int)course);
     datalog("Cap_moy",cap_moyen);
+    logBat();
   }
-
-  datalog("Mode", 1);
+  
   mode_autonome();
 
   smooth_bar();
-
-  logBat();
   
   // Cadencement du dataloggeur et informations complémentaires
   if (millis() - timer3 > interval_datalogging) {
