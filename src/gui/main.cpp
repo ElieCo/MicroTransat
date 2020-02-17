@@ -14,6 +14,6 @@ int main(int argc, char *argv[])
     CommManager cm;
     cm.openSerialPort("/dev/ttyUSB0");
     cm.closeSerialPort();
-
+//
 //    return a.exec();
 }
