@@ -55,6 +55,7 @@ unsigned long interval_calcul = 10000;
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
 String var_name_log[] = {"Battery","Time","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir","Index_wpt"};
+String head;
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -88,16 +89,15 @@ void datalog(String var_name, int value){
 
     else if (var_name == "init") {  // initialisation de l'entête csv.
       myFile = SD.open("log.csv", FILE_WRITE);
-      String line;
       for (unsigned int i = 0; i < sizeof(var_name_log)/sizeof(var_name_log[0]); i++){
-          line += var_name_log[i];
-          line += ";";
+          head += var_name_log[i];
+          head += ";";
       }
       //Serial.println(line);
-      myFile.println(line);
+      myFile.println(head);
       myFile.close();
-      sendLora(line);
-      Serial.println(line);
+      sendLora(head);
+      Serial.println(head);
     }
     else {
         // 1) Trouver la position de la variable dans la trame csv
@@ -119,13 +119,19 @@ void datalog(String var_name, int value){
     }
 }
 
+void sendHeaderLora()
+{
+  uint8_t data[150];
+  head.getBytes(data, 150);
+  lora.send(data, sizeof(data));
+  lora.waitPacketSent();
+}
+
 void sendLora(String line)
 {
   uint8_t data[150];
   line.getBytes(data, 150);
-
   lora.send(data, sizeof(data));
- 
   lora.waitPacketSent();
 }
 
@@ -476,9 +482,6 @@ void navLoop() {
   if (millis() - timer3 > interval_datalogging) {
     timer3 = millis();
     datalog("push", 0);
+    sendHeaderLora();
   }
 }
-
-
-
-
