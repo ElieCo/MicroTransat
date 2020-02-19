@@ -121,16 +121,16 @@ void datalog(String var_name, int value){
 
 void sendHeaderLora()
 {
-  uint8_t data[150];
-  head.getBytes(data, 150);
+  uint8_t data[400];
+  head.getBytes(data, 400);
   lora.send(data, sizeof(data));
   lora.waitPacketSent();
 }
 
 void sendLora(String line)
 {
-  uint8_t data[150];
-  line.getBytes(data, 150);
+  uint8_t data[300];
+  line.getBytes(data, 300);
   lora.send(data, sizeof(data));
   lora.waitPacketSent();
 }
