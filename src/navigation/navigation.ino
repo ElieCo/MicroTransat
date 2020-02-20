@@ -55,7 +55,6 @@ unsigned long interval_calcul = 10000;
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
 String var_name_log[] = {"Battery","Time","HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude","Lat_next_point","Lon_next_point","Wpt_angle", "Wpt_dst","ecart_axe","Presence_couloir","Index_wpt"};
-String head;
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -81,23 +80,22 @@ void datalog(String var_name, int value){
             line += ";";
         }
         lines_buffer[index_buffer_lignes] = line;
-        sendLora(line);
-        Serial.println(line);
+        sendLora();
         index_buffer_lignes ++;
         //buf[sizeof(var_name_log)];  // reset buffer
     }
 
     else if (var_name == "init") {  // initialisation de l'entête csv.
       myFile = SD.open("log.csv", FILE_WRITE);
+      String line;
       for (unsigned int i = 0; i < sizeof(var_name_log)/sizeof(var_name_log[0]); i++){
-          head += var_name_log[i];
-          head += ";";
+          line += var_name_log[i];
+          line += ";";
       }
       //Serial.println(line);
-      myFile.println(head);
+      myFile.println(line);
       myFile.close();
-      sendLora(head);
-      Serial.println(head);
+      Serial.println(line);
     }
     else {
         // 1) Trouver la position de la variable dans la trame csv
@@ -119,20 +117,21 @@ void datalog(String var_name, int value){
     }
 }
 
-void sendHeaderLora()
+void sendLora()
 {
-  uint8_t data[400];
-  head.getBytes(data, 400);
-  lora.send(data, sizeof(data));
-  lora.waitPacketSent();
-}
-
-void sendLora(String line)
-{
-  uint8_t data[300];
-  line.getBytes(data, 300);
-  lora.send(data, sizeof(data));
-  lora.waitPacketSent();
+  for (unsigned int index_var = 0; index_var < (sizeof(var_name_log)/sizeof(var_name_log[0])); index_var ++){
+    String var_name = var_name_log[index_var];
+    String var_value = buf[index_var];
+    char separ = 0x1F;
+    String msg = var_name + separ + var_value;
+    
+    Serial.println(msg);
+    
+    uint8_t data[2 * msg.length()];
+    msg.getBytes(data, sizeof(data));
+    lora.send(data, sizeof(data));
+    lora.waitPacketSent();
+  }
 }
 
 // récupère l'angle du régulateur d'allure, le cap et en déduis la direction du vent.
@@ -482,6 +481,5 @@ void navLoop() {
   if (millis() - timer3 > interval_datalogging) {
     timer3 = millis();
     datalog("push", 0);
-    sendHeaderLora();
   }
 }
