@@ -43,7 +43,6 @@ void CommManager::decryptMsg(QString msg)
 {
     if(!msg.contains(";"))
         return;
-
     QStringList dataList = msg.split(";");
     bool isNotFirstLine = false;
     dataList[0].toInt(&isNotFirstLine);
@@ -51,7 +50,7 @@ void CommManager::decryptMsg(QString msg)
         for (int i = 0; i < dataList.length(); i++){
             m_serialData[m_firstLine[i]] = dataList[i].toInt();
         }
-    } else if(!isNotFirstLine && m_firstLine.length() == 0){
+    } else if(!isNotFirstLine){
         for (int i = 0; i < dataList.length(); i++){
             if (!dataList[i].contains("\n")){
                 m_serialData.insert(dataList[i], 0);
@@ -59,7 +58,7 @@ void CommManager::decryptMsg(QString msg)
             }
         }
     }
-    qDebug() << m_serialData;
+    //qDebug() << m_serialData;
 }
 
 void CommManager::readData()

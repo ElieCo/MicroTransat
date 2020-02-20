@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
     // lecture de fichier
     QString text;
-    QFile fichier("./MicroTransat/src/gui/resources/carte_lac.csv");
+    QFile fichier("D:/micro_transat/coque3/MicroTransat/src/gui/resources/carte_lac.csv");
 
     if(fichier.open(QIODevice::ReadOnly | QIODevice::Text))
     {
