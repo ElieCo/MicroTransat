@@ -41,24 +41,21 @@ void CommManager::closeSerialPort()
 
 void CommManager::decryptMsg(QString msg)
 {
-    if(!msg.contains(";"))
-        return;
-    QStringList dataList = msg.split(";");
-    bool isNotFirstLine = false;
-    dataList[0].toInt(&isNotFirstLine);
-    if (isNotFirstLine && m_firstLine.length() >= dataList.length()) {
-        for (int i = 0; i < dataList.length(); i++){
-            m_serialData[m_firstLine[i]] = dataList[i].toInt();
-        }
-    } else if(!isNotFirstLine){
-        for (int i = 0; i < dataList.length(); i++){
-            if (!dataList[i].contains("\n")){
-                m_serialData.insert(dataList[i], 0);
-                m_firstLine.append(dataList[i]);
-            }
-        }
+    QStringList dataList = msg.split(0x1F);
+    if (dataList.length() == 2){
+        m_serialData[dataList[0]] = dataList[1].toInt();
     }
-    //qDebug() << m_serialData;
+}
+
+int CommManager::getData(QString name)
+{
+    qDebug() << m_serialData[name];
+    if (m_serialData[name]){
+        return  m_serialData[name];
+    }
+    else {
+        return 404;
+    }
 }
 
 void CommManager::readData()

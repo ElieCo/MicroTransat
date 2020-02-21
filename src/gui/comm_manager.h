@@ -21,12 +21,12 @@ private:
     void decryptMsg(QString msg);
 
     QMap<QString, int> m_serialData;
-    QStringList m_firstLine;
     QSerialPort *m_serial;
     QString m_cache;
 
 public slots:
     void readData();
+    int getData(QString name);
 
 };
 

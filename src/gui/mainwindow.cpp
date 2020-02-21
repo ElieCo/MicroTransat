@@ -6,10 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
-    ui->tableView->alternatingRowColors();
-
-   // ui->setupUi(this);
+   ui->setupUi(this);
 }
 //=================================================================================
 MainWindow::~MainWindow()

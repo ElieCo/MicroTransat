@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QDebug>
+#include <QTimer>
 #include "mainwindow.h"
 #include "comm_manager.h"
 #include <QFile>
@@ -79,6 +80,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    CommManager cm;
+    cm.openSerialPort("//./COM6");
+
+    MainWindow test;
+
     // display window
     QGraphicsScene scene;
     scene.addText("Hello world !");
@@ -93,8 +99,9 @@ int main(int argc, char *argv[])
 
     //return app.exec();
 
-//    CommManager cm;
-//    cm.openSerialPort("//./COM6");
+    /*QTimer *timer = new QTimer();
+    timer->connect(timer, SIGNAL(timeout()),this, SLOT(cm.getData("Battery")));
+    timer->start(500);*/
 //    cm.closeSerialPort();
 //
     return a.exec();
