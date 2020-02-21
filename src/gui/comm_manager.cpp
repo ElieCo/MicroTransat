@@ -49,7 +49,6 @@ void CommManager::decryptMsg(QString msg)
 
 int CommManager::getData(QString name)
 {
-    qDebug() << m_serialData[name];
     if (m_serialData[name]){
         return  m_serialData[name];
     }

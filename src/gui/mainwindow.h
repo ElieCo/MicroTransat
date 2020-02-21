@@ -1,34 +1,20 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef HEADER_MAINWINDOW
+#define HEADER_MAINWINDOW
 
-#include <QMainWindow>
-#include <QtSerialPort/QSerialPort>
-
-#include <QString>
-#include <QMessageBox>
-#include <QDebug>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QSlider>
-
-namespace Ui {
-class MainWindow;
-}
+#include <QtWidgets>
+#include "comm_manager.h"
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+    public:
+    MainWindow();
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-public slots:
-
-private:
-  Ui::MainWindow *ui;
-
+    private:
+    QPolygon createBackground();
+    void updateView();
+    QGraphicsScene scene;
+    CommManager cm;
+    QGraphicsTextItem * label;
 };
 
-#endif // MAINWINDOW_H
+#endif
