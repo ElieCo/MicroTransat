@@ -1,22 +1,19 @@
 
-class DataBase;
-
-class Manager{
+class BaseManager{
 
  public:
  
-  Manager(){
+  BaseManager(){
     m_runInterval = 1000;
     m_timer = millis() - m_runInterval;
-    m_name = "Manager";
+    m_name = "BaseManager";
   }
-  ~Manager(){}
+  ~BaseManager(){}
 
 
   void run(){
     if (isNotTimeToRun()) return;
-
-    go();
+    else go();
   }
 
   void initInterval(unsigned long interval){
