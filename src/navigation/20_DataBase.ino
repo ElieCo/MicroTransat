@@ -7,9 +7,11 @@ using namespace std;
 #define MAP_TYPE(type) std::map<std::string, type>
 
 #define GET_AND_SET(type)                                 \
-        void getData(string name, type &data) {           \
-          if (VAR_NAME(type).count(name))                 \
+        bool getData(string name, type &data) {           \
+          if (VAR_NAME(type).count(name)) {               \
             data = VAR_NAME(type)[name];                  \
+            return true;                                  \
+          } else return false;                            \
         }                                                 \
         void setData(string name, type data) {            \
           VAR_NAME(type)[name] = data;                    \
@@ -43,6 +45,8 @@ class DataBase {
         ADD_TO_MAP_AS_STRING(map_string, String)
         ADD_TO_MAP_AS_STRING(map_string, int)
         ADD_TO_MAP_AS_STRING(map_string, float)
+
+        return map_string;
     }
 
   private:
