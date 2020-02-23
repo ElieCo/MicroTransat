@@ -8,7 +8,9 @@ class ServoMotor
     m_pin = pin;
     m_servo.attach(m_pin);
   }
-  ~ServoMotor(){}
+  ~ServoMotor(){
+    m_servo.detach();
+  }
 
   void write(int angle){
     m_servo.write(angle);
