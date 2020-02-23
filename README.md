@@ -1,1 +1,1 @@
-# MiniTransat
+# MicroTransat
