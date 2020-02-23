@@ -3,10 +3,10 @@ class BaseManager{
 
  public:
  
-  BaseManager(unsigned long inter = 1000){
+  BaseManager(String name = "BaseManager", unsigned long inter = 1000){
     m_runInterval = inter;
     m_timer = millis() - m_runInterval;
-    m_name = "BaseManager";
+    m_name = name;
   }
   ~BaseManager(){}
 
