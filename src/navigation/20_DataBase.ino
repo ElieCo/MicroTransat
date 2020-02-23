@@ -36,6 +36,8 @@ class DataBase {
     GET_AND_SET(String)
     GET_AND_SET(string)
     GET_AND_SET(int)
+    GET_AND_SET(unsigned)
+    GET_AND_SET(long)
     GET_AND_SET(float)
 
     std::map<string, string> getAllData(){
@@ -44,6 +46,8 @@ class DataBase {
         ADD_TO_MAP(map_string, string)
         ADD_TO_MAP_AS_STRING(map_string, String)
         ADD_TO_MAP_AS_STRING(map_string, int)
+        ADD_TO_MAP_AS_STRING(map_string, unsigned)
+        ADD_TO_MAP_AS_STRING(map_string, long)
         ADD_TO_MAP_AS_STRING(map_string, float)
 
         return map_string;
@@ -54,6 +58,8 @@ class DataBase {
     MAP(String)
     MAP(string)
     MAP(int)
+    MAP(unsigned)
+    MAP(long)
     MAP(float)
 };
 
