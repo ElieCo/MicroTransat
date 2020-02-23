@@ -3,8 +3,8 @@ class BaseManager{
 
  public:
  
-  BaseManager(){
-    m_runInterval = 1000;
+  BaseManager(unsigned long inter = 1000){
+    m_runInterval = inter;
     m_timer = millis() - m_runInterval;
     m_name = "BaseManager";
   }
