@@ -19,7 +19,7 @@ class Manager{
     go();
   }
 
-  void initInterval(int interval){
+  void initInterval(unsigned long interval){
     m_runInterval = interval;
   }
 
@@ -43,8 +43,8 @@ class Manager{
   }
 
   String m_name;
-  int m_timer;
-  int m_runInterval;
+  unsigned long m_timer;
+  unsigned long m_runInterval;
   DataBase * m_db;
   
 };
