@@ -1,6 +1,6 @@
 
 
-class ServoBar : public ServoMotor
+class BarManager : public BaseManager
 {
  protected:
   void go(){
