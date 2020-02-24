@@ -13,8 +13,17 @@ class MainWindow : public QMainWindow
     QPolygon createBackground();
     void updateView();
     QGraphicsScene scene;
+    QGraphicsView * view;
+    QGraphicsLineItem * ligne1;
+    QGraphicsLineItem * ligne2;
     CommManager cm;
-    QGraphicsTextItem * label;
+    QGraphicsTextItem * label_hdop;
+    QGraphicsTextItem * label_speed;
+    QGraphicsTextItem * label_reg_angle;
+    QGraphicsTextItem * label_battery;
+    int lat_ofset;
+    int lon_ofset;
+    int scale;
 };
 
 #endif

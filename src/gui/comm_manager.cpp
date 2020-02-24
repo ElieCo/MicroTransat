@@ -49,7 +49,7 @@ void CommManager::decryptMsg(QString msg)
 
 int CommManager::getData(QString name)
 {
-    if (m_serialData[name]){
+    if (m_serialData.contains(name)){
         return  m_serialData[name];
     }
     else {

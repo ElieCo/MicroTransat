@@ -47,9 +47,9 @@ QPolygon MainWindow::createBackground(){
             }
          }
 
-         int lat_ofset = (lat_max - lat_min)/2 + lat_min;
-         int lon_ofset = (lon_max - lon_min)/2 + lon_min;
-         int scale = 0;
+         lat_ofset = (lat_max - lat_min)/2 + lat_min;
+         lon_ofset = (lon_max - lon_min)/2 + lon_min;
+         scale = 0;
          if (lat_min - lat_max > lon_min - lon_max){
              scale = (lat_max - lat_min)/200;
          }
@@ -70,8 +70,17 @@ QPolygon MainWindow::createBackground(){
 
 void MainWindow::updateView()
 {
-    qDebug() << cm.getData("battery");
-    label->setPlainText(QString("Pouf"));
+    label_hdop->setPlainText("HDOP : " + QString::number(cm.getData("HDOP")));
+    label_speed->setPlainText("Speed : " + QString::number(cm.getData("Vitesse")));
+    label_reg_angle->setPlainText("Reg angle : " + QString::number(cm.getData("Angle_regulateur")));
+    label_battery->setPlainText("Battery : " + QString::number(cm.getData("Battery")));
+    int lat = cm.getData("Latittude");
+    int lon = cm.getData("Longitude");
+
+    if (lat != 404 && lon != 404){
+    ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
+    ligne2->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale-5, (lon-lon_ofset)/scale, -(lat-lat_ofset)/scale+5);
+    }
 }
 
 MainWindow::MainWindow()
@@ -85,12 +94,25 @@ MainWindow::MainWindow()
     scene.addPolygon(fond_carte);
     scene.addText("Lac du ter");
 
-    label = new QGraphicsTextItem();
-    label->setPos(50, 50);
-    scene.addItem(label);
-    label->setPlainText(QString("Pif"));
+    ligne1 = scene.addLine(QLine(-5,0,5,0));
+    ligne2 = scene.addLine(QLine(0,-5,0,5));
 
-    QGraphicsView * view = new QGraphicsView(&scene);
+    label_hdop = new QGraphicsTextItem();
+    label_speed = new QGraphicsTextItem();
+    label_reg_angle = new QGraphicsTextItem();
+    label_battery = new QGraphicsTextItem();
+
+    label_hdop->setPos(-200, 100);
+    label_speed->setPos(-100, 100);
+    label_reg_angle->setPos(0, 100);
+    label_battery->setPos(100, 100);
+
+    scene.addItem(label_hdop);
+    scene.addItem(label_speed);
+    scene.addItem(label_reg_angle);
+    scene.addItem(label_battery);
+
+    view = new QGraphicsView(&scene);
     view->show();
 
     QFormLayout *layout = new QFormLayout;
