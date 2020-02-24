@@ -451,7 +451,7 @@ void navSetup() {
   }
 
   // init module Lora
-  initLora = lora.init()
+  initLora = lora.init();
   if (!initLora) {
     Serial.println("initialisation Lora : failed");
   }
