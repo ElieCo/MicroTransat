@@ -31,6 +31,8 @@ int cap_moyen;
 boolean first_loop = true;
 boolean hors_couloir = true;
 
+boolean initLora = false;
+
 // liste points GPS
 float distanceToWaypoint;
 double angleToWaypoint;
@@ -119,16 +121,18 @@ void datalog(String var_name, int value) {
 
 void sendLora()
 {
-  for (unsigned int index_var = 0; index_var < (sizeof(var_name_log) / sizeof(var_name_log[0])); index_var ++) {
-    String var_name = var_name_log[index_var];
-    String var_value = buf[index_var];
-    char separ = 0x1F;
-    String msg = var_name + separ + var_value;
-
-    uint8_t data[2 * msg.length()];
-    msg.getBytes(data, sizeof(data));
-    lora.send(data, sizeof(data));
-    lora.waitPacketSent();
+  if (initLora){
+    for (unsigned int index_var = 0; index_var < (sizeof(var_name_log) / sizeof(var_name_log[0])); index_var ++) {
+      String var_name = var_name_log[index_var];
+      String var_value = buf[index_var];
+      char separ = 0x1F;
+      String msg = var_name + separ + var_value;
+  
+      uint8_t data[2 * msg.length()];
+      msg.getBytes(data, sizeof(data));
+      lora.send(data, sizeof(data));
+      lora.waitPacketSent();
+    }
   }
 }
 
@@ -447,7 +451,8 @@ void navSetup() {
   }
 
   // init module Lora
-  if (!lora.init()) {
+  initLora = lora.init()
+  if (!initLora) {
     Serial.println("initialisation Lora : failed");
   }
   else {
