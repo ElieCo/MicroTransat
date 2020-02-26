@@ -428,7 +428,7 @@ void lecture_gps() {
         else {
           int last_point = (sizeof(wp_lat) / sizeof(float)) - 1;
           datalog("Lat_prev_point", int(wp_lat[last_point] * 1000000));
-          datalog("Lon_prev_point", int(wp_lat[last_point] * 1000000));
+          datalog("Lon_prev_point", int(wp_lon[last_point] * 1000000));
         }
       }
     }
