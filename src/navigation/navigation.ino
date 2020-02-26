@@ -57,7 +57,7 @@ unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"};
+String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -205,6 +205,7 @@ boolean next_point(float dist) { // unité : mètres
 
 // paramètre : largeur du couloir de bord à bord. Return : true si le bateau est dans le couloir, false sinon
 boolean test_couloir(int largeur) {
+  datalog("Corridor_width", largeur);
   // calcul de l'axe du parcours
   float axe_parcours;
   if (index_wpt < (sizeof(wp_lat) / sizeof(float)) - 1) {
@@ -418,6 +419,17 @@ void lecture_gps() {
         datalog("Wpt_dst", distanceToWaypoint);
         datalog("Lat_next_point", int(wp_lat[index_wpt] * 1000000));
         datalog("Lon_next_point", int(wp_lon[index_wpt] * 1000000));
+
+        // log the coordonates of the previous waypoint
+        if (index_wpt > 0){
+          datalog("Lat_prev_point", int(wp_lat[index_wpt-1] * 1000000));
+          datalog("Lon_prev_point", int(wp_lat[index_wpt-1] * 1000000));
+        }
+        else {
+          int last_point = (sizeof(wp_lat) / sizeof(float)) - 1;
+          datalog("Lat_prev_point", int(wp_lat[last_point] * 1000000));
+          datalog("Lon_prev_point", int(wp_lat[last_point] * 1000000));
+        }
       }
     }
   }
@@ -476,7 +488,6 @@ void navLoop() {
   }
 
   mode_autonome();
-
   smooth_bar();
 
   // Cadencement du dataloggeur et informations complémentaires
