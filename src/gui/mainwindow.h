@@ -20,8 +20,12 @@ class MainWindow : public QMainWindow
     QGraphicsView * view;
     QGraphicsLineItem * ligne1;
     QGraphicsLineItem * ligne2;
-    QGraphicsEllipseItem * wpt_circle;
-    QGraphicsTextItem * label_wpt;
+    QGraphicsLineItem * ligne3;
+
+    QGraphicsEllipseItem * wpt_circle1;
+    QGraphicsEllipseItem * wpt_circle2;
+    QGraphicsTextItem * label_wpt1;
+    QGraphicsTextItem * label_wpt2;
 
     CommManager cm;
 
@@ -30,6 +34,8 @@ class MainWindow : public QMainWindow
     QLabel * longitude;
     QLabel * lat_next_point;
     QLabel * lon_next_point;
+    QLabel * lat_prev_point;
+    QLabel * lon_prev_point;
     QLabel * wpt_angle;
     QLabel * wpt_dist;
     QLabel * Index_wpt;
@@ -41,6 +47,7 @@ class MainWindow : public QMainWindow
     QLabel * winglet_pos;
     QLabel * battery;
 
+    QLabel * corridor_width;
     QLabel * ecart_axe;
     QLabel * Presence_couloir;
 

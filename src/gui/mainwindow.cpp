@@ -75,6 +75,8 @@ void MainWindow::updateView()
     longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));
     lat_next_point->setText("lat_next_point : " + QString::number(cm.getData("Lat_next_point")));
     lon_next_point->setText("lon_next_point : " + QString::number(cm.getData("Lon_next_point")));
+    lat_prev_point->setText("lat_prev_point : " + QString::number(cm.getData("Lat_prev_point")));
+    lon_prev_point->setText("lon_prev_point : " + QString::number(cm.getData("Lon_prev_point")));
     wpt_angle->setText("wpt_angle : " + QString::number(cm.getData("Wpt_angle")));
     wpt_dist->setText("wpt_dist : " + QString::number(cm.getData("Wpt_dst")));
     Index_wpt->setText("Index_wpt : " + QString::number(cm.getData("Index_wpt")));
@@ -86,6 +88,7 @@ void MainWindow::updateView()
     winglet_pos->setText("winglet_pos : " + QString::number(cm.getData("Pos_aile")));
     battery->setText("battery : " + QString::number(cm.getData("Battery")));
 
+    corridor_width->setText("corridor_width : " + QString::number(cm.getData("Corridor_width")));
     ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("ecart_axe")));
     Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("Presence_couloir")));
 
@@ -94,6 +97,8 @@ void MainWindow::updateView()
     int lon = cm.getData("Longitude");
     int lat_next_p = cm.getData("Lat_next_point");
     int lon_next_p = cm.getData("Lon_next_point");
+    int lat_prev_p = cm.getData("Lat_prev_point");
+    int lon_prev_p = cm.getData("Lon_prev_point");
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
     ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
@@ -101,8 +106,13 @@ void MainWindow::updateView()
     }
 
     if (lat_next_p != 404 && lon_next_p != 404 && lat_next_p != 0 && lon_next_p != 0){
-       wpt_circle->setPos((lon_next_p-lon_ofset)/scale, -(lat_next_p-lat_ofset)/scale);
-       label_wpt->setPos((lon_next_p-lon_ofset)/scale, -20-(lat_next_p-lat_ofset)/scale);
+       wpt_circle1->setPos(-2.5+(lon_next_p-lon_ofset)/scale, -2.5-(lat_next_p-lat_ofset)/scale);
+       label_wpt1->setPos((lon_next_p-lon_ofset)/scale, -20-(lat_next_p-lat_ofset)/scale);
+        if (lat_prev_p != 404 && lon_prev_p != 404 && lat_prev_p != 0 && lon_prev_p != 0){
+           wpt_circle2->setPos(-2.5+(lon_prev_p-lon_ofset)/scale, -2.5-(lat_prev_p-lat_ofset)/scale);
+           label_wpt2->setPos((lon_prev_p-lon_ofset)/scale, -20-(lat_prev_p-lat_ofset)/scale);
+           ligne3->setLine((lon_next_p-lon_ofset)/scale, -(lat_next_p-lat_ofset)/scale, (lon_prev_p-lon_ofset)/scale, -(lat_prev_p-lat_ofset)/scale);
+        }
     }
 }
 
@@ -120,26 +130,32 @@ void MainWindow::setVarDisplay(QGridLayout * layout)
     grid->addWidget(lat_next_point,3,0);
     lon_next_point= new QLabel();
     grid->addWidget(lon_next_point,4,0);
+    lat_prev_point= new QLabel();
+    grid->addWidget(lat_prev_point,5,0);
+    lon_prev_point= new QLabel();
+    grid->addWidget(lon_prev_point,6,0);
     wpt_angle = new QLabel();
-    grid->addWidget(wpt_angle,5,0);
+    grid->addWidget(wpt_angle,7,0);
     wpt_dist = new QLabel();
-    grid->addWidget(wpt_dist,6,0);
+    grid->addWidget(wpt_dist,8,0);
     Index_wpt = new QLabel();
-    grid->addWidget(Index_wpt,7,0);
+    grid->addWidget(Index_wpt,9,0);
     speed = new QLabel();
-    grid->addWidget(speed,8,0);
+    grid->addWidget(speed,10,0);
     heading = new QLabel();
-    grid->addWidget(heading,9,0);
+    grid->addWidget(heading,11,0);
     reg_angle = new QLabel();
-    grid->addWidget(reg_angle,10,0);
+    grid->addWidget(reg_angle,12,0);
     winglet_pos = new QLabel();
-    grid->addWidget(winglet_pos,11,0);
+    grid->addWidget(winglet_pos,13,0);
     battery = new QLabel();
-    grid->addWidget(battery,12,0);
+    grid->addWidget(battery,14,0);
+    corridor_width = new QLabel();
+    grid->addWidget(corridor_width,15,0);
     ecart_axe = new QLabel();
-    grid->addWidget(ecart_axe,13,0);
+    grid->addWidget(ecart_axe,16,0);
     Presence_couloir = new QLabel();
-    grid->addWidget(Presence_couloir,14,0);
+    grid->addWidget(Presence_couloir,17,0);
 
     layout->addLayout(grid,0,0);
 }
@@ -153,15 +169,17 @@ MainWindow::MainWindow()
     // lecture de fichier
     QPolygon fond_carte = createBackground();
     scene.addPolygon(fond_carte);
-    scene.addText("Lac du ter");
 
     // draw the cross representing the boat
     ligne1 = scene.addLine(QLine(-5,0,5,0));
     ligne2 = scene.addLine(QLine(0,-5,0,5));
 
     // draw the circle for the first wpt
-    label_wpt = scene.addText("next wpt");
-    wpt_circle = scene.addEllipse(0,0,10,10);
+    label_wpt1 = scene.addText("next wpt");
+    wpt_circle1 = scene.addEllipse(0,0,10,10);
+    label_wpt2 = scene.addText("prev wpt");
+    wpt_circle2 = scene.addEllipse(0,0,10,10);
+    ligne3 = scene.addLine(QLine(0,1,0,2));
 
     view = new QGraphicsView(&scene);
     view->show();
