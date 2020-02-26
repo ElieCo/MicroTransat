@@ -10,17 +10,40 @@ class MainWindow : public QMainWindow
     MainWindow();
 
     private:
+
     QPolygon createBackground();
     void updateView();
+    void setVarDisplay(QGridLayout  *);
+
+
     QGraphicsScene scene;
     QGraphicsView * view;
     QGraphicsLineItem * ligne1;
     QGraphicsLineItem * ligne2;
+    QGraphicsEllipseItem * wpt_circle;
+    QGraphicsTextItem * label_wpt;
+
     CommManager cm;
-    QGraphicsTextItem * label_hdop;
-    QGraphicsTextItem * label_speed;
-    QGraphicsTextItem * label_reg_angle;
-    QGraphicsTextItem * label_battery;
+
+    QLabel * hdop;
+    QLabel * latittude;
+    QLabel * longitude;
+    QLabel * lat_next_point;
+    QLabel * lon_next_point;
+    QLabel * wpt_angle;
+    QLabel * wpt_dist;
+    QLabel * Index_wpt;
+
+    QLabel * speed;
+    QLabel * heading;
+
+    QLabel * reg_angle;
+    QLabel * winglet_pos;
+    QLabel * battery;
+
+    QLabel * ecart_axe;
+    QLabel * Presence_couloir;
+
     int lat_ofset;
     int lon_ofset;
     int scale;
