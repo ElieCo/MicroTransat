@@ -405,7 +405,7 @@ void lecture_gps() {
       datalog("Date", (int)(date));
       datalog("Time", (int)(time));
 
-      datalog("HDOP", (int)(hdop * 100)); // multiplié par 100 pour rester en int avec une bonne précision
+      datalog("HDOP", (int)hdop);
 
       if (hdop > 0 && hdop < 500) { // vérification la validité des données reçues avant de les exploiter
         // Calcul du prochain waypoint si waypoint en cours atteint
