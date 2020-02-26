@@ -21,11 +21,15 @@ class MainWindow : public QMainWindow
     QGraphicsLineItem * ligne1;
     QGraphicsLineItem * ligne2;
     QGraphicsLineItem * ligne3;
+    QGraphicsLineItem * cap;
+    QGraphicsLineItem * wind;
 
     QGraphicsEllipseItem * wpt_circle1;
     QGraphicsEllipseItem * wpt_circle2;
     QGraphicsTextItem * label_wpt1;
     QGraphicsTextItem * label_wpt2;
+    QGraphicsTextItem * label_cap;
+    QGraphicsTextItem * label_wind;
 
     CommManager cm;
 

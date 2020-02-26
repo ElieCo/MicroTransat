@@ -106,12 +106,36 @@ void MainWindow::updateView()
     }
 
     if (lat_next_p != 404 && lon_next_p != 404 && lat_next_p != 0 && lon_next_p != 0){
-       wpt_circle1->setPos(-2.5+(lon_next_p-lon_ofset)/scale, -2.5-(lat_next_p-lat_ofset)/scale);
-       label_wpt1->setPos((lon_next_p-lon_ofset)/scale, -20-(lat_next_p-lat_ofset)/scale);
+        wpt_circle1->setPos(-2.5+(lon_next_p-lon_ofset)/scale, -2.5-(lat_next_p-lat_ofset)/scale);
+        label_wpt1->setPos((lon_next_p-lon_ofset)/scale, -20-(lat_next_p-lat_ofset)/scale);
+
         if (lat_prev_p != 404 && lon_prev_p != 404 && lat_prev_p != 0 && lon_prev_p != 0){
            wpt_circle2->setPos(-2.5+(lon_prev_p-lon_ofset)/scale, -2.5-(lat_prev_p-lat_ofset)/scale);
            label_wpt2->setPos((lon_prev_p-lon_ofset)/scale, -20-(lat_prev_p-lat_ofset)/scale);
            ligne3->setLine((lon_next_p-lon_ofset)/scale, -(lat_next_p-lat_ofset)/scale, (lon_prev_p-lon_ofset)/scale, -(lat_prev_p-lat_ofset)/scale);
+        }
+
+        int heading_ = cm.getData("Cap");
+        if (heading_ != 404)
+        {
+            label_cap->setPos(sin(M_PI*heading_/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*heading_/180)*40-(lat-lat_ofset)/scale);
+            cap->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale, sin(M_PI*heading_/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*heading_/180)*40-(lat-lat_ofset)/scale);
+        }
+        int wind_angle = cm.getData("Angle_regulateur");
+        if (wind_angle != 404)
+        {
+            if (wind_angle < 0){
+                wind_angle += 180;
+            }
+            wind_angle += heading_;
+
+            if (wind_angle > 360)
+            {
+                wind_angle -= 360;
+            }
+
+            label_wind->setPos(sin(M_PI*wind_angle/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*wind_angle/180)*40-(lat-lat_ofset)/scale);
+            wind->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale, sin(M_PI*wind_angle/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*wind_angle/180)*40-(lat-lat_ofset)/scale);
         }
     }
 }
@@ -173,6 +197,11 @@ MainWindow::MainWindow()
     // draw the cross representing the boat
     ligne1 = scene.addLine(QLine(-5,0,5,0));
     ligne2 = scene.addLine(QLine(0,-5,0,5));
+
+    label_cap = scene.addText("heading");
+    cap = scene.addLine(QLine(0,0,0,1));
+    label_wind = scene.addText("supposed wind direction");
+    wind = scene.addLine(QLine(0,0,0,1));
 
     // draw the circle for the first wpt
     label_wpt1 = scene.addText("next wpt");
