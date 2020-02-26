@@ -376,7 +376,7 @@ void lecture_gps() {
       gps.get_datetime(&date, &time, &fix_age);
 
       // returns speed in 100ths of a knot
-      speed = gps.speed() / 100;
+      speed = gps.speed();
 
       // course in 100ths of a degree
       course = float(gps.course()) / 100;
@@ -398,7 +398,7 @@ void lecture_gps() {
       Serial.println("====================");
 
 
-      datalog("Vitesse", (int)(speed * 100));
+      datalog("Vitesse", (int)speed);
       datalog("Cap", (int) course);
       datalog("Latittude", (int)(lat));
       datalog("Longitude", (int)(lon));
