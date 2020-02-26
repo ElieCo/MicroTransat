@@ -423,7 +423,7 @@ void lecture_gps() {
         // log the coordonates of the previous waypoint
         if (index_wpt > 0){
           datalog("Lat_prev_point", int(wp_lat[index_wpt-1] * 1000000));
-          datalog("Lon_prev_point", int(wp_lat[index_wpt-1] * 1000000));
+          datalog("Lon_prev_point", int(wp_lon[index_wpt-1] * 1000000));
         }
         else {
           int last_point = (sizeof(wp_lat) / sizeof(float)) - 1;
