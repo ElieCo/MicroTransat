@@ -74,3 +74,8 @@ void CommManager::readData()
         m_cache += data.split('\r')[0];
     }
 }
+
+void CommManager::send(QString text)
+{
+    m_serial->write(text.toStdString().c_str());
+}

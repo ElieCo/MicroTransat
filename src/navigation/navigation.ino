@@ -52,7 +52,7 @@ unsigned long timer4 = 0;           // Clignotement de la led
 unsigned long timer5 = 0;           // Envoie de trames Lora
 unsigned long smooth_timer = millis();
 uint32_t timer_mesure = millis();
-unsigned long timer6;
+unsigned long timer6 = millis();
 unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
@@ -136,6 +136,32 @@ void sendLora()
   }
 }
 
+void receiveLora(){
+  if (initLora){
+    // reception de message via lora  
+    Serial.println(millis());
+    if(lora.available())  // waiting for a response 
+    {
+      Serial.println(millis());
+      uint8_t buf[10];
+      uint8_t len = sizeof(buf);
+      if(lora.recv(buf, &len))
+      {
+          String msg = String((char *)buf);
+          Serial.print("Lora received : ");
+          Serial.println(String((char *)buf));
+          if (msg == "pif"){
+            Serial.println("gagne !!!");
+          }
+      }
+      else
+      {
+          Serial.println("recv failed");
+      }
+    }
+  }
+}
+
 // récupère l'angle du régulateur d'allure, le cap et en déduis la direction du vent.
 int analyse_vent(int regulateur, int cap) {
   int estim = cap - regulateur;
@@ -150,11 +176,6 @@ void logBat() {
   double input_voltage = double(value) * 3.3 / 1023;
   double battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
   datalog("Battery", battery_voltage * 100);
-  /*
-    Serial.print("Input value: ");
-    Serial.println(input_voltage);
-    Serial.print("Battery value: ");
-    Serial.println(battery_voltage);*/
 }
 
 int filtrage_cap(int cap_instant) {
@@ -383,7 +404,7 @@ void lecture_gps() {
 
       hdop = gps.hdop();
 
-      Serial.print("time: ");
+      /*Serial.print("time: ");
       Serial.println(time);
       Serial.print("lat: ");
       Serial.println(lat);
@@ -395,7 +416,7 @@ void lecture_gps() {
       Serial.println(course);
       Serial.print("speed: ");
       Serial.println(speed);
-      Serial.println("====================");
+      Serial.println("====================");*/
 
 
       datalog("Vitesse", (int)speed);
@@ -496,8 +517,13 @@ void navLoop() {
     datalog("push", 0);
   }
 
-  if (millis() - timer5 > 10000) {
+  if (millis() - timer5 > 1000) {
     timer5 = millis();
-    sendLora();
+    //sendLora();
+  }
+  
+  if (millis() - timer6 > 200) {
+    timer6 = millis();
+    receiveLora();
   }
 }

@@ -15,6 +15,8 @@ public:
     ~CommManager();
 
     void openSerialPort(QString nameport);
+    void send(QString text);
+    int getData(QString name);
     void closeSerialPort();
 
 private:
@@ -26,7 +28,6 @@ private:
 
 public slots:
     void readData();
-    int getData(QString name);
 
 };
 

@@ -51,7 +51,7 @@ QPolygon MainWindow::createBackground(){
          lon_ofset = (lon_max - lon_min)/2 + lon_min;
          scale = 0;
          if (lat_min - lat_max > lon_min - lon_max){
-             scale = (lat_max - lat_min)/200;
+             scale = (lat_max - lat_min)/500;
          }
          else {
              scale = (lon_max - lon_min)/200;
@@ -101,16 +101,16 @@ void MainWindow::updateView()
     int lon_prev_p = cm.getData("Lon_prev_point");
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
-    ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
-    ligne2->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale-5, (lon-lon_ofset)/scale, -(lat-lat_ofset)/scale+5);
+        ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
+        ligne2->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale-5, (lon-lon_ofset)/scale, -(lat-lat_ofset)/scale+5);
     }
 
     if (lat_next_p != 404 && lon_next_p != 404 && lat_next_p != 0 && lon_next_p != 0){
-        wpt_circle1->setPos(-2.5+(lon_next_p-lon_ofset)/scale, -2.5-(lat_next_p-lat_ofset)/scale);
+        wpt_circle1->setPos(-2.5+(lon_next_p-lon_ofset)/scale, -5-(lat_next_p-lat_ofset)/scale);
         label_wpt1->setPos((lon_next_p-lon_ofset)/scale, -20-(lat_next_p-lat_ofset)/scale);
 
         if (lat_prev_p != 404 && lon_prev_p != 404 && lat_prev_p != 0 && lon_prev_p != 0){
-           wpt_circle2->setPos(-2.5+(lon_prev_p-lon_ofset)/scale, -2.5-(lat_prev_p-lat_ofset)/scale);
+           wpt_circle2->setPos(-2.5+(lon_prev_p-lon_ofset)/scale, -5-(lat_prev_p-lat_ofset)/scale);
            label_wpt2->setPos((lon_prev_p-lon_ofset)/scale, -20-(lat_prev_p-lat_ofset)/scale);
            ligne3->setLine((lon_next_p-lon_ofset)/scale, -(lat_next_p-lat_ofset)/scale, (lon_prev_p-lon_ofset)/scale, -(lat_prev_p-lat_ofset)/scale);
         }
@@ -184,6 +184,24 @@ void MainWindow::setVarDisplay(QGridLayout * layout)
     layout->addLayout(grid,0,0);
 }
 
+void MainWindow::setButtonDisplay(QGridLayout * layout)
+{
+    QGridLayout * grid = new QGridLayout();
+
+    test_button = new QPushButton("My Button", this);
+    test_button->setGeometry(QRect(QPoint(100, 100),QSize(200, 50)));
+    connect(test_button, SIGNAL (released()), this, SLOT (handleButton()));
+    grid->addWidget(test_button);
+
+    layout->addLayout(grid,0,1);
+}
+
+void MainWindow::handleButton()
+{
+   test_button->setText("Example");
+   cm.send("pif");
+}
+
 MainWindow::MainWindow()
 {
     QWidget *zoneCentrale = new QWidget;
@@ -216,8 +234,9 @@ MainWindow::MainWindow()
     QGridLayout  *layout = new QGridLayout();
 
     setVarDisplay(layout);
+    setButtonDisplay(layout);
 
-    layout->addWidget(view,1,2);
+    layout->addWidget(view,1,1);
     zoneCentrale->setLayout(layout);
     setCentralWidget(zoneCentrale);
 

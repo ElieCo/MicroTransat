@@ -6,15 +6,18 @@
 
 class MainWindow : public QMainWindow
 {
+        Q_OBJECT
     public:
     MainWindow();
 
-    private:
+    private slots:
+    void handleButton();
 
+    private:
     QPolygon createBackground();
     void updateView();
-    void setVarDisplay(QGridLayout  *);
-
+    void setVarDisplay(QGridLayout *);
+    void setButtonDisplay(QGridLayout *);
 
     QGraphicsScene scene;
     QGraphicsView * view;
@@ -30,6 +33,8 @@ class MainWindow : public QMainWindow
     QGraphicsTextItem * label_wpt2;
     QGraphicsTextItem * label_cap;
     QGraphicsTextItem * label_wind;
+
+    QPushButton * test_button;
 
     CommManager cm;
 
