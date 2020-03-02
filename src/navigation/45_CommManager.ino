@@ -7,6 +7,7 @@ class CommManager : public BaseManager
   void go(){
     // check received messages
     String msg_rcv = m_lora.receive();
+    m_db->setData("Msg_received", msg_rcv);
 
     // send message
     std::map<string, string> data = m_db->getAllData();
