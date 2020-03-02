@@ -10,10 +10,17 @@ class BaseManager{
   }
   ~BaseManager(){}
 
+  void init(){
+    print("Init manager:", m_name);
+  }
 
   void run(){
     if (isNotTimeToRun()) return;
     else go();
+  }
+
+  void stop(){
+    print("Stop manager:", m_name);
   }
 
   void initInterval(unsigned long interval){
