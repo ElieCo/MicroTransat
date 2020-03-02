@@ -6,15 +6,18 @@ using namespace std;
 
 #define MAP_TYPE(type) std::map<std::string, type>
 
-#define GET_AND_SET(type)                                 \
-        bool getData(string name, type &data) {           \
-          if (VAR_NAME(type).count(name)) {               \
-            data = VAR_NAME(type)[name];                  \
-            return true;                                  \
-          } else return false;                            \
-        }                                                 \
-        void setData(string name, type data) {            \
-          VAR_NAME(type)[name] = data;                    \
+#define GET_AND_SET(type)                                             \
+        bool getData(string name, type &data) {                       \
+          if (VAR_NAME(type).count(name)) {                           \
+            data = VAR_NAME(type)[name];                              \
+            return true;                                              \
+          } else {                                                    \
+            print("Error: try to get non valid data:", name.c_str()); \
+            return false;                                             \
+          }                                                           \
+        }                                                             \
+        void setData(string name, type data) {                        \
+          VAR_NAME(type)[name] = data;                                \
         }
 
 #define MAP(type) MAP_TYPE(type) VAR_NAME(type);
