@@ -43,7 +43,6 @@ void loop()
 {
   String courrier = "";
   // lecture des données venants du port série
-  delay(100);
   if (Serial.available() > 0) {
     courrier = Serial.readString();
   }
@@ -56,13 +55,14 @@ void loop()
   courrier.getBytes(data, sizeof(data));
   rf95.send(data, sizeof(data));
   rf95.waitPacketSent();
-  
+  delay(200);
   if(rf95.available())
   { 
+    digitalWrite(led, HIGH);
     uint8_t buf[400];
     uint8_t len = sizeof(buf);
     if(rf95.recv(buf, &len))
-    {
+    { 
         digitalWrite(led, HIGH);
         ShowSerial.println((char*)buf);
     }
@@ -70,6 +70,7 @@ void loop()
     {
         ShowSerial.println("recv failed");
     }
+    digitalWrite(led, LOW);
   }
 }
 

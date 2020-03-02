@@ -31,7 +31,9 @@ int cap_moyen;
 boolean first_loop = true;
 boolean hors_couloir = true;
 
-boolean initLora = false;
+boolean init_lora = false;
+boolean send_log = false;
+int index_log = 0;
 
 // liste points GPS
 float distanceToWaypoint;
@@ -119,40 +121,45 @@ void datalog(String var_name, int value) {
   }
 }
 
-void sendLora()
+void sendLog()
 {
-  if (initLora){
-    for (unsigned int index_var = 0; index_var < (sizeof(var_name_log) / sizeof(var_name_log[0])); index_var ++) {
-      String var_name = var_name_log[index_var];
-      String var_value = buf[index_var];
-      char separ = 0x1F;
-      String msg = var_name + separ + var_value;
-  
-      uint8_t data[2 * msg.length()];
-      msg.getBytes(data, sizeof(data));
-      lora.send(data, sizeof(data));
-      lora.waitPacketSent();
-    }
+  String var_name = var_name_log[index_log];
+  String var_value = buf[index_log];
+  char separ = 0x1F;
+  String msg = var_name + separ + var_value;
+
+  uint8_t data[2 * msg.length()];
+  Serial.print("la teensy envoie : ");
+  Serial.println(msg);
+  msg.getBytes(data, sizeof(data));
+  lora.send(data, sizeof(data));
+  lora.waitPacketSent();
+
+  index_log ++;
+  if ( index_log == (sizeof(var_name_log) / sizeof(var_name_log[0])))
+  {
+    index_log = 0;
+    send_log = false;
   }
 }
 
 void receiveLora(){
-  if (initLora){
+  if (init_lora){
     // reception de message via lora  
-    Serial.println(millis());
     if(lora.available())  // waiting for a response 
     {
-      Serial.println(millis());
       uint8_t buf[10];
       uint8_t len = sizeof(buf);
       if(lora.recv(buf, &len))
       {
           String msg = String((char *)buf);
-          Serial.print("Lora received : ");
-          Serial.println(String((char *)buf));
           if (msg == "pif"){
-            Serial.println("gagne !!!");
+            send_log= true;
           }
+          // gestion des choix 
+              if (send_log){
+                sendLog();
+              }
       }
       else
       {
@@ -484,8 +491,8 @@ void navSetup() {
   }
 
   // init module Lora
-  initLora = lora.init();
-  if (!initLora) {
+  init_lora = lora.init();
+  if (!init_lora) {
     Serial.println("initialisation Lora : failed");
   }
   else {
@@ -516,14 +523,6 @@ void navLoop() {
     timer3 = millis();
     datalog("push", 0);
   }
-
-  if (millis() - timer5 > 1000) {
-    timer5 = millis();
-    //sendLora();
-  }
   
-  if (millis() - timer6 > 200) {
-    timer6 = millis();
-    receiveLora();
-  }
+  receiveLora();  
 }

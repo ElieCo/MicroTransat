@@ -60,10 +60,12 @@ int CommManager::getData(QString name)
 void CommManager::readData()
 {
     QByteArray data = m_serial->readAll();
+    qDebug()<<"brut : " << data;
     if (data.contains("\n")) {
         if (data.contains("\r")){
             m_cache += data.split('\r')[0];
         }
+        qDebug()<< "contenu final : " << m_cache;
         decryptMsg(m_cache);
         m_cache = data.split('\n').last();
     }
