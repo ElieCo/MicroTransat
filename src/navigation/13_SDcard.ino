@@ -20,7 +20,7 @@ class SDcard
     m_file = SD.open("log.csv", FILE_WRITE);
   }
 
-  void write(String line){
+  void log(String line){
     m_file.println(line);
   }
 
