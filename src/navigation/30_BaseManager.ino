@@ -27,7 +27,7 @@ class BaseManager{
  protected:
 
   void go(){
-    print("Manager start:", m_name);
+    print("Run manager:", m_name);
   }
 
   bool isNotTimeToRun(){
