@@ -4,7 +4,6 @@
 class MissionManager : public BaseManager
 {
   public:
-  MissionManager(){}
   ~MissionManager(){}
 
   void go(){
