@@ -31,6 +31,12 @@ void CommManager::openSerialPort(QString nameport)
           m_serial->setParity(QSerialPort::NoParity);
           m_serial->setDataBits(QSerialPort::Data8);
           m_serial->setFlowControl(QSerialPort::NoFlowControl);
+
+          // definition de la liste des entrée (oui c'est un peu caca)
+          header = QStringList({"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"});
+          for (int i=0; i<header.size(); i++){
+              m_serialData.insert(header.at(i), 0);
+          }
      }
 }
 
@@ -41,9 +47,11 @@ void CommManager::closeSerialPort()
 
 void CommManager::decryptMsg(QString msg)
 {
-    QStringList dataList = msg.split(0x1F);
-    if (dataList.length() == 2){
-        m_serialData[dataList[0]] = dataList[1].toInt();
+    if(!msg.contains(";"))
+            return;
+    QStringList dataList = msg.split(";");
+    for (int i = 0; i < dataList.length(); i++){
+        m_serialData[header.at(i)] = dataList[i].toInt();
     }
 }
 
@@ -60,13 +68,12 @@ int CommManager::getData(QString name)
 void CommManager::readData()
 {
     QByteArray data = m_serial->readAll();
-    qDebug()<<"brut : " << data;
     if (data.contains("\n")) {
         if (data.contains("\r")){
             m_cache += data.split('\r')[0];
         }
-        qDebug()<< "contenu final : " << m_cache;
         decryptMsg(m_cache);
+        qDebug() << m_cache;
         m_cache = data.split('\n').last();
     }
     else if (!data.contains('\r')){

@@ -54,18 +54,25 @@ void loop()
   uint8_t data[2 * courrier.length()];
   courrier.getBytes(data, sizeof(data));
 
+  //unsigned long t = millis();
+  //Serial.println("message pret pour envoi");
   rf95.send(data, sizeof(data));
   rf95.waitPacketSent();
+
+  //Serial.print("message envoye en : ");
+  //Serial.println(millis()-t);
   
-  if(rf95.waitAvailableTimeout(1000))
+  if(rf95.waitAvailableTimeout(500))
   { 
     digitalWrite(led, HIGH);
-    uint8_t buf[400];
+    uint8_t buf[200];
     uint8_t len = sizeof(buf);
     if(rf95.recv(buf, &len))
     { 
         digitalWrite(led, HIGH);
         ShowSerial.println((char*)buf);
+        //Serial.print("message recu en : ");
+        //Serial.println(millis() - t);
     }
     else
     {

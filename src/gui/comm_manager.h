@@ -25,6 +25,7 @@ private:
     QMap<QString, int> m_serialData;
     QSerialPort *m_serial;
     QString m_cache;
+    QStringList header;
 
 public slots:
     void readData();

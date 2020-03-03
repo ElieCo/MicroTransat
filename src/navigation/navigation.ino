@@ -65,6 +65,8 @@ int buf[sizeof(var_name_log)];
 int index_buffer_lignes = 0;
 int taille_buffer_lignes = 10;
 String lines_buffer[10];
+String header;
+String line;
 
 // GPS data
 float lat, lon;
@@ -78,8 +80,8 @@ unsigned long hdop;
 void datalog(String var_name, int value) {
 
   if (var_name == "push") {
+    line = "";
     // 4) Sur appel du mot clef "push", copier le buffer dans la carte sd. Et clear buffer.
-    String line;
     for (unsigned int i = 0; i < sizeof(var_name_log) / sizeof(var_name_log[0]) - 1; i++) {
       line += buf[i];
       line += ";";
@@ -91,11 +93,12 @@ void datalog(String var_name, int value) {
 
   else if (var_name == "init") {  // initialisation de l'entête csv.
     myFile = SD.open("log.csv", FILE_WRITE);
-    String line;
+    line = "";
     for (unsigned int i = 0; i < sizeof(var_name_log) / sizeof(var_name_log[0]); i++) {
       line += var_name_log[i];
       line += ";";
     }
+    header = line;
     //Serial.println(line);
     myFile.println(line);
     myFile.close();
@@ -121,25 +124,14 @@ void datalog(String var_name, int value) {
   }
 }
 
-void sendLog()
+void sendLog(String msg)
 {
-  String var_name = var_name_log[index_log];
-  String var_value = buf[index_log];
-  char separ = 0x1F;
-  String msg = var_name + separ + var_value;
-
+  
   uint8_t data[2 * msg.length()];
 
   msg.getBytes(data, sizeof(data));
   lora.send(data, sizeof(data));
   lora.waitPacketSent();
-
-  index_log ++;
-  if ( index_log == (sizeof(var_name_log) / sizeof(var_name_log[0])))
-  {
-    index_log = 0;
-    send_log = false;
-  }
 }
 
 void receiveLora(){
@@ -152,13 +144,21 @@ void receiveLora(){
       if(lora.recv(buf, &len))
       {
           String msg = String((char *)buf);
-          if (msg == "pif"){
-            send_log= true;
+          Serial.println(msg);
+          if (msg == "log"){
+            send_log = true;
           }
-          // gestion des choix 
-              if (send_log){
-                sendLog();
-              }
+      }
+      if (send_log){
+        if (index_log == 0){
+          index_log ++;
+          sendLog(line.substring(0,50));
+        }
+        else {
+          index_log = 0;
+          send_log = false;
+          sendLog(line.substring(80));
+        }
       }
       else
       {

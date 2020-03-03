@@ -199,7 +199,7 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
 void MainWindow::handleButton()
 {
    test_button->setText("Example");
-   cm.send("pif");
+   cm.send("log");
 }
 
 MainWindow::MainWindow()
