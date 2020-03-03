@@ -53,10 +53,11 @@ void loop()
   // send a witchever message to allow the boat to respond
   uint8_t data[2 * courrier.length()];
   courrier.getBytes(data, sizeof(data));
+
   rf95.send(data, sizeof(data));
   rf95.waitPacketSent();
-  delay(200);
-  if(rf95.available())
+  
+  if(rf95.waitAvailableTimeout(1000))
   { 
     digitalWrite(led, HIGH);
     uint8_t buf[400];
@@ -70,6 +71,7 @@ void loop()
     {
         ShowSerial.println("recv failed");
     }
+      
     digitalWrite(led, LOW);
   }
 }

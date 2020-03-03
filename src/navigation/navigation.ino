@@ -59,7 +59,7 @@ unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"};
+String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -129,8 +129,7 @@ void sendLog()
   String msg = var_name + separ + var_value;
 
   uint8_t data[2 * msg.length()];
-  Serial.print("la teensy envoie : ");
-  Serial.println(msg);
+
   msg.getBytes(data, sizeof(data));
   lora.send(data, sizeof(data));
   lora.waitPacketSent();
@@ -523,6 +522,6 @@ void navLoop() {
     timer3 = millis();
     datalog("push", 0);
   }
-  
+ 
   receiveLora();  
 }
