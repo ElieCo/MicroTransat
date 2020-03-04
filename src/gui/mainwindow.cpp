@@ -70,6 +70,7 @@ QPolygon MainWindow::createBackground(){
 
 void MainWindow::updateView()
 {
+    cm.send("log");
     hdop->setText("HDOP : " + QString::number(cm.getData("HDOP")));
     latittude->setText("latittude : " + QString::number(cm.getData("Latittude")));
     longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));

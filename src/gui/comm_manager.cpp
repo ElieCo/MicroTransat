@@ -1,4 +1,5 @@
 #include "comm_manager.h"
+#include "QTimer"
 
 CommManager::CommManager(QObject *parent)
     : QObject(parent)
@@ -26,7 +27,7 @@ void CommManager::openSerialPort(QString nameport)
    else
      {
          qDebug() << "Port open "+nameport;
-          m_serial->setBaudRate(QSerialPort::Baud9600);
+          m_serial->setBaudRate(QSerialPort::Baud115200);
           m_serial->setStopBits(QSerialPort::OneStop);
           m_serial->setParity(QSerialPort::NoParity);
           m_serial->setDataBits(QSerialPort::Data8);
@@ -68,19 +69,17 @@ int CommManager::getData(QString name)
 void CommManager::readData()
 {
     QByteArray data = m_serial->readAll();
-    if (data.contains("\n")) {
-        if (data.contains("\r")){
-            m_cache += data.split('\r')[0];
-        }
+    if (data.contains('~')){   // fin du message detectee
+        m_cache += data;
+        m_cache.remove(QChar('\r'), Qt::CaseInsensitive);
+        m_cache.remove(QChar('\n'), Qt::CaseInsensitive);
+        m_cache.remove(QChar('~'), Qt::CaseInsensitive);
         decryptMsg(m_cache);
         qDebug() << m_cache;
-        m_cache = data.split('\n').last();
-    }
-    else if (!data.contains('\r')){
-        m_cache += data;
+        m_cache = "";
     }
     else {
-        m_cache += data.split('\r')[0];
+        m_cache += data;
     }
 }
 

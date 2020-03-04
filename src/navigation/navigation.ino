@@ -124,9 +124,11 @@ void datalog(String var_name, int value) {
   }
 }
 
-void sendLog(String msg)
+void sendLog(String msg, boolean end_communication)
 {
-  
+  if (end_communication){
+    msg = msg + '~';
+  }
   uint8_t data[2 * msg.length()];
 
   msg.getBytes(data, sizeof(data));
@@ -145,24 +147,24 @@ void receiveLora(){
       {
           String msg = String((char *)buf);
           Serial.println(msg);
-          if (msg == "log"){
+          if (msg.indexOf("log")>= 0){
             send_log = true;
           }
-      }
-      if (send_log){
-        if (index_log == 0){
-          index_log ++;
-          sendLog(line.substring(0,50));
-        }
-        else {
-          index_log = 0;
-          send_log = false;
-          sendLog(line.substring(80));
-        }
       }
       else
       {
           Serial.println("recv failed");
+      }
+      if (send_log){
+        if (index_log == 0){
+          index_log ++;
+          sendLog(line.substring(0,50), false);
+        }
+        else {
+          index_log = 0;
+          send_log = false;
+          sendLog(line.substring(50), true);
+        }
       }
     }
   }
