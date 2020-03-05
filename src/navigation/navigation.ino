@@ -141,15 +141,18 @@ void sendLora()
 }
 
 void manage_led(){
-  if (gps_ready) {
-    digitalWrite(ledPin, HIGH);
-  } else {
-    if (led_timer - millis() > led_blink){
-      led_timer = millis();
+  if (led_timer - millis() > led_blink){
+    led_timer = millis();
+    
+    if (gps_ready) {
+      digitalWrite(ledPin, HIGH);
+      led_on = true;
+    } else {
       if (led_on) digitalWrite(ledPin, LOW);
       else digitalWrite(ledPin, HIGH);
       led_on = !led_on;
     }
+    
   }
 }
 
