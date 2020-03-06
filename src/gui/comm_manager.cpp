@@ -51,8 +51,10 @@ void CommManager::decryptMsg(QString msg)
     if(!msg.contains(";"))
             return;
     QStringList dataList = msg.split(";");
-    for (int i = 0; i < dataList.length(); i++){
-        m_serialData[header.at(i)] = dataList[i].toInt();
+    if (dataList.length() == header.length()){
+        for (int i = 0; i < header.length(); i++){
+            m_serialData[header.at(i)] = dataList[i].toInt();
+        }
     }
 }
 
@@ -85,5 +87,6 @@ void CommManager::readData()
 
 void CommManager::send(QString text)
 {
+    m_serial->flush();
     m_serial->write(text.toStdString().c_str());
 }

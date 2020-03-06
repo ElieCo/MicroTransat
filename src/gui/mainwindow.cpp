@@ -58,7 +58,6 @@ QPolygon MainWindow::createBackground(){
          }
 
          for (int i = 0; i < lat.length(); i++){
-             //qDebug() << lon[i] << "   " << scale << "   " << lon_ofset;
              fond_carte << QPoint((lon[i]-lon_ofset)/scale, -(lat[i]-lat_ofset)/scale);
          }
     }
@@ -189,18 +188,28 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
 {
     QGridLayout * grid = new QGridLayout();
 
+    val_selection = new QSpinBox();
+    val_selection->setMaximum(99999999);
+    val_selection->setMinimum(0);
+    connect(val_selection, SIGNAL (valueChanged(int)), this, SLOT (update_val(int)));
+    grid->addWidget(val_selection,0,0);
+
     test_button = new QPushButton("My Button", this);
     test_button->setGeometry(QRect(QPoint(100, 100),QSize(200, 50)));
     connect(test_button, SIGNAL (released()), this, SLOT (handleButton()));
-    grid->addWidget(test_button);
+    grid->addWidget(test_button,0,1);
 
     layout->addLayout(grid,0,1);
 }
 
+void MainWindow::update_val(int i){
+        qDebug()<< "valeur de la box : "<< i;
+}
 void MainWindow::handleButton()
 {
    test_button->setText("Example");
-   cm.send("log");
+   qDebug()<< "valeur de la box : "<< val_selection->value();
+   cm.send(QString::number(val_selection->value()));
 }
 
 MainWindow::MainWindow()

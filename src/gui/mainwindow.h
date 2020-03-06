@@ -12,6 +12,7 @@ class MainWindow : public QMainWindow
 
     private slots:
     void handleButton();
+    void update_val(int);
 
     private:
     QPolygon createBackground();
@@ -35,6 +36,7 @@ class MainWindow : public QMainWindow
     QGraphicsTextItem * label_wind;
 
     QPushButton * test_button;
+    QSpinBox * val_selection;
 
     CommManager cm;
 
