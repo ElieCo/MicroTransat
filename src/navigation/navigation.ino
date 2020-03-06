@@ -21,6 +21,8 @@ int pos1 = 90 - 10;
 int pos3 = 90 + 10;
 
 int ledPin = 13;                  // LED test pin
+bool led_on = false;
+int led_blink = 1000;
 int navLigth = 33;
 int current_mode = 0;
 int angle_regulateur;
@@ -54,7 +56,8 @@ unsigned long timer4 = 0;           // Clignotement de la led
 unsigned long timer5 = 0;           // Envoie de trames Lora
 unsigned long smooth_timer = millis();
 uint32_t timer_mesure = millis();
-unsigned long timer6 = millis();
+unsigned long timer6;
+unsigned long led_timer = millis();
 unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
@@ -75,6 +78,7 @@ float speed, course;
 unsigned long chars;
 unsigned short sentences, failed_checksum;
 unsigned long hdop;
+bool gps_ready=false;
 
 // fonction de data logging
 void datalog(String var_name, int value) {
@@ -167,6 +171,22 @@ void receiveLora(){
         }
       }
     }
+  }
+}
+
+void manage_led(){
+  if (led_timer - millis() > led_blink){
+    led_timer = millis();
+    
+    if (gps_ready) {
+      digitalWrite(ledPin, HIGH);
+      led_on = true;
+    } else {
+      if (led_on) digitalWrite(ledPin, LOW);
+      else digitalWrite(ledPin, HIGH);
+      led_on = !led_on;
+    }
+    
   }
 }
 
@@ -435,6 +455,8 @@ void lecture_gps() {
       datalog("Time", (int)(time));
 
       datalog("HDOP", (int)hdop);
+      
+      gps_ready = false;
 
       if (hdop > 0 && hdop < 500) { // vérification la validité des données reçues avant de les exploiter
         // Calcul du prochain waypoint si waypoint en cours atteint
@@ -459,6 +481,8 @@ void lecture_gps() {
           datalog("Lat_prev_point", int(wp_lat[last_point] * 1000000));
           datalog("Lon_prev_point", int(wp_lon[last_point] * 1000000));
         }
+
+        gps_ready = true;
       }
     }
   }
@@ -508,6 +532,8 @@ void navSetup() {
 void navLoop() {
   // Read GPS data
   lecture_gps();
+
+  manage_led();
 
   if (millis() - timer_mesure > 1000) { // cadencement 1 Hz
     timer_mesure = millis();
