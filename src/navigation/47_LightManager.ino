@@ -1,0 +1,7 @@
+
+
+class LightManager : public BaseManager
+{
+  
+};
+
