@@ -62,7 +62,7 @@ unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"};
+String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt", "Gps_recent_data"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
@@ -79,6 +79,7 @@ unsigned long chars;
 unsigned short sentences, failed_checksum;
 unsigned long hdop;
 bool gps_ready=false;
+bool gps_recent_data = false;
 
 // fonction de data logging
 void datalog(String var_name, int value) {
@@ -410,6 +411,8 @@ void lecture_gps() {
 
   if (GPS_SERIAL.available()) {
 
+    gps_recent_data = true;
+
     char c = GPS_SERIAL.read();
     if (gps.encode(c))
     {
@@ -547,6 +550,8 @@ void navLoop() {
 
   // Cadencement du dataloggeur et informations complémentaires
   if (millis() - timer3 > interval_datalogging) {
+    datalog("Gps_recent_data", gps_recent_data);
+    gps_recent_data = false;
     timer3 = millis();
     datalog("push", 0);
   }
