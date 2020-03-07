@@ -39,6 +39,8 @@ void loop(){
 }
 
 bool testNav_01(){
+  smooth_bar();
+  
   static int test_interval = 1000;
   static int test_timer = millis() - test_interval;
   if(millis() - test_timer < test_interval)
@@ -46,18 +48,21 @@ bool testNav_01(){
   test_timer = millis();
   
   timer2 = millis() + interval_calcul + 1;
-  index_wpt = 0;
 
   if(first_test_loop){
     initSimuMove(290, 50, interval_calcul);
-    initSimuPos(47.731564, -3.393134);
-    initSimuWaypoint(47.732344, -3.395307);
+    initSimuPos(47.731775, -3.394241);
+    initSimuWaypoint(47.731042, -3.393050);
   }
   simuMove();
   
   cap_moyen = course;
   angleToWaypoint = getSimuAngleToWaypoint();
   distanceToWaypoint = getSimuDistanceToWaypoint();
+  if (next_point(distanceToWaypoint)){
+    angleToWaypoint = getSimuAngleToWaypoint();
+    distanceToWaypoint = getSimuDistanceToWaypoint();
+  }
 
   mode_autonome();
   datalog("push", 0);
@@ -124,19 +129,22 @@ bool testGPS(){
 }
 
 bool testServoBar(){
-  static int test_interval = 1000;
+  static int test_interval = 3000;
   static int test_timer = millis() - test_interval;
   if(millis() - test_timer < test_interval)
     return false;
   test_timer = millis();
   
   static int regulation_angle = 0;
-  static int step = 10;
+  static int step = 45;
   Serial1.print("regulation angle: ");
-  Serial1.println(regulation_angle);
-  barre.write(regulation_angle*(180.0/170.0));
+  Serial1.print(regulation_angle);
+  double real_angle = (-regulation_angle*(180.0/170.0)*(21.0/35.0)/2)+90;
+  Serial1.print("    ");
+  Serial1.println(real_angle);
+  barre.write(real_angle);
   regulation_angle += step;
-  if(regulation_angle > 170 || regulation_angle < 0){
+  if(regulation_angle > 90.0 || regulation_angle < -90.0){
     step = -step;
     regulation_angle += 2*step;
   }
