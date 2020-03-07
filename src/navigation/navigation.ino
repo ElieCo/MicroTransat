@@ -176,7 +176,7 @@ void receiveLora(){
 }
 
 void manage_led(){
-  if (led_timer - millis() > led_blink){
+  if (millis() - led_timer > led_blink){
     led_timer = millis();
     
     if (gps_ready) {
