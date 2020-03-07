@@ -6,6 +6,8 @@ class SensorsManager: public BaseManager
   ~SensorsManager(){}
 
   void go(){
+
+    // Manage GPS
     m_gps.updateGpsData();
 
     m_db->setData("Latitude", m_gps.lat);
@@ -19,8 +21,14 @@ class SensorsManager: public BaseManager
     m_db->setData("Sentences", m_gps.sentences);
     m_db->setData("Failed_checksum", m_gps.failed_checksum);
     m_db->setData("HDOP", int(m_gps.hdop));
+
+    // Manage battery
+    double bat_val = m_bat.getValue();
+
+    m_db->setData("Battery", bat_val);
   }
 
   Gps m_gps;
+  Battery m_bat;
 };
 
