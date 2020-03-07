@@ -1,19 +1,20 @@
-#include <QGuiApplication>
-#include <QDebug>
 
+#include <QApplication>
+
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QDebug>
 #include "mainwindow.h"
 
-#include "comm_manager.h"
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
-//    MainWindow w;
-//    w.show();
+    QApplication a(argc, argv);
 
-    CommManager cm;
-    cm.openSerialPort("/dev/ttyUSB0");
-    cm.closeSerialPort();
+    MainWindow window;
+    window.show();
 
-//    return a.exec();
+    //    cm.closeSerialPort();
+//
+    return a.exec();
 }

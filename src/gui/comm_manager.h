@@ -15,15 +15,17 @@ public:
     ~CommManager();
 
     void openSerialPort(QString nameport);
+    void send(QString text);
+    int getData(QString name);
     void closeSerialPort();
 
 private:
     void decryptMsg(QString msg);
 
     QMap<QString, int> m_serialData;
-    QStringList m_firstLine;
     QSerialPort *m_serial;
     QString m_cache;
+    QStringList header;
 
 public slots:
     void readData();

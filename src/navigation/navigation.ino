@@ -33,7 +33,9 @@ int cap_moyen;
 boolean first_loop = true;
 boolean hors_couloir = true;
 
-boolean initLora = false;
+boolean init_lora = false;
+boolean send_log = false;
+int index_log = 0;
 
 // liste points GPS
 float distanceToWaypoint;
@@ -60,12 +62,14 @@ unsigned long interval_calcul = 10000;
 
 // variables globales pour le data logger
 unsigned long interval_datalogging = 1000;//1000;
-String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Nb_satellites", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"};
+String var_name_log[] = {"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt", "Gps_recent_data"};
 int buf[sizeof(var_name_log)];
 
 int index_buffer_lignes = 0;
 int taille_buffer_lignes = 10;
 String lines_buffer[10];
+String header;
+String line;
 
 // GPS data
 float lat, lon;
@@ -75,13 +79,14 @@ unsigned long chars;
 unsigned short sentences, failed_checksum;
 unsigned long hdop;
 bool gps_ready=false;
+bool gps_recent_data = false;
 
 // fonction de data logging
 void datalog(String var_name, int value) {
 
   if (var_name == "push") {
+    line = "";
     // 4) Sur appel du mot clef "push", copier le buffer dans la carte sd. Et clear buffer.
-    String line;
     for (unsigned int i = 0; i < sizeof(var_name_log) / sizeof(var_name_log[0]) - 1; i++) {
       line += buf[i];
       line += ";";
@@ -93,11 +98,12 @@ void datalog(String var_name, int value) {
 
   else if (var_name == "init") {  // initialisation de l'entête csv.
     myFile = SD.open("log.csv", FILE_WRITE);
-    String line;
+    line = "";
     for (unsigned int i = 0; i < sizeof(var_name_log) / sizeof(var_name_log[0]); i++) {
       line += var_name_log[i];
       line += ";";
     }
+    header = line;
     //Serial.println(line);
     myFile.println(line);
     myFile.close();
@@ -123,19 +129,48 @@ void datalog(String var_name, int value) {
   }
 }
 
-void sendLora()
+void sendLog(String msg, boolean end_communication)
 {
-  if (initLora){
-    for (unsigned int index_var = 0; index_var < (sizeof(var_name_log) / sizeof(var_name_log[0])); index_var ++) {
-      String var_name = var_name_log[index_var];
-      String var_value = buf[index_var];
-      char separ = 0x1F;
-      String msg = var_name + separ + var_value;
-  
-      uint8_t data[2 * msg.length()];
-      msg.getBytes(data, sizeof(data));
-      lora.send(data, sizeof(data));
-      lora.waitPacketSent();
+  if (end_communication){
+    msg = msg + '~';
+  }
+  uint8_t data[2 * msg.length()];
+
+  msg.getBytes(data, sizeof(data));
+  lora.send(data, sizeof(data));
+  lora.waitPacketSent();
+}
+
+void receiveLora(){
+  if (init_lora){
+    // reception de message via lora  
+    if(lora.available())  // waiting for a response 
+    {
+      uint8_t buf[10];
+      uint8_t len = sizeof(buf);
+      if(lora.recv(buf, &len))
+      {
+          String msg = String((char *)buf);
+          Serial.println(msg);
+          if (msg.indexOf("log")>= 0){
+            send_log = true;
+          }
+      }
+      else
+      {
+          Serial.println("recv failed");
+      }
+      if (send_log){
+        if (index_log == 0){
+          index_log ++;
+          sendLog(line.substring(0,50), false);
+        }
+        else {
+          index_log = 0;
+          send_log = false;
+          sendLog(line.substring(50), true);
+        }
+      }
     }
   }
 }
@@ -170,11 +205,6 @@ void logBat() {
   double input_voltage = double(value) * 3.3 / 1023;
   double battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
   datalog("Battery", battery_voltage * 100);
-  /*
-    Serial.print("Input value: ");
-    Serial.println(input_voltage);
-    Serial.print("Battery value: ");
-    Serial.println(battery_voltage);*/
 }
 
 int filtrage_cap(int cap_instant) {
@@ -381,6 +411,8 @@ void lecture_gps() {
 
   if (GPS_SERIAL.available()) {
 
+    gps_recent_data = true;
+
     char c = GPS_SERIAL.read();
     if (gps.encode(c))
     {
@@ -403,7 +435,7 @@ void lecture_gps() {
 
       hdop = gps.hdop();
 
-      Serial.print("time: ");
+      /*Serial.print("time: ");
       Serial.println(time);
       Serial.print("lat: ");
       Serial.println(lat);
@@ -415,7 +447,7 @@ void lecture_gps() {
       Serial.println(course);
       Serial.print("speed: ");
       Serial.println(speed);
-      Serial.println("====================");
+      Serial.println("====================");*/
 
 
       datalog("Vitesse", (int)speed);
@@ -487,8 +519,8 @@ void navSetup() {
   }
 
   // init module Lora
-  initLora = lora.init();
-  if (!initLora) {
+  init_lora = lora.init();
+  if (!init_lora) {
     Serial.println("initialisation Lora : failed");
   }
   else {
@@ -518,12 +550,11 @@ void navLoop() {
 
   // Cadencement du dataloggeur et informations complémentaires
   if (millis() - timer3 > interval_datalogging) {
+    datalog("Gps_recent_data", gps_recent_data);
+    gps_recent_data = false;
     timer3 = millis();
     datalog("push", 0);
   }
-
-  if (millis() - timer5 > 10000) {
-    timer5 = millis();
-    sendLora();
-  }
+ 
+  receiveLora();  
 }

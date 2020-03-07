@@ -22,14 +22,12 @@ RH_RF95<Uart> rf95(COMSerial);
 RH_RF95<HardwareSerial> rf95(COMSerial);
 #endif
 
-
 int led = 13;
-
+unsigned long t = 0;
 
 void setup() 
 {
     ShowSerial.begin(115200);
-    ShowSerial.println("RF95 server test.");
     
     pinMode(led, OUTPUT); 
     
@@ -44,27 +42,47 @@ void setup()
 
 void loop()
 {
-  if(rf95.available())
-  {  
-    uint8_t buf[400];
+  String courrier = "";
+  // lecture des données venants du port série
+  if (Serial.available() > 0) {
+    courrier = Serial.readString();
+  }
+  else {
+    courrier = "42";
+  }
+  // send a specific order, or
+  // send a witchever message to allow the boat to respond
+  uint8_t data[2 * courrier.length()];
+  courrier.getBytes(data, sizeof(data));
+
+  /*if (courrier == "log"){
+    t = millis();
+  }
+  Serial.println("message pret pour envoi");
+  */
+  rf95.send(data, sizeof(data));
+  rf95.waitPacketSent();
+  
+  if(rf95.waitAvailableTimeout(1000))
+  { 
+    digitalWrite(led, HIGH);
+    uint8_t buf[200];
     uint8_t len = sizeof(buf);
     if(rf95.recv(buf, &len))
-    {
+    { 
         digitalWrite(led, HIGH);
+        //ShowSerial.print(millis() - t);
+        //ShowSerial.print("    ");
         ShowSerial.println((char*)buf);
-
-        /*
-        // Send a reply
-        uint8_t data[] = "And hello back to you";
-        rf95.send(data, sizeof(data));
-        rf95.waitPacketSent();
-        ShowSerial.println("Sent a reply");
-        */
+        //Serial.print("message recu en : ");
+        //Serial.println(millis() - t);
     }
     else
     {
         ShowSerial.println("recv failed");
     }
+      
+    digitalWrite(led, LOW);
   }
 }
 

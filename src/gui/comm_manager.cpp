@@ -1,4 +1,5 @@
 #include "comm_manager.h"
+#include "QTimer"
 
 CommManager::CommManager(QObject *parent)
     : QObject(parent)
@@ -26,11 +27,17 @@ void CommManager::openSerialPort(QString nameport)
    else
      {
          qDebug() << "Port open "+nameport;
-          m_serial->setBaudRate(QSerialPort::Baud9600);
+          m_serial->setBaudRate(QSerialPort::Baud115200);
           m_serial->setStopBits(QSerialPort::OneStop);
           m_serial->setParity(QSerialPort::NoParity);
           m_serial->setDataBits(QSerialPort::Data8);
           m_serial->setFlowControl(QSerialPort::NoFlowControl);
+
+          // definition de la liste des entrée (oui c'est un peu caca)
+          header = QStringList({"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"});
+          for (int i=0; i<header.size(); i++){
+              m_serialData.insert(header.at(i), 0);
+          }
      }
 }
 
@@ -42,40 +49,44 @@ void CommManager::closeSerialPort()
 void CommManager::decryptMsg(QString msg)
 {
     if(!msg.contains(";"))
-        return;
-
+            return;
     QStringList dataList = msg.split(";");
-    bool isNotFirstLine = false;
-    dataList[0].toInt(&isNotFirstLine);
-    if (isNotFirstLine && m_firstLine.length() >= dataList.length()) {
-        for (int i = 0; i < dataList.length(); i++){
-            m_serialData[m_firstLine[i]] = dataList[i].toInt();
-        }
-    } else if(!isNotFirstLine && m_firstLine.length() == 0){
-        for (int i = 0; i < dataList.length(); i++){
-            if (!dataList[i].contains("\n")){
-                m_serialData.insert(dataList[i], 0);
-                m_firstLine.append(dataList[i]);
-            }
+    if (dataList.length() == header.length()){
+        for (int i = 0; i < header.length(); i++){
+            m_serialData[header.at(i)] = dataList[i].toInt();
         }
     }
-    qDebug() << m_serialData;
+}
+
+int CommManager::getData(QString name)
+{
+    if (m_serialData.contains(name)){
+        return  m_serialData[name];
+    }
+    else {
+        return 404;
+    }
 }
 
 void CommManager::readData()
 {
     QByteArray data = m_serial->readAll();
-    if (data.contains("\n")) {
-        if (data.contains("\r")){
-            m_cache += data.split('\r')[0];
-        }
-        decryptMsg(m_cache);
-        m_cache = data.split('\n').last();
-    }
-    else if (!data.contains('\r')){
+    if (data.contains('~')){   // fin du message detectee
         m_cache += data;
+        m_cache.remove(QChar('\r'), Qt::CaseInsensitive);
+        m_cache.remove(QChar('\n'), Qt::CaseInsensitive);
+        m_cache.remove(QChar('~'), Qt::CaseInsensitive);
+        decryptMsg(m_cache);
+        qDebug() << m_cache;
+        m_cache = "";
     }
     else {
-        m_cache += data.split('\r')[0];
+        m_cache += data;
     }
+}
+
+void CommManager::send(QString text)
+{
+    m_serial->flush();
+    m_serial->write(text.toStdString().c_str());
 }
