@@ -1,6 +1,6 @@
 
 
-class BarManager : public BaseManager
+class HelmManager : public BaseManager
 {
  protected:
   void go(){
