@@ -1,4 +1,4 @@
-#include "TinyGPS.h"
+
 
 
 class MissionManager : public BaseManager
@@ -11,12 +11,11 @@ class MissionManager : public BaseManager
     m_db->getData("Latitude", lat);
     m_db->getData("Longitude", lng);
 
-    float distanceToWaypoint = (float)TinyGPS::distance_between(lat / 1000000, lon / 1000000, wp_lat[m_index], wp_lon[m_index]);
-    float angleToWaypoint = TinyGPS::course_to(lat / 1000000, lon / 1000000, wp_lat[m_index], wp_lon[m_index]);
+    float distanceToWaypoint = get_distance(float(lat) / 1000000, float(lon) / 1000000, wp_lat[m_index], wp_lon[m_index]);
     if (next_point(distanceToWaypoint)) {
-      distanceToWaypoint = (float)TinyGPS::distance_between(lat / 1000000, lon / 1000000, wp_lat[m_index], wp_lon[m_index]);
-      angleToWaypoint = TinyGPS::course_to(lat / 1000000, lon / 1000000, wp_lat[m_index], wp_lon[m_index]);
+      distanceToWaypoint = get_distance(float(lat) / 1000000, float(lon) / 1000000, wp_lat[m_index], wp_lon[m_index]);
     }
+    float angleToWaypoint = get_course(float(lat) / 1000000, float(lon) / 1000000, wp_lat[m_index], wp_lon[m_index]);
 
     m_db->setData("Wpt_dist", distanceToWaypoint);
     m_db->setData("Wpt_angle", angleToWaypoint);
