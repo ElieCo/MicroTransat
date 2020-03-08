@@ -10,7 +10,7 @@ class Gps
   }
   ~Gps(){}
 
-  void updateGpsData(){
+  bool updateGpsData(){
     if(GPS_SERIAL.available()){
   
       char c = GPS_SERIAL.read();
@@ -31,8 +31,11 @@ class Gps
         course = float(m_gps.course())/100;
   
         hdop = m_gps.hdop();
+
+        return true;
       }
     }
+    return false;
   }
 
   long lat, lon;
