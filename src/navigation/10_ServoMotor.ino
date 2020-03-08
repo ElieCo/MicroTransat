@@ -4,12 +4,14 @@ class ServoMotor
 {
  public:
   
-  ServoMotor(int pin){
-    m_pin = pin;
-    m_servo.attach(m_pin);
-  }
+  ServoMotor();
   ~ServoMotor(){
     m_servo.detach();
+  }
+
+  void init(int pin){
+    m_pin = pin;
+    m_servo.attach(m_pin);
   }
 
   void write(int angle){
