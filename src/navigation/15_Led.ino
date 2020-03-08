@@ -4,11 +4,13 @@ class Led
 {
   public:
 
-  Led(int pin){
+  Led();
+  ~Led();
+  
+  void init(int pin){
     pinMode(pin, OUTPUT);
     m_pin = pin;
   }
-  ~Led();
 
   void on(){
     digitalWrite(m_pin, HIGH);
