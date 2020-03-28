@@ -152,8 +152,24 @@ void receiveLora(){
       {
           String msg = String((char *)buf);
           Serial.println(msg);
+          int index = msg.indexOf("c");
+          
           if (msg.indexOf("log")>= 0){
             send_log = true;
+          }
+          else if (index >= 0){
+            Serial.println(msg.substring(index + 1, index + 2));
+            switch (msg.substring(index + 1, index + 2).toInt()){
+              case 1:
+                Serial.println("hello maitre ! ");
+                break;
+              case 2:
+                Serial.println("Tu es vraiment tres fort !");
+                break;
+              default:
+                Serial.println("requete inconnue");
+                break;
+            }
           }
       }
       else

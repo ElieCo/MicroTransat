@@ -15,7 +15,8 @@ public:
     ~CommManager();
 
     void openSerialPort(QString nameport);
-    void send(QString text);
+    void send();
+    void setrequest(QString text);
     int getData(QString name);
     void closeSerialPort();
 
@@ -26,6 +27,7 @@ private:
     QSerialPort *m_serial;
     QString m_cache;
     QStringList header;
+    QString request;
 
 public slots:
     void readData();

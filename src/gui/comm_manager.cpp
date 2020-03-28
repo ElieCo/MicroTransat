@@ -53,8 +53,6 @@ void CommManager::decryptMsg(QString msg)
     QStringList dataList = msg.split(";");
     if (dataList.length()-1 == header.length()){
         for (int i = 0; i < header.length(); i++){
-            qDebug() << "var name : " << m_serialData[header.at(i)];
-            qDebug() << "value : " << dataList[i].toInt();
             m_serialData[header.at(i)] = dataList[i].toInt();
         }
     }
@@ -86,9 +84,18 @@ void CommManager::readData()
         m_cache += data;
     }
 }
-
-void CommManager::send(QString text)
+void CommManager::setrequest(QString text)
 {
+    request = text;
+}
+
+void CommManager::send()
+{
+    if (request.length() == 0){
+        request = "log";
+    }
     m_serial->flush();
-    m_serial->write(text.toStdString().c_str());
+    m_serial->write(request.toStdString().c_str());
+
+    request = "";
 }
