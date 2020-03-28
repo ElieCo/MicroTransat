@@ -51,8 +51,10 @@ void CommManager::decryptMsg(QString msg)
     if(!msg.contains(";"))
             return;
     QStringList dataList = msg.split(";");
-    if (dataList.length() == header.length()){
+    if (dataList.length()-1 == header.length()){
         for (int i = 0; i < header.length(); i++){
+            qDebug() << "var name : " << m_serialData[header.at(i)];
+            qDebug() << "value : " << dataList[i].toInt();
             m_serialData[header.at(i)] = dataList[i].toInt();
         }
     }
@@ -77,7 +79,7 @@ void CommManager::readData()
         m_cache.remove(QChar('\n'), Qt::CaseInsensitive);
         m_cache.remove(QChar('~'), Qt::CaseInsensitive);
         decryptMsg(m_cache);
-        qDebug() << m_cache;
+        qDebug() << "msg recu et assemble : " << m_cache;
         m_cache = "";
     }
     else {

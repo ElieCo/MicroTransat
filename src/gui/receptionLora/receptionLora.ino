@@ -8,26 +8,13 @@ SoftwareSerial SSerial(10, 11); // RX, TX
 RH_RF95<SoftwareSerial> rf95(COMSerial);
 #endif
 
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-#define COMSerial Serial1
-#define ShowSerial SerialUSB 
-
-RH_RF95<Uart> rf95(COMSerial);
-#endif
-
-#ifdef ARDUINO_ARCH_STM32F4
-#define COMSerial Serial
-#define ShowSerial SerialUSB 
-
-RH_RF95<HardwareSerial> rf95(COMSerial);
-#endif
-
 int led = 13;
 unsigned long t = 0;
 
 void setup() 
 {
     ShowSerial.begin(115200);
+    ShowSerial.setTimeout(100);
     
     pinMode(led, OUTPUT); 
     
