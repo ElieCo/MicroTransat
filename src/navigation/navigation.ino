@@ -93,6 +93,7 @@ void datalog(String var_name, int value) {
     }
     lines_buffer[index_buffer_lignes] = line;
     index_buffer_lignes ++;
+    Serial.println(line);
     //buf[sizeof(var_name_log)];  // reset buffer
   }
 
@@ -325,7 +326,9 @@ void smooth_bar() {
     }
 
     datalog("Asserv_regulateur", smooth_angle);
-    int angle = (-((float)smooth_angle) * (180.0 / 170.0) * (21.0 / 35.0) / 2) + 90; // on s'adapte a la course du servo (180°)
+    int angle = (-(float)smooth_angle*(180/155))/2 + 90; // on s'adapte a la course du servo (180°)
+    Serial.print('barre : ');
+    Serial.println(angle);
     barre.write(angle);
 
     int wing_angle = smooth_angle;
