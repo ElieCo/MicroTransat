@@ -36,5 +36,7 @@ class LogManager: public BaseManager
     m_sd.stop();
   }
 
+  private:
+
   SDcard m_sd;
 };
