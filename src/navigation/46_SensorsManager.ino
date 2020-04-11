@@ -6,6 +6,13 @@ class SensorsManager: public BaseManager
   BASIC_CONSTRUCTOR(SensorsManager)
   ~SensorsManager(){}
 
+  void init(){
+    m_course_tab_size = sizeof(m_course_tab) / sizeof(m_course_tab[0]);
+    for (int i = 0; i < m_course_tab_size; i++)
+      m_course_tab[i] = 0.0;
+    m_course_index = 0;
+  }
+
   void go(){
 
     // Manage GPS
@@ -20,6 +27,7 @@ class SensorsManager: public BaseManager
       m_db->setData("Date", int(m_gps.date));
       m_db->setData("Speed", m_gps.speed);
       m_db->setData("Course", m_gps.course);
+      m_db->setData("Average_course", averageCourse(m_gps.course));
       m_db->setData("Chars", int(m_gps.chars));
       m_db->setData("Sentences", m_gps.sentences);
       m_db->setData("Failed_checksum", m_gps.failed_checksum);
@@ -34,6 +42,29 @@ class SensorsManager: public BaseManager
     m_db->setData("Battery", bat_val);
   }
 
+  private:
+
+  float averageCourse(float new_course){
+    m_course_tab[m_course_index] = new_course;
+    m_course_index = (m_course_index + 1) % m_course_tab_size;
+
+    float x_cap = 0;
+    float y_cap = 0;
+
+    for (unsigned int i = 0; i < m_course_tab_size; i++) {
+      x_cap += cos(radians(m_course_tab[i]));
+      y_cap += sin(radians(m_course_tab[i]));
+    }
+
+    float average_course = atan2(y_cap, x_cap);
+
+    return average_course;
+  }
+
   Gps m_gps;
+  float m_course_tab[10];
+  int m_course_index;
+  int m_course_tab_size;
+
   Battery m_bat;
 };

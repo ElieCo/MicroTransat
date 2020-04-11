@@ -43,7 +43,7 @@ class Captain : public BaseManager
 
   void state_decide(){
     float course;
-    m_db->getData("Course", course);
+    m_db->getData("Average_course", course);
 
     float angleToWaypoint;
     m_db->getData("Wpt_angle", angleToWaypoint);
