@@ -6,9 +6,14 @@
 class LoRa
 {
   public:
-  LoRa(){
+  LoRa(){}
+  ~LoRa(){
+    delete m_lora;
+  }
+
+  void init(){
     m_lora = new RH_RF95<HardwareSerial>(LORA_SERIAL);
-    
+
     if (!m_lora->init()) {
       print("initialisation Lora : failed");
     }
@@ -16,9 +21,6 @@ class LoRa
       print("initialization Lora : OK");
       m_lora->setFrequency(LORA_FREQ);
     }
-  }
-  ~LoRa(){
-    delete m_lora;
   }
 
   void send(String msg){
@@ -29,10 +31,24 @@ class LoRa
   }
 
   String receive(){
-    return "";
+    String msg = "";
+
+    if(lora.available())  // waiting for a response
+    {
+      uint8_t buf[10];
+      uint8_t len = sizeof(buf);
+      if(lora.recv(buf, &len))
+      {
+        msg = String((char *)buf);
+        print(msg);
+      } else {
+        print("recv failed");
+      }
+    }
+
+    return msg;
   }
-  
+
   private:
   RH_RF95<HardwareSerial> *m_lora;
 };
-
