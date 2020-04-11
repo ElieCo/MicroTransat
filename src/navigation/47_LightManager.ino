@@ -12,12 +12,11 @@ class LightManager : public BaseManager
 
   void go(){
     bool gps_ready;
-    if (m_db->getData("Gps_ready", gps_ready)){
-      if (gps_ready) {
-        m_btn_led.on();
-      } else {
-        m_btn_led.reverse();
-      }
+    bool has_data = m_db->getData("Gps_ready", gps_ready);
+    if (has_data && gps_ready) {
+      m_btn_led.on();
+    } else {
+      m_btn_led.reverse();
     }
   }
 
