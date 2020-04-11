@@ -53,7 +53,7 @@ class SensorsManager: public BaseManager
     float x_cap = 0;
     float y_cap = 0;
 
-    for (unsigned int i = 0; i < m_course_tab_size; i++) {
+    for (int i = 0; i < m_course_tab_size; i++) {
       x_cap += cos(radians(m_course_tab[i]));
       y_cap += sin(radians(m_course_tab[i]));
     }
