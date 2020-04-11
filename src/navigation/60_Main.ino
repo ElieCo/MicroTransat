@@ -1,9 +1,10 @@
+GlobalManager globalManager;
 
 void setup(){
-  navSetup();
+  globalManager.globalInit();
 }
 
 void loop(){
-  navLoop();
+  globalManager.globalRun();
 }
 
