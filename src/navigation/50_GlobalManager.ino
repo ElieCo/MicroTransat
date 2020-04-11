@@ -8,10 +8,10 @@ public:
     , m_logMan("LoggerManager", 2000)
     , m_helmMan("HelmManager", 250)
     , m_wingMan("WingManager", 250)
-    , m_commMan("CommManager", 1000)
+    , m_commMan("CommManager", 0)
     , m_sensorsMan("SensorsManager", 1000)
     , m_lightMan("LightManager", 500)
-    , m_captain("Captain", 1000)
+    , m_captain("Captain", 500)
   {
     m_managers.push_back(&m_missionMan);
     m_managers.push_back(&m_logMan);
@@ -25,7 +25,7 @@ public:
 
   void globalInit(){
     initSerialDebug();
-    
+
     for (unsigned int i; i < m_managers.size(); i++){
       m_managers.at(i)->setDB(&m_db);
     }
