@@ -11,6 +11,8 @@ class SensorsManager: public BaseManager
     for (int i = 0; i < m_course_tab_size; i++)
       m_course_tab[i] = 0.0;
     m_course_index = 0;
+
+    m_bat.init(A14);
   }
 
   void go(){
