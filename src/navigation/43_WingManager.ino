@@ -16,9 +16,9 @@ class WingManager : public BaseManager
 
   void go(){
     float angle_helm;
-    if (!m_db->getData("Cmd_helm", angle_helm))
-      if (!m_db->getData("Regulator_angle", angle_helm))
-        return;
+    //if (!m_db->getData("Cmd_helm", angle_helm))
+    if (!m_db->getData("Regulator_angle", angle_helm))
+      return;
 
     float angle_wing;
     if (angle_helm < 0) angle_wing = m_starbord_angle;
