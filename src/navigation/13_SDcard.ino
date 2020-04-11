@@ -10,7 +10,7 @@ class SDcard
   }
 
   void initLog(){
-    
+
     if (!SD.begin(BUILTIN_SDCARD)) {
       Serial1.println("initialization carte SD : failed");
     }
@@ -22,6 +22,7 @@ class SDcard
 
   void log(String line){
     m_file.println(line);
+    m_file.flush();
   }
 
   void stop(){
@@ -30,4 +31,3 @@ class SDcard
 
   File m_file;
 };
-
