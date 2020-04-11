@@ -13,9 +13,16 @@ class HelmManager : public BaseManager
 
     m_servo.init(7);
   }
+
   void go(){
     float cmd;
     m_db->getData("Regulator_angle", cmd);
+
+    float max_upwind = 30;
+    m_db->getData("Max_upwind", max_upwind);
+    float angle_speed;
+    if (abs(m_helm_angle) <= max_upwind) angle_speed = m_tack_angle_speed;
+    else angle_speed = m_normal_angle_speed;
 
     float helm_cmd = (cmd+180) * (1/2) * (180.0 / 170.0) * (21.0 / 35.0);
 
@@ -24,8 +31,8 @@ class HelmManager : public BaseManager
     float diff = time - m_last_time;
     m_last_time = time;
 
-    float step = m_normal_angle_speed * diff/1000.0;
-    
+    float step = angle_speed * diff/1000.0;
+
     if (helm_cmd != m_helm_angle) {
       if ( helm_cmd > m_helm_angle + step ) {
         m_helm_angle += step;
@@ -37,7 +44,7 @@ class HelmManager : public BaseManager
 
       cmd_helm();
     }
-    
+
   }
 
   private:

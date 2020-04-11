@@ -10,9 +10,10 @@ class Captain : public BaseManager
   void init(){
     m_behaviour = ACQUISITION;
     m_max_upwind = 30;
+    m_db->setData("Max_upwind", m_max_upwind);
     m_max_downwind = 130;
   }
-  
+
   void go(){
     switch(m_behaviour){
       case SLEEP:
@@ -50,7 +51,7 @@ class Captain : public BaseManager
     float reg_angle;
     m_db->getData("Regulator_angle", reg_angle);
 
-    
+
 
     float diff = angleToWaypoint - course;
     from180to180(diff);
@@ -75,4 +76,3 @@ class Captain : public BaseManager
 
   float m_max_upwind, m_max_downwind;
 };
-
