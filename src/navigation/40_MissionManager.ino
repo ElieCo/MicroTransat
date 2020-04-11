@@ -22,15 +22,15 @@ class MissionManager : public BaseManager
     m_db->getData("Longitude", lng);
 
     // Calcul the distance to the next waypoint.
-    float distanceToWaypoint = get_distance(float(lat) / 1000000, float(lon) / 1000000, wp_lat[m_index], wp_lon[m_index]);
+    float distanceToWaypoint = get_distance(float(lat) / 1000000, float(lng) / 1000000, wp_lat[m_index], wp_lon[m_index]);
 
     // Check if the actual waypoint is validated and select the next one if needed.
     if (next_point(distanceToWaypoint)) {
       // Calcul the distance to the new waypoint.
-      distanceToWaypoint = get_distance(float(lat) / 1000000, float(lon) / 1000000, wp_lat[m_index], wp_lon[m_index]);
+      distanceToWaypoint = get_distance(float(lat) / 1000000, float(lng) / 1000000, wp_lat[m_index], wp_lon[m_index]);
     }
     // Calcul the course to the next waypoint.
-    float angleToWaypoint = get_course(float(lat) / 1000000, float(lon) / 1000000, wp_lat[m_index], wp_lon[m_index]);
+    float angleToWaypoint = get_course(float(lat) / 1000000, float(lng) / 1000000, wp_lat[m_index], wp_lon[m_index]);
 
     // Set all this data in the DB.
     m_db->setData("Wpt_dist", distanceToWaypoint);
