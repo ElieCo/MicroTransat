@@ -23,6 +23,13 @@ class HelmManager : public BaseManager
     float helm_cmd;
     m_db->getData("Regulator_angle", helm_cmd);
 
+    // Choose the speed in function of the angle to the wind
+    float max_upwind = 30;
+    m_db->getData("Max_upwind", max_upwind);
+    float angle_speed;
+    if (abs(m_helm_angle) <= max_upwind) angle_speed = m_tack_angle_speed;
+    else angle_speed = m_normal_angle_speed;
+
     // Calcul the time this the last time.
     int time = millis();
     if (m_last_time < 0) m_last_time = time;
