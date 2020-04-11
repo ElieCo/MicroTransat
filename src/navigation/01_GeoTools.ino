@@ -8,6 +8,14 @@ float get_course(float lat1, float lng1, float lat2, float lng2){
   return TinyGPS::course_to(lat1, lng1, lat2, lng2);
 }
 
+/**
+ * Find the coordinates of the point thanks to an other point,
+ * a distance and a bearing.
+ * @param actual_lat and actual_lon the coordinates of the reference point.
+ * @param bearing from the reference point to the result point.
+ * @param distance between the two points.
+ * @param new_lat and new_lon references on the coordinates of the result point.
+ */
 void get_point_at_dist_bearing(float actual_lat, float actual_lon, float bearing, float distance, float &new_lat, float &new_lon) {
   actual_lat = radians(actual_lat);
   actual_lon = radians(actual_lon);

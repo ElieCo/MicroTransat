@@ -15,19 +15,24 @@ class HelmManager : public BaseManager
   }
 
   void go(){
+    // Get the command angle.
     float cmd;
     m_db->getData("Regulator_angle", cmd);
 
     // TODO : put security and adaptation on the low level ? -> il faut que la vitesse corresponde a la vitesse de la gouverne et pas du servo
+    // Adapt the command of course to a helm command.
     float helm_cmd = (cmd+180) * (1/2) * (180.0 / 170.0) * (21.0 / 35.0);
 
+    // Calcul the time this the last time.
     int time = millis();
     if (m_last_time < 0) m_last_time = time;
     float diff = time - m_last_time;
     m_last_time = time;
 
+    // Calcul the step in degrees to do.
     float step = angle_speed * diff/1000.0;
 
+    // Find the new helm command angle.
     if (helm_cmd != m_helm_angle) {
       if ( helm_cmd > m_helm_angle + step ) {
         m_helm_angle += step;
@@ -45,7 +50,9 @@ class HelmManager : public BaseManager
   private:
 
   void cmd_helm(){
+    // Set in the DB the value of this angle.
     m_db->setData("Cmd_helm", m_helm_angle);
+    // Command the servo-motor.
     m_servo.write(m_helm_angle);
   }
 

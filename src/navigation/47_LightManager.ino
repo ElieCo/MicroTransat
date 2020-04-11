@@ -13,6 +13,8 @@ class LightManager : public BaseManager
   }
 
   void go(){
+    // Led on if the gps is ready.
+    // Led binking if not.
     bool gps_ready;
     bool has_data = m_db->getData("Gps_ready", gps_ready);
     if (has_data && gps_ready) {

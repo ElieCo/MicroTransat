@@ -7,11 +7,13 @@ class SensorsManager: public BaseManager
   ~SensorsManager(){}
 
   void init(){
+    // Initialize attributs needed to make the course average.
     m_course_tab_size = sizeof(m_course_tab) / sizeof(m_course_tab[0]);
     for (int i = 0; i < m_course_tab_size; i++)
       m_course_tab[i] = 0.0;
     m_course_index = 0;
 
+    // Initialize the battery.
     m_bat.init(A14);
   }
 

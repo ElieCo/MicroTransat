@@ -16,6 +16,10 @@ class BaseManager{
     print("Init manager:", m_name);
   }
 
+  /**
+   * Run the function go if the last time was
+   * at least *m_runInterval* ms before.
+   */
   void run(){
     if (isTimeToRun()) go();
   }
@@ -38,7 +42,12 @@ class BaseManager{
     print("Run manager:", m_name);
   }
 
-  bool isNotTimeToRun(){
+  /**
+   * Check the time between two call.
+   * @return true if it was more than
+   * *m_runInterval* ms ago, else false.
+   */
+  bool isTimeToRun(){
     if(millis() - m_timer > m_runInterval){
       m_timer = millis();
       return true;

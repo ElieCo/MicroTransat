@@ -33,7 +33,7 @@ class LoRa
   String receive(){
     String msg = "";
 
-    if(lora.available())  // waiting for a response
+    if(lora.available())
     {
       uint8_t buf[10];
       uint8_t len = sizeof(buf);
