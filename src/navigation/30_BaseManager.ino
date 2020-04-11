@@ -17,8 +17,7 @@ class BaseManager{
   }
 
   void run(){
-    if (isNotTimeToRun()) return;
-    else go();
+    if (isTimeToRun()) go();
   }
 
   void stop(){
@@ -42,9 +41,9 @@ class BaseManager{
   bool isNotTimeToRun(){
     if(millis() - m_timer > m_runInterval){
       m_timer = millis();
-      return false;
-    } else {
       return true;
+    } else {
+      return false;
     }
   }
 
