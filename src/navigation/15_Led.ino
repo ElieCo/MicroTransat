@@ -4,8 +4,8 @@ class Led
 {
   public:
 
-  Led();
-  ~Led();
+  Led(){}
+  ~Led(){}
   
   void init(int pin){
     pinMode(pin, OUTPUT);

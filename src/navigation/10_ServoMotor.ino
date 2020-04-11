@@ -4,7 +4,7 @@ class ServoMotor
 {
  public:
 
-  ServoMotor();
+  ServoMotor(){}
   ~ServoMotor(){
     m_servo.detach();
   }
