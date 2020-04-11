@@ -7,23 +7,21 @@ class HelmManager : public BaseManager
   ~HelmManager(){}
 
   void init() {
-    m_db->initData("Cmd_helm", float());
+    m_db->initData("Cmd_helm",
+    float());
 
     m_normal_angle_speed = 45;
     m_tack_angle_speed = 180;
     m_last_time = -1;
 
-    m_servo.init(7);
+    int ratio = (1.0/2.0) * (180.0 / 170.0) * (21.0 / 35.0);
+    m_servo.init(7, ratio, 180);
   }
 
   void go(){
     // Get the command angle.
-    float cmd;
-    m_db->getData("Regulator_angle", cmd);
-
-    // TODO : put security and adaptation on the low level ? -> il faut que la vitesse corresponde a la vitesse de la gouverne et pas du servo
-    // Adapt the command of course to a helm command.
-    float helm_cmd = (cmd+180) * (1/2) * (180.0 / 170.0) * (21.0 / 35.0);
+    float helm_cmd;
+    m_db->getData("Regulator_angle", helm_cmd);
 
     // Calcul the time this the last time.
     int time = millis();
