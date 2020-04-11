@@ -6,7 +6,7 @@ using namespace std;
 
 #define MAP_TYPE(type) std::map<std::string, type>
 
-#define GET_AND_SET(type)                                             \
+#define GET_SET_AND_INIT(type)                                        \
         bool getData(string name, type &data) {                       \
           if (VAR_NAME(type).count(name)) {                           \
             data = VAR_NAME(type)[name];                              \
@@ -17,6 +17,13 @@ using namespace std;
           }                                                           \
         }                                                             \
         void setData(string name, type data) {                        \
+          if (!VAR_NAME(type).count(name)) {                          \
+            print("Variable not initialized:", name.c_str());         \
+            return;                                                   \
+          }                                                           \
+          VAR_NAME(type)[name] = data;                                \
+        }                                                             \
+        void initData(string name, type data) {                       \
           VAR_NAME(type)[name] = data;                                \
         }
 
@@ -36,14 +43,14 @@ class DataBase {
 
   public:
 
-    GET_AND_SET(String)
-    GET_AND_SET(string)
-    GET_AND_SET(int)
-    GET_AND_SET(unsigned)
-    GET_AND_SET(long)
-    GET_AND_SET(float)
-    GET_AND_SET(double)
-    GET_AND_SET(bool)
+    GET_SET_AND_INIT(String)
+    GET_SET_AND_INIT(string)
+    GET_SET_AND_INIT(int)
+    GET_SET_AND_INIT(unsigned)
+    GET_SET_AND_INIT(long)
+    GET_SET_AND_INIT(float)
+    GET_SET_AND_INIT(double)
+    GET_SET_AND_INIT(bool)
 
     std::map<string, string> getAllData(){
         std::map<string, string> map_string;
@@ -71,4 +78,3 @@ class DataBase {
     MAP(double)
     MAP(bool)
 };
-

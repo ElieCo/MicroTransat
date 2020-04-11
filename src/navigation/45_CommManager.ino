@@ -7,6 +7,8 @@ class CommManager : public BaseManager
   ~CommManager(){}
 
   void init(){
+    m_db->initData("Msg_received", String());
+
     m_lora.init();
 
     m_index_log = 0;

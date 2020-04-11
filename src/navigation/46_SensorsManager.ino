@@ -7,6 +7,22 @@ class SensorsManager: public BaseManager
   ~SensorsManager(){}
 
   void init(){
+    m_db->initData("Gps_recent_data", bool());
+    m_db->initData("Latitude", long());
+    m_db->initData("Longitude", long());
+    m_db->initData("Fix_age", int());
+    m_db->initData("Time", int());
+    m_db->initData("Date", int());
+    m_db->initData("Speed", float());
+    m_db->initData("Course", float());
+    m_db->initData("Average_course", float());
+    m_db->initData("Chars", int());
+    m_db->initData("Sentences", unsigned());
+    m_db->initData("Failed_checksum", unsigned());
+    m_db->initData("HDOP", int());
+    m_db->initData("Gps_ready", bool());
+    m_db->initData("Battery", double());
+
     // Initialize attributs needed to make the course average.
     m_course_tab_size = sizeof(m_course_tab) / sizeof(m_course_tab[0]);
     for (int i = 0; i < m_course_tab_size; i++)

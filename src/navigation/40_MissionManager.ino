@@ -7,6 +7,14 @@ class MissionManager : public BaseManager
   BASIC_CONSTRUCTOR(MissionManager)
   ~MissionManager(){}
 
+  void init(){
+    m_db->initData("Wpt_dist", float());
+    m_db->initData("Wpt_angle", float());
+    m_db->initData("Lat_next_point", int());
+    m_db->initData("Lon_next_point", int());
+    m_db->initData("Wpt_index", int());
+  }
+
   void go(){
     // Get actual coordintes.
     long lat, lng;

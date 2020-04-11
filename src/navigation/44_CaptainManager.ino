@@ -10,7 +10,8 @@ class Captain : public BaseManager
   void init(){
     m_behaviour = ACQUISITION;
     m_max_upwind = 30;
-    m_db->setData("Max_upwind", m_max_upwind);
+    m_db->initData("Max_upwind", m_max_upwind);
+    m_db->initData("Regulator_angle", float());
     m_max_downwind = 130;
   }
 
