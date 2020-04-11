@@ -17,11 +17,11 @@ class WingManager : public BaseManager
   }
 
   void go(){
-    // Get the angle of the helm.
+    // Get the angle of the helm or of the regulator if the first one doesn't exists.
     float angle_helm;
-    //if (!m_db->getData("Cmd_helm", angle_helm))
-    if (!m_db->getData("Regulator_angle", angle_helm))
-      return;
+    if (!m_db->getData("Cmd_helm", angle_helm))
+      if (!m_db->getData("Regulator_angle", angle_helm))
+        return;
 
     // Function of the helm angle, choose the wing angle.
     float angle_wing;
