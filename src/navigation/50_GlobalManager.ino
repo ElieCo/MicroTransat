@@ -24,6 +24,8 @@ public:
   }
 
   void globalInit(){
+    initSerialDebug();
+    
     for (unsigned int i; i < m_managers.size(); i++){
       m_managers.at(i)->setDB(&m_db);
     }
