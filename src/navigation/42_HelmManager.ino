@@ -24,6 +24,7 @@ class HelmManager : public BaseManager
     if (abs(m_helm_angle) <= max_upwind) angle_speed = m_tack_angle_speed;
     else angle_speed = m_normal_angle_speed;
 
+    // TODO : put security and adaptation on the low level ? -> il faut que la vitesse corresponde a la vitesse de la gouverne et pas du servo
     float helm_cmd = (cmd+180) * (1/2) * (180.0 / 170.0) * (21.0 / 35.0);
 
     int time = millis();
