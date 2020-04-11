@@ -2,6 +2,10 @@
 
 class HelmManager : public BaseManager
 {
+  public:
+  BASIC_CONSTRUCTOR(HelmManager)
+  ~HelmManager(){}
+
   void init() {
     m_normal_angle_speed = 45;
     m_tack_angle_speed = 180;

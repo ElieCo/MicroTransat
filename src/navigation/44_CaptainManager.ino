@@ -3,6 +3,10 @@ enum BEHAVIOUR { SLEEP = 0, ACQUISITION = 1, DECIDE = 2, PROCESS = 3 };
 
 class Captain : public BaseManager
 {
+  public:
+  BASIC_CONSTRUCTOR(Captain)
+  ~Captain(){}
+
   void init(){
     m_behaviour = ACQUISITION;
     m_max_upwind = 30;

@@ -3,6 +3,7 @@
 class SensorsManager: public BaseManager
 {
   public:
+  BASIC_CONSTRUCTOR(SensorsManager)
   ~SensorsManager(){}
 
   void go(){
@@ -10,7 +11,7 @@ class SensorsManager: public BaseManager
     // Manage GPS
     bool has_data = m_gps.updateGpsData();
     m_db->setData("Gps_recent_data", has_data);
-    
+
     if (has_data){
       m_db->setData("Latitude", m_gps.lat);
       m_db->setData("Longitude", m_gps.lon);
@@ -36,4 +37,3 @@ class SensorsManager: public BaseManager
   Gps m_gps;
   Battery m_bat;
 };
-

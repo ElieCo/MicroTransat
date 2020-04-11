@@ -2,11 +2,13 @@
 
 class LogManager: public BaseManager
 {
+  public:
+  BASIC_CONSTRUCTOR(LogManager)
   ~LogManager(){}
 
   void init(){
     m_sd.initLog();
-    
+
     std::map<string, string> data = m_db->getAllData();
     String line = "";
     for (std::map<string, string>::iterator it = data.begin(); it != data.end(); ++it){
@@ -36,4 +38,3 @@ class LogManager: public BaseManager
 
   SDcard m_sd;
 };
-

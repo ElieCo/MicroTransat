@@ -4,6 +4,7 @@
 class MissionManager : public BaseManager
 {
   public:
+  BASIC_CONSTRUCTOR(MissionManager)
   ~MissionManager(){}
 
   void go(){
@@ -38,10 +39,9 @@ class MissionManager : public BaseManager
     }
     return false;
   }
-  
+
   float wp_lat[2] = {47.731309, 47.730627};
   float wp_lon[2] = { -3.395384, -3.390921};
   unsigned m_index = 0;
   int m_valid_wpt = 25;
 };
-

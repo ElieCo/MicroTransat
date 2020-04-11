@@ -2,6 +2,10 @@
 
 class WingManager : public BaseManager
 {
+  public:
+  BASIC_CONSTRUCTOR(WingManager)
+  ~WingManager(){}
+
   void init(){
     int angle = 10;
     m_starbord_angle = 90 + angle;
@@ -9,7 +13,7 @@ class WingManager : public BaseManager
 
     m_servo.init(5);
   }
-  
+
   void go(){
     float angle_helm;
     if (!m_db->getData("Cmd_helm", angle_helm))
@@ -29,4 +33,3 @@ class WingManager : public BaseManager
   int m_starbord_angle, m_port_angle;
   ServoMotor m_servo;
 };
-

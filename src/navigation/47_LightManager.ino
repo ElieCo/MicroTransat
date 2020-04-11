@@ -2,11 +2,14 @@
 
 class LightManager : public BaseManager
 {
+  public:
+  BASIC_CONSTRUCTOR(LightManager)
+  ~LightManager(){}
 
   void init(){
     m_btn_led.init(13);
   }
-  
+
   void go(){
     bool gps_ready;
     if (m_db->getData("Gps_ready", gps_ready)){
@@ -22,4 +25,3 @@ class LightManager : public BaseManager
 
   Led m_btn_led;
 };
-

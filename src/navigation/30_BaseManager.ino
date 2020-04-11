@@ -1,8 +1,10 @@
 
+#define BASIC_CONSTRUCTOR(className) className(String name, unsigned long inter) : BaseManager(name, inter){}
+
 class BaseManager{
 
  public:
- 
+
   BaseManager(String name = "BaseManager", unsigned long inter = 1000){
     m_runInterval = inter;
     m_timer = millis() - m_runInterval;
@@ -50,6 +52,5 @@ class BaseManager{
   unsigned long m_timer;
   unsigned long m_runInterval;
   DataBase * m_db;
-  
-};
 
+};

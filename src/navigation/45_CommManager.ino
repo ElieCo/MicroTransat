@@ -3,6 +3,8 @@
 class CommManager : public BaseManager
 {
   public:
+  BASIC_CONSTRUCTOR(CommManager)
+  ~CommManager(){}
 
   void go(){
     // check received messages
@@ -23,4 +25,3 @@ class CommManager : public BaseManager
 
   LoRa m_lora;
 };
-
