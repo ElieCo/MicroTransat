@@ -12,8 +12,9 @@ class BaseManager{
   }
   ~BaseManager(){}
 
-  void init(){
+  void baseInit(){
     print("Init manager:", m_name);
+    init();
   }
 
   /**
@@ -24,8 +25,9 @@ class BaseManager{
     if (isTimeToRun()) go();
   }
 
-  void stop(){
+  void baseStop(){
     print("Stop manager:", m_name);
+    stop();
   }
 
   void initInterval(unsigned long interval){
@@ -36,11 +38,12 @@ class BaseManager{
     m_db = db;
   }
 
- protected:
+  protected:
 
-  void go(){
-    print("Run manager:", m_name);
-  }
+  virtual void init(){}
+  virtual void go(){}
+  virtual void stop(){}
+  virtual void plop(){}
 
   /**
    * Check the time between two call.

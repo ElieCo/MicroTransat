@@ -31,7 +31,7 @@ public:
     }
 
     for (unsigned int i = 0; i < m_managers.size(); i++){
-      m_managers.at(i)->init();
+      m_managers.at(i)->baseInit();
     }
   }
 
@@ -43,7 +43,7 @@ public:
 
   void globalStop(){
     for (unsigned int i = 0; i < m_managers.size(); i++){
-      m_managers.at(i)->stop();
+      m_managers.at(i)->baseStop();
     }
   }
 
