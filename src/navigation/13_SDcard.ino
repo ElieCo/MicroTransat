@@ -11,11 +11,11 @@ class SDcard
     m_file.close();
   }
 
-  void initLog(){
+  void init(String filename){
 
     if (SD.begin(BUILTIN_SDCARD)) {
       Serial1.println("initialization carte SD : OK");
-      m_file = SD.open("log.csv", FILE_WRITE);
+      m_file = SD.open(filename.c_str(), FILE_WRITE);
       m_file_opened = true;
     }
     else {

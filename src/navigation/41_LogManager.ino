@@ -8,7 +8,7 @@ class LogManager: public BaseManager
 
   void init(){
     // Initialize the SD card.
-    m_sd.initLog();
+    m_sd.init("log.csv");
 
     m_not_initialized = true;
   }
