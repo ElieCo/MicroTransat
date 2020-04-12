@@ -43,7 +43,6 @@ class BaseManager{
   virtual void init(){}
   virtual void go(){}
   virtual void stop(){}
-  virtual void plop(){}
 
   /**
    * Check the time between two call.
