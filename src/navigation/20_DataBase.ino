@@ -1,6 +1,3 @@
-#include <map>
-#include <string>
-using namespace std;
 
 #define VAR_NAME(type) DB##type
 
