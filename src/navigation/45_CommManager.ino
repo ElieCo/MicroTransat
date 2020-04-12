@@ -40,6 +40,8 @@ class CommManager : public BaseManager
     }
   }
 
+  void stop(){}
+
   private:
 
   /**

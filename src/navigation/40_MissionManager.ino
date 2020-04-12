@@ -39,6 +39,8 @@ class MissionManager : public BaseManager
     m_db->setData("Lon_next_point", int(wp_lon[m_index] * 1000000));
   }
 
+  void stop(){}
+
   private:
 
   boolean next_point(float dist) { // unité : mètres

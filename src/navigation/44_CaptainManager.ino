@@ -32,6 +32,8 @@ class Captain : public BaseManager
     }
   }
 
+  void stop();
+
   private:
 
   void state_sleep(){

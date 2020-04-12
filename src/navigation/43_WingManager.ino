@@ -34,6 +34,8 @@ class WingManager : public BaseManager
     m_db->setData("Wing_angle", angle_wing);
   }
 
+  void stop(){}
+
   private:
 
   int m_starbord_angle, m_port_angle;

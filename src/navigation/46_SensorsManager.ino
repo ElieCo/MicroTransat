@@ -62,6 +62,8 @@ class SensorsManager: public BaseManager
     m_db->setData("Battery", bat_val);
   }
 
+  void stop(){}
+
   private:
 
   float averageCourse(float new_course){

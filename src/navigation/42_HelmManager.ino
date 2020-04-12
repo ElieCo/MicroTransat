@@ -54,6 +54,8 @@ class HelmManager : public BaseManager
 
   }
 
+  void stop(){}
+
   private:
 
   void cmd_helm(){
