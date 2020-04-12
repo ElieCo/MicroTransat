@@ -1,13 +1,13 @@
 #include <SD.h>
 
-class SDcard
+class SDfile
 {
   public:
 
-  SDcard(){
+  SDfile(){
     m_file_opened = false;
   }
-  ~SDcard(){
+  ~SDfile(){
     m_file.close();
   }
 

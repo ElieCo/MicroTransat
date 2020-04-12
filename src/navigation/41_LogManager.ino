@@ -56,6 +56,6 @@ class LogManager: public BaseManager
 
   private:
 
-  SDcard m_sd;
+  SDfile m_sd;
   bool m_not_initialized;
 };
