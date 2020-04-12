@@ -24,14 +24,14 @@ class SDfile
     }
   }
 
-  void log(String line){
+  void write(String line){
     if (!m_file_opened) return;
 
     m_file.println(line);
     m_file.flush();
   }
 
-  void stop(){
+  void close(){
     m_file.close();
   }
 

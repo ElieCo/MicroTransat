@@ -8,7 +8,7 @@ class LogManager: public BaseManager
 
   void init(){
     // Initialize the SD card.
-    m_sd.init("log.csv");
+    m_log_file.init("log.csv");
 
     m_not_initialized = true;
   }
@@ -26,7 +26,7 @@ class LogManager: public BaseManager
         }
       }
       // Log a first line all the names.
-      m_sd.log(line);
+      m_log_file.write(line);
 
       // Remember that we did it.
       m_not_initialized = false;
@@ -46,16 +46,16 @@ class LogManager: public BaseManager
         }
       }
       // Log this line.
-      m_sd.log(line);
+      m_log_file.write(line);
     }
   }
 
   void stop() {
-    m_sd.stop();
+    m_log_file.close();
   }
 
   private:
 
-  SDfile m_sd;
+  SDfile m_log_file;
   bool m_not_initialized;
 };
