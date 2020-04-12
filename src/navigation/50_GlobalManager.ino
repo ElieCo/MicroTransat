@@ -25,6 +25,10 @@ public:
   void globalInit(){
     initSerialDebug();
       
+    print("=====================================");
+    print("=========== Hello World! ============");
+    print("=====================================");
+
     for (int i = 0; i < m_managers.size(); i++){
       m_managers.at(i)->setDB(&m_db);
     }
