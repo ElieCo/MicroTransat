@@ -32,7 +32,7 @@ class Captain : public BaseManager
     }
   }
 
-  void stop();
+  void stop(){}
 
   private:
 
