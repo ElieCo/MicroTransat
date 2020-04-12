@@ -1,5 +1,10 @@
 #include "TinyGPS.h"
 
+struct Coord{
+  float lat = 0.0;
+  float lng = 0.0;
+};
+
 float get_distance(float lat1, float lng1, float lat2, float lng2){
   return TinyGPS::distance_between(lat1, lng1, lat2, lng2);
 }
