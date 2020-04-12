@@ -21,7 +21,8 @@
           VAR_NAME(type).set(name, data);                             \
         }                                                             \
         void initData(String name, type data) {                       \
-          VAR_NAME(type).set(name, data);                             \
+          if (!VAR_NAME(type).contains(name))                         \
+            VAR_NAME(type).set(name, data);                           \
         }
 
 #define MAP(type) MAP_TYPE(type) VAR_NAME(type);
