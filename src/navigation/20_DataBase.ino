@@ -6,7 +6,7 @@
 #define GET_SET_AND_INIT(type)                                        \
         bool getData(String name, type &data) {                       \
           if (VAR_NAME(type).contains(name)) {                        \
-            data = type();                          \
+            data = VAR_NAME(type).get(name);                          \
             return true;                                              \
           } else {                                                    \
             print("Error: try to get non valid data:", name.c_str()); \
