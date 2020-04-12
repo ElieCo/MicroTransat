@@ -1,5 +1,3 @@
-#include <vector>
-using namespace std;
 
 class GlobalManager {
 
@@ -26,24 +24,24 @@ public:
 
   void globalInit(){
     initSerialDebug();
-
-    for (unsigned int i = 0; i < m_managers.size(); i++){
+      
+    for (int i = 0; i < m_managers.size(); i++){
       m_managers.at(i)->setDB(&m_db);
     }
 
-    for (unsigned int i = 0; i < m_managers.size(); i++){
+    for (int i = 0; i < m_managers.size(); i++){
       m_managers.at(i)->baseInit();
     }
   }
 
   void globalRun(){
-    for (unsigned int i = 0; i < m_managers.size(); i++){
+    for (int i = 0; i < m_managers.size(); i++){
       m_managers.at(i)->run();
     }
   }
 
   void globalStop(){
-    for (unsigned int i = 0; i < m_managers.size(); i++){
+    for (int i = 0; i < m_managers.size(); i++){
       m_managers.at(i)->baseStop();
     }
   }
@@ -60,5 +58,5 @@ private:
   LightManager m_lightMan;
   Captain m_captain;
 
-  vector<BaseManager*> m_managers;
+  Vector<BaseManager*> m_managers;
 };
