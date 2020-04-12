@@ -13,8 +13,12 @@ class MissionManager : public BaseManager
     m_db->initData("Lat_next_point", int());
     m_db->initData("Lon_next_point", int());
     m_db->initData("Wpt_index", int());
+    m_db->initData("SD_ready", false);
 
-    m_mission_file.init("mission.txt");
+    bool sd_ready = false;
+    m_db->getData("SD_ready", sd_ready);
+    sd_ready = m_mission_file.init("mission.txt", sd_ready);
+    m_db->setData("SD_ready", sd_ready);
     parseMission();
   }
 

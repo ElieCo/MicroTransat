@@ -11,18 +11,24 @@ class SDfile
     m_file.close();
   }
 
-  void init(String filename, bool read = true){
+  bool init(String filename, bool sd_initialized, bool read = true){
 
-    if (SD.begin(BUILTIN_SDCARD)) {
-      Serial1.println("initialization carte SD : OK");
+    if (SD.begin(BUILTIN_SDCARD) || sd_initialized) {
+      if (!sd_initialized) print("initialization carte SD : OK");
       if (read) m_file = SD.open(filename.c_str(), FILE_READ);
       else m_file = SD.open(filename.c_str(), FILE_WRITE);
-      if (m_file) m_file_opened = true;
-      else m_file_opened = false;
+      if (m_file) {
+        m_file_opened = true;
+      } else {
+        m_file_opened = false;
+        print("Error: Open file failed", filename);
+      }
+      return true;
     }
     else {
-      Serial1.println("initialization carte SD : failed");
+      print("initialization carte SD : failed");
       m_file_opened = false;
+      return false;
     }
   }
 
