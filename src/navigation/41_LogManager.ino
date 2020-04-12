@@ -17,11 +17,11 @@ class LogManager: public BaseManager
     // If the first line is not initialized.
     if (m_not_initialized) {
       // Get all the data names.
-      std::map<string, string> data = m_db->getAllData();
+      Map<String, String> data = m_db->getAllData();
       String line = "";
-      for (std::map<string, string>::iterator it = data.begin(); it != data.end(); ++it){
-        line += it->first.c_str();
-        if (it != data.end()) {
+      for (int i = 0; i < data.size(); i++){
+        line += data.keyAt(i).c_str();
+        if (i != data.size()-1) {
           line += ";";
         }
       }
@@ -36,12 +36,12 @@ class LogManager: public BaseManager
     else {
 
       // Get all data.
-      std::map<string, string> data = m_db->getAllData();
+      Map<String, String> data = m_db->getAllData();
       // Make a string line with all this data.
       String line = "";
-      for (std::map<string, string>::iterator it = data.begin(); it != data.end(); ++it){
-        line += it->second.c_str();
-        if (it != data.end()) {
+      for (int i = 0; i < data.size(); i++){
+        line += data.valueAt(i).c_str();
+        if (i != data.size()-1) {
           line += ";";
         }
       }

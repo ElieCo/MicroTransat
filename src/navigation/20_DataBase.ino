@@ -4,39 +4,34 @@ using namespace std;
 
 #define VAR_NAME(type) DB##type
 
-#define MAP_TYPE(type) std::map<std::string, type>
+#define MAP_TYPE(type) Map<String, type>
 
 #define GET_SET_AND_INIT(type)                                        \
-        bool getData(string name, type &data) {                       \
-          if (VAR_NAME(type).count(name)) {                           \
-            data = VAR_NAME(type)[name];                              \
+        bool getData(String name, type &data) {                       \
+          if (VAR_NAME(type).contains(name)) {                        \
+            data = type();                          \
             return true;                                              \
           } else {                                                    \
             print("Error: try to get non valid data:", name.c_str()); \
             return false;                                             \
           }                                                           \
         }                                                             \
-        void setData(string name, type data) {                        \
-          if (!VAR_NAME(type).count(name)) {                          \
+        void setData(String name, type data) {                        \
+          if (!VAR_NAME(type).contains(name)) {                       \
             print("Variable not initialized:", name.c_str());         \
             return;                                                   \
           }                                                           \
-          VAR_NAME(type)[name] = data;                                \
+          VAR_NAME(type).set(name, data);                             \
         }                                                             \
-        void initData(string name, type data) {                       \
-          VAR_NAME(type)[name] = data;                                \
+        void initData(String name, type data) {                       \
+          VAR_NAME(type).set(name, data);                             \
         }
 
 #define MAP(type) MAP_TYPE(type) VAR_NAME(type);
 
 #define ADD_TO_MAP_AS_STRING(map_name, type)                                                            \
-        for (MAP_TYPE(type)::iterator it = VAR_NAME(type).begin(); it != VAR_NAME(type).end(); ++it){   \
-                map_name[it->first] = String(it->second).c_str();                                       \
-        }
-
-#define ADD_TO_MAP(map_name, type)                                                                      \
-        for (MAP_TYPE(type)::iterator it = VAR_NAME(type).begin(); it != VAR_NAME(type).end(); ++it){   \
-                map_name[it->first] = it->second;                                                       \
+        for (int i = 0; i < VAR_NAME(type).size(); i++){                                                \
+                map_name.set(VAR_NAME(type).keyAt(i), String(VAR_NAME(type).valueAt(i)));               \
         }
 
 class DataBase {
@@ -44,7 +39,6 @@ class DataBase {
   public:
 
     GET_SET_AND_INIT(String)
-    GET_SET_AND_INIT(string)
     GET_SET_AND_INIT(int)
     GET_SET_AND_INIT(unsigned)
     GET_SET_AND_INIT(long)
@@ -52,10 +46,9 @@ class DataBase {
     GET_SET_AND_INIT(double)
     GET_SET_AND_INIT(bool)
 
-    std::map<string, string> getAllData(){
-        std::map<string, string> map_string;
+    Map<String, String> getAllData(){
+        Map<String, String> map_string;
 
-        ADD_TO_MAP(map_string, string)
         ADD_TO_MAP_AS_STRING(map_string, String)
         ADD_TO_MAP_AS_STRING(map_string, int)
         ADD_TO_MAP_AS_STRING(map_string, unsigned)
@@ -70,7 +63,6 @@ class DataBase {
   private:
 
     MAP(String)
-    MAP(string)
     MAP(int)
     MAP(unsigned)
     MAP(long)

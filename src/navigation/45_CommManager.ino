@@ -49,11 +49,11 @@ class CommManager : public BaseManager
    * @return line the string with all data in it.
    */
   String getLine(){
-    std::map<string, string> data = m_db->getAllData();
+    Map<String, String> data = m_db->getAllData();
     String line = "";
-    for (std::map<string, string>::iterator it = data.begin(); it != data.end(); ++it){
-      line += it->second.c_str();
-      if (it != data.end()) {
+    for (int i = 0; i < data.size(); i++){
+      line += data.valueAt(i).c_str();
+      if (i != data.size()-1) {
         line += ";";
       }
     }
