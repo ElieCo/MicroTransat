@@ -69,7 +69,7 @@ QPolygon MainWindow::createBackground(){
 
 void MainWindow::updateView()
 {
-    cm.send("log");
+    cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
     hdop->setText("HDOP : " + QString::number(cm.getData("HDOP")));
     latittude->setText("latittude : " + QString::number(cm.getData("Latittude")));
     longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));
@@ -205,11 +205,12 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
 void MainWindow::update_val(int i){
         qDebug()<< "valeur de la box : "<< i;
 }
+
 void MainWindow::handleButton()
 {
    test_button->setText("Example");
-   qDebug()<< "valeur de la box : "<< val_selection->value();
-   cm.send(QString::number(val_selection->value()));
+   //qDebug()<< "valeur de la box : "<< val_selection->value();
+   cm.setrequest("c"+QString::number(val_selection->value()));
 }
 
 MainWindow::MainWindow()
@@ -252,5 +253,5 @@ MainWindow::MainWindow()
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateView));
-    timer->start(1000);
+    timer->start(1500);
 }

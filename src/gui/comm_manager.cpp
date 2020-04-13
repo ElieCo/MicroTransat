@@ -51,7 +51,7 @@ void CommManager::decryptMsg(QString msg)
     if(!msg.contains(";"))
             return;
     QStringList dataList = msg.split(";");
-    if (dataList.length() == header.length()){
+    if (dataList.length()-1 == header.length()){
         for (int i = 0; i < header.length(); i++){
             m_serialData[header.at(i)] = dataList[i].toInt();
         }
@@ -77,16 +77,25 @@ void CommManager::readData()
         m_cache.remove(QChar('\n'), Qt::CaseInsensitive);
         m_cache.remove(QChar('~'), Qt::CaseInsensitive);
         decryptMsg(m_cache);
-        qDebug() << m_cache;
+        qDebug() << "msg recu et assemble : " << m_cache;
         m_cache = "";
     }
     else {
         m_cache += data;
     }
 }
-
-void CommManager::send(QString text)
+void CommManager::setrequest(QString text)
 {
+    request = text;
+}
+
+void CommManager::send()
+{
+    if (request.length() == 0){
+        request = "log";
+    }
     m_serial->flush();
-    m_serial->write(text.toStdString().c_str());
+    m_serial->write(request.toStdString().c_str());
+
+    request = "";
 }
