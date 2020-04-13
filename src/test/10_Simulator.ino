@@ -51,8 +51,8 @@ class Simulator{
     else
       return;
 
-    m_db->setData("Latitude", m_actual_position.lat);
-    m_db->setData("Longitude", m_actual_position.lng);
+    m_db->setData("Latitude", long(m_actual_position.lat*1000000));
+    m_db->setData("Longitude", long(m_actual_position.lng*1000000));
     m_db->setData("Fix_age", int(0));
 
     int time = millis()*1000;
