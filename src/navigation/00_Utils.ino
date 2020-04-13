@@ -48,3 +48,32 @@ void from0to360(float &angle){
 void from180to180(float &angle){
   limit_angle(angle, 180.0);
 }
+
+template <class T>
+class Average{
+  public:
+  Average(int len){
+    m_buffer = new T[len];
+    m_len = len;
+    m_index = 0;
+  }
+  ~Average(){}
+
+  T average(T value){
+    m_buffer[m_index++] = value;
+    
+    T total = T();
+    for(int i = 0; i < m_len; i++){
+      total += m_buffer[i];
+    }
+
+    return total/m_len;
+  }
+
+  private:
+  T *m_buffer;
+  int m_len;
+  int m_index;
+  
+};
+
