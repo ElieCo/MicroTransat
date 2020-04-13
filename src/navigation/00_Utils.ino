@@ -57,7 +57,9 @@ class Average{
     m_len = len;
     m_index = 0;
   }
-  ~Average(){}
+  ~Average(){
+    delete m_buffer;
+  }
 
   T average(T value){
     m_buffer[m_index++] = value;
