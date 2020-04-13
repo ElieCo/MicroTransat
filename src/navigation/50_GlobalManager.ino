@@ -50,6 +50,10 @@ public:
     }
   }
 
+  DataBase* getDB(){
+    return &m_db;
+  }
+
 private:
   DataBase m_db;
 
