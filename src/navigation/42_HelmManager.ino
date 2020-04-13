@@ -7,8 +7,7 @@ class HelmManager : public BaseManager
   ~HelmManager(){}
 
   void init() {
-    m_db->initData("Cmd_helm",
-    float());
+    m_db->initData("Cmd_helm", float());
 
     m_normal_angle_speed = 45;
     m_tack_angle_speed = 180;
