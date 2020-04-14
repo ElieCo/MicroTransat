@@ -12,7 +12,7 @@ class LogManager: public BaseManager
     // Initialize the SD card.
     bool sd_ready = false;
     m_db->getData("SD_ready", sd_ready);
-    sd_ready = m_log_file.init("log.csv", sd_ready, false);
+    sd_ready = m_log_csv_file.init("log.csv", sd_ready, false);
     m_db->setData("SD_ready", sd_ready);
 
     m_not_initialized = true;
@@ -31,7 +31,7 @@ class LogManager: public BaseManager
         }
       }
       // Log a first line all the names.
-      m_log_file.write(line);
+      m_log_csv_file.write(line);
 
       // Remember that we did it.
       m_not_initialized = false;
@@ -51,16 +51,16 @@ class LogManager: public BaseManager
         }
       }
       // Log this line.
-      m_log_file.write(line);
+      m_log_csv_file.write(line);
     }
   }
 
   void stop() {
-    m_log_file.close();
+    m_log_csv_file.close();
   }
 
   private:
 
-  SDfile m_log_file;
+  SDfile m_log_csv_file;
   bool m_not_initialized;
 };
