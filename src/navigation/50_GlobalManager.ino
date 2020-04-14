@@ -4,13 +4,13 @@ class GlobalManager {
 public:
   GlobalManager()
     : m_missionMan("MissionManager", 1000)
-    , m_logMan("LoggerManager", 1000)
+    , m_logMan("LoggerManager", 250)
     , m_helmMan("HelmManager", 250)
     , m_wingMan("WingManager", 250)
     , m_commMan("CommManager", 0)
     , m_sensorsMan("SensorsManager", 500)
     , m_lightMan("LightManager", 500)
-    , m_captain("Captain", 500)
+    , m_captain("Captain", 5000)
   {
     m_managers.push_back(&m_missionMan);
     m_managers.push_back(&m_logMan);
