@@ -54,22 +54,23 @@ class Captain : public BaseManager
     m_db->getData("Wpt_angle", angleToWaypoint);
 
     // Get the angle of the regulator.
+    // We ue this data as if it was the real wind cap of the boat,
+    // so we have to take the helm cmd, not the regulator angle,
+    // because it's more close to the wind cap.
     float reg_angle;
-    m_db->getData("Regulator_angle", reg_angle);
-
+    m_db->getData("Cmd_helm", reg_angle);
+    from180to180(reg_angle);
 
     // Calcul the difference between the actual course an the angle to the next waypoint.
     float diff = angleToWaypoint - course;
-    from180to180(diff);
 
     // Calcul the new regulator command to reach the waypoint.
     float new_reg = reg_angle + diff;
-
-    int sign = new_reg/new_reg;
+    from180to180(new_reg);
 
     // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
-    if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
-    if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
+    if (abs(new_reg) < m_max_upwind) new_reg = (reg_angle >= 0) ? m_max_upwind : -m_max_upwind;
+    if (abs(new_reg) > m_max_downwind) new_reg = (reg_angle >= 0) ? m_max_downwind : -m_max_downwind;
 
     // Set in the DB the regulator angle.
     m_db->setData("Regulator_angle", new_reg);
