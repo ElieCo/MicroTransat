@@ -55,11 +55,11 @@ class Simulator{
     m_db->setData("Longitude", long(m_actual_position.lng*1000000));
     m_db->setData("Fix_age", int(0));
 
-    int time = millis()*1000;
+    int time = millis()/1000;
     int second = time % 60;
     int min = ((time - second)/60) % 60;
     int hour = (time - second - min*60) / 3600;
-    time = String(String(hour)+String(min)+String(second)).toInt();
+    time = String(String(hour)+(min<10 ? "0" : "")+String(min)+(second<10 ? "0" : "")+String(second)).toInt();
     
     m_db->setData("Time", time);
     m_db->setData("Date", int(0));
