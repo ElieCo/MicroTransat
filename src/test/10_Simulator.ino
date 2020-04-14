@@ -7,7 +7,7 @@ class Simulator{
     , m_movement_time(0)
     , m_gps_period(500)
     , m_gps_time(0)
-    , m_wind_direction(0.0)
+    , m_wind_origin(0.0)
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
     , m_average_course(10)
@@ -17,9 +17,9 @@ class Simulator{
   }
   ~Simulator(){}
 
-  void initSimulation(DataBase* db, float wind_dir, Coord init_pos){
+  void initSimulation(DataBase* db, float wind_origin, Coord init_pos){
     m_db = db;
-    m_wind_direction = wind_dir;
+    m_wind_origin = wind_origin;
     m_actual_position = init_pos;
   }
 
@@ -34,7 +34,9 @@ class Simulator{
     calculatePosition(m_movement_period);
 
     // Get the new cap
-    m_db->getData("Cmd_helm", m_actual_cap);
+    float helm = 0.0;
+    m_db->getData("Cmd_helm", helm);
+    m_actual_cap = m_wind_origin + helm;
     from0to360(m_actual_cap);
     
     // Calcul new speed
@@ -71,15 +73,15 @@ class Simulator{
   }
 
   float getWindDirection(){
-    return m_wind_direction;
+    return m_wind_origin;
   }
   void setWindDirection(float wind_dir){
-    m_wind_direction = wind_dir;
-    from0to360(m_wind_direction);
+    m_wind_origin = wind_dir;
+    from0to360(m_wind_origin);
   }
   void moveWindDirection(float diff){
-    m_wind_direction = m_wind_direction + diff;
-    from0to360(m_wind_direction);
+    m_wind_origin = m_wind_origin + diff;
+    from0to360(m_wind_origin);
   }
 
   void setMovementPeriod(int period){
@@ -97,7 +99,7 @@ class Simulator{
   unsigned int m_gps_period;
   unsigned int m_gps_time;
 
-  float m_wind_direction;
+  float m_wind_origin;
   float m_actual_cap;
   float m_actual_speed;
   Coord m_actual_position;
@@ -105,18 +107,28 @@ class Simulator{
   Average<float> m_average_course;
 
   void calculateSpeed(float wing_angle){
+    print("========================================");
+    print("wing_angle", wing_angle);
+    print("m_wind_origin", m_wind_origin);
+    print("m_actual_speed", m_actual_speed);
+    print("m_actual_cap", m_actual_cap);
 
-    float lift_to_wind = 90 + abs(wing_angle - 90);
-    if (wing_angle > 90) lift_to_wind *= -1;
+    float wind_direction = m_wind_origin + 180;
+    float sail_angle = wind_direction - (wing_angle - 90);
+    print("sail_angle", sail_angle);
     
-    float lift_angle = m_wind_direction + lift_to_wind;
+    float lift_angle = (wind_direction - sail_angle) > 0 ? sail_angle+90 : sail_angle-90;
     from0to360(lift_angle);
+    print("lift_angle", lift_angle);
 
     float diff_angle = abs(m_actual_cap - lift_angle);
+    print("diff_angle", diff_angle);
     float prop_coeff = cos(radians(diff_angle));
+    print("prop_coeff", prop_coeff);
     
-    float max_speed = 1.5;
+    float max_speed = 5;
     float theorical_speed = max_speed * prop_coeff;
+    print("theorical_speed", theorical_speed);
 
     m_actual_speed = m_actual_speed + 0.3*(theorical_speed - m_actual_speed);
   }
