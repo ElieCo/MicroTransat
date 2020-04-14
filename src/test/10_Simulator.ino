@@ -122,7 +122,7 @@ class Simulator{
 
   void calculatePosition(float dt){
     float dist = m_actual_speed * dt/1000;
-    float nlat, nlng;
+    double nlat, nlng;
     getPointAtDistAndBearing(m_actual_position.lat, m_actual_position.lng, dist, m_actual_cap, nlat, nlng);
     m_actual_position.lat = nlat;
     m_actual_position.lng = nlng;

@@ -1,8 +1,8 @@
 #include "TinyGPS.h"
 
 struct Coord{
-  float lat = 0.0;
-  float lng = 0.0;
+  double lat = 0.0;
+  double lng = 0.0;
 };
 
 float get_distance(float lat1, float lng1, float lat2, float lng2){
@@ -21,7 +21,7 @@ float get_course(float lat1, float lng1, float lat2, float lng2){
  * @param distance between the two points.
  * @param new_lat and new_lon references on the coordinates of the result point.
  */
-void getPointAtDistAndBearing(float actual_lat, float actual_lon, float distance, float bearing, float &new_lat, float &new_lon) {
+void getPointAtDistAndBearing(double actual_lat, double actual_lon, double distance, double bearing, double &new_lat, double &new_lon) {
   actual_lat = radians(actual_lat);
   actual_lon = radians(actual_lon);
   bearing = radians(bearing);
