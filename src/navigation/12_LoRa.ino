@@ -40,7 +40,6 @@ class LoRa
       if(m_lora->recv(buf, &len))
       {
         msg = String((char *)buf);
-        print(msg);
       } else {
         print("recv failed");
       }
