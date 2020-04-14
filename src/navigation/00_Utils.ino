@@ -62,7 +62,8 @@ class Average{
   }
 
   T average(T value){
-    m_buffer[m_index++] = value;
+    m_buffer[m_index] = value;
+    m_index = (m_index + 1) % m_len;
     
     T total = T();
     for(int i = 0; i < m_len; i++){
