@@ -65,6 +65,9 @@ class MissionManager : public BaseManager
         m_waypoints.push_back(wp);
       }
     }
+    
+    m_db->setData("Lat_next_point", int(m_waypoints.at(m_index).lat * 1000000));
+    m_db->setData("Lon_next_point", int(m_waypoints.at(m_index).lng * 1000000));
   }
 
   boolean next_point(float dist) { // unité : mètres
