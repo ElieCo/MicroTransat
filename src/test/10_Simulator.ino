@@ -106,9 +106,10 @@ class Simulator{
 
   void calculateSpeed(float wing_angle){
 
-    float lift_angle = 0.0;
-    if (wing_angle < 0) lift_angle = m_wind_direction + (wing_angle + 90);
-    else lift_angle = m_wind_direction - (wing_angle + 90);
+    float lift_to_wind = 90 + abs(wing_angle - 90);
+    if (wing_angle > 90) lift_to_wind *= -1;
+    
+    float lift_angle = m_wind_direction + lift_to_wind;
     from0to360(lift_angle);
 
     float diff_angle = abs(m_actual_cap - lift_angle);
