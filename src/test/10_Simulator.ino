@@ -114,7 +114,7 @@ class Simulator{
     float diff_angle = abs(m_actual_cap - lift_angle);
     float prop_coeff = cos(radians(diff_angle));
     
-    float max_speed = 0.5;
+    float max_speed = 1.5;
     float theorical_speed = max_speed * prop_coeff;
 
     m_actual_speed = m_actual_speed + 0.3*(theorical_speed - m_actual_speed);
