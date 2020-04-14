@@ -14,6 +14,14 @@ void print(String s1, String s2){
   serialDebug.println(s2);
 }
 
+void print(String s1, String s2, String s3){
+  serialDebug.print(s1);
+  serialDebug.print(" ");
+  serialDebug.print(s2);
+  serialDebug.print(" ");
+  serialDebug.println(s3);
+}
+
 float toMS(float speed){
   return speed/1.94384;
 }
