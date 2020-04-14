@@ -1,5 +1,7 @@
 #define serialDebug Serial1
 
+#define DEBUGLEVEL 0
+
 void initSerialDebug(){
   serialDebug.begin(9600);
 }
@@ -36,6 +38,7 @@ float toKnots(float speed){
  * @param ma the superior limit.
  */
 void limit_angle(float &angle, float ma){
+  if (DEBUGLEVEL >= 2) print("limit_angle", angle, ma);
   float mi = ma - 360;
   while(angle > ma) angle -= 360;
   while(angle < mi) angle += 360;

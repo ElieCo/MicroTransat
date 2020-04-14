@@ -146,6 +146,7 @@ private:
   }
 
   Element* recursiveFind(T1 key, Element* element){
+    if(DEBUGLEVEL >= 2) print("recursiveFind", key);
     if (!element) return NULL;
     if (element->key == key) return element;
     else {
@@ -155,6 +156,7 @@ private:
   }
 
   void recursiveClear(Element* element){
+    if(DEBUGLEVEL >= 2) print("recursiveClear");
     if (!element) return;
     if (element->next_element != m_first_element)
       recursiveClear(element->next_element);
@@ -162,6 +164,7 @@ private:
   }
 
   void recursiveCount(Element* element, int &count){
+    if(DEBUGLEVEL >= 2) print("recursiveCount", count);
     if (!element) return;
     if (element->next_element != m_first_element)
       recursiveCount(element->next_element, count);
@@ -169,6 +172,7 @@ private:
   }
 
   Element* recursiveAt(Element* element, int &count){
+    if(DEBUGLEVEL >= 2) print("recursiveAt", count);
     if (!element) return NULL;
     if (count > 0) {
       count--;

@@ -22,7 +22,10 @@ class BaseManager{
    * at least *m_runInterval* ms before.
    */
   void run(){
-    if (isTimeToRun()) go();
+    if (isTimeToRun()) {
+      if (DEBUGLEVEL>= 1) print("Run: ",m_name);
+      go();
+    }
   }
 
   void baseStop(){
