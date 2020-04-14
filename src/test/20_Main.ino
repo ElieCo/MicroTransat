@@ -7,7 +7,7 @@ void setup(){
   int lat = 0;
   int lng = 0;
   globalManager.getDB()->getData("Lat_next_point", lat);
-  globalManager.getDB()->getData("Lat_next_point", lng);
+  globalManager.getDB()->getData("Lon_next_point", lng);
   Coord first_pos;
   first_pos.lat = float(lat)/1000000;
   first_pos.lng = float(lng)/1000000;
