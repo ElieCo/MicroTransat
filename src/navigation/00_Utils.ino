@@ -64,6 +64,8 @@ class Average{
     m_buffer = new T[len];
     m_len = len;
     m_index = 0;
+
+    for (int i = 0; i < m_len; i++) m_buffer[i] = 0;
   }
   ~Average(){
     delete m_buffer;
