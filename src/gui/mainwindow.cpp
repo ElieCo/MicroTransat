@@ -67,9 +67,8 @@ QPolygon MainWindow::createBackground(){
     return fond_carte;
 }
 
-void MainWindow::updateView()
+void MainWindow::updateRawData()
 {
-    cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
     hdop->setText("HDOP : " + QString::number(cm.getData("HDOP")));
     latittude->setText("latittude : " + QString::number(cm.getData("Latittude")));
     longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));
@@ -91,8 +90,10 @@ void MainWindow::updateView()
     corridor_width->setText("corridor_width : " + QString::number(cm.getData("Corridor_width")));
     ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("ecart_axe")));
     Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("Presence_couloir")));
+}
 
-
+void MainWindow::updateBoatPosition()
+{
     int lat = cm.getData("Latittude");
     int lon = cm.getData("Longitude");
     int lat_next_p = cm.getData("Lat_next_point");
@@ -138,6 +139,14 @@ void MainWindow::updateView()
             wind->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale, sin(M_PI*wind_angle/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*wind_angle/180)*40-(lat-lat_ofset)/scale);
         }
     }
+}
+
+void MainWindow::updateView()
+{
+    cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
+
+    updateRawData();
+    updateBoatPosition();
 }
 
 void MainWindow::setVarDisplay(QGridLayout * layout)
