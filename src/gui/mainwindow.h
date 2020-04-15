@@ -16,6 +16,9 @@ class MainWindow : public QMainWindow
 
     private:
     QPolygon createBackground();
+    void updateView();
+    void updateRawData();
+    void updateBoatPosition();
     void setVarDisplay(QGridLayout *);
     void setButtonDisplay(QGridLayout *);
 
