@@ -94,7 +94,7 @@ void MainWindow::updateRawData()
 
 void MainWindow::updateBoatPosition()
 {
-    int lat = cm.getData("Latittude");
+    int lat = cm.getData("Latitude");
     int lon = cm.getData("Longitude");
 
 
