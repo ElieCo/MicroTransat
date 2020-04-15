@@ -121,10 +121,11 @@ void MainWindow::updateBoatPosition()
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
         if (track.length()>0){
-            track.lineTo(lon,-lat);
+            track.lineTo((lon-lon_ofset)/scale,-(lat-lat_ofset)/scale);
         }
         else {
-            track.moveTo(lon,-lat);
+            track.moveTo((lon-lon_ofset)/scale,1-(lat-lat_ofset)/scale);
+            track.lineTo((lon-lon_ofset)/scale,-(lat-lat_ofset)/scale);
         }
         ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
         ligne2->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale-5, (lon-lon_ofset)/scale, -(lat-lat_ofset)/scale+5);
@@ -171,6 +172,7 @@ void MainWindow::updateView()
 
     updateRawData();
     updateBoatPosition();
+    path->setPath(track);
 }
 
 void MainWindow::setVarDisplay(QGridLayout * layout)
@@ -260,7 +262,7 @@ MainWindow::MainWindow()
     scene.addPolygon(createBackground());
 
     // add the boat track in the scetch
-    scene.addPath(track);
+    path = scene.addPath(track);
 
     // draw the cross representing the boat
     ligne1 = scene.addLine(QLine(-5,0,5,0));

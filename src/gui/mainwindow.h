@@ -23,6 +23,7 @@ class MainWindow : public QMainWindow
 
     QGraphicsScene scene;
     QGraphicsView * view;
+    QGraphicsPathItem * path;
     QPainterPath track;
     QGraphicsLineItem * ligne1;
     QGraphicsLineItem * ligne2;
