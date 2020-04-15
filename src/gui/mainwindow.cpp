@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "mainwindow.h"
 #include <QFile>
 #include <QGraphicsTextItem>
 
@@ -70,21 +70,21 @@ QPolygon MainWindow::createBackground(){
 void MainWindow::updateRawData()
 {
     hdop->setText("HDOP : " + QString::number(cm.getData("HDOP")));
-    latittude->setText("latittude : " + QString::number(cm.getData("Latittude")));
+    latittude->setText("latitude : " + QString::number(cm.getData("Latitude")));
     longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));
     lat_next_point->setText("lat_next_point : " + QString::number(cm.getData("Lat_next_point")));
     lon_next_point->setText("lon_next_point : " + QString::number(cm.getData("Lon_next_point")));
     lat_prev_point->setText("lat_prev_point : " + QString::number(cm.getData("Lat_prev_point")));
     lon_prev_point->setText("lon_prev_point : " + QString::number(cm.getData("Lon_prev_point")));
     wpt_angle->setText("wpt_angle : " + QString::number(cm.getData("Wpt_angle")));
-    wpt_dist->setText("wpt_dist : " + QString::number(cm.getData("Wpt_dst")));
-    Index_wpt->setText("Index_wpt : " + QString::number(cm.getData("Index_wpt")));
+    wpt_dist->setText("wpt_dist : " + QString::number(cm.getData("Wpt_dist")));
+    Index_wpt->setText("Index_wpt : " + QString::number(cm.getData("Wpt_index")));
 
-    speed->setText("speed : " + QString::number(cm.getData("Vitesse")));
-    heading->setText("heading : " + QString::number(cm.getData("Cap")));
+    speed->setText("speed : " + QString::number(cm.getData("Speed")));
+    heading->setText("heading : " + QString::number(cm.getData("Course")));
 
-    reg_angle->setText("reg_angle : " + QString::number(cm.getData("Angle_regulateur")));
-    winglet_pos->setText("winglet_pos : " + QString::number(cm.getData("Pos_aile")));
+    reg_angle->setText("reg_angle : " + QString::number(cm.getData("Regulator_angle")));
+    winglet_pos->setText("winglet_pos : " + QString::number(cm.getData("Wing_angle")));
     battery->setText("battery : " + QString::number(cm.getData("Battery")));
 
     corridor_width->setText("corridor_width : " + QString::number(cm.getData("Corridor_width")));
@@ -96,10 +96,27 @@ void MainWindow::updateBoatPosition()
 {
     int lat = cm.getData("Latittude");
     int lon = cm.getData("Longitude");
-    int lat_next_p = cm.getData("Lat_next_point");
-    int lon_next_p = cm.getData("Lon_next_point");
-    int lat_prev_p = cm.getData("Lat_prev_point");
-    int lon_prev_p = cm.getData("Lon_prev_point");
+
+    if ((cm.getData("Lat_prev_point") == 404 || cm.getData("Lat_prev_point") == 0) && lat != 404 && lat !=0) {
+        cm.setData("Lat_prev_point", lat);
+        lat_prev_p = lat;
+    }
+    if ((cm.getData("Lon_prev_point") == 404 || cm.getData("Lon_prev_point") == 0) && lon != 404 && lon !=0) {
+        cm.setData("Lon_prev_point", lon);
+        lon_prev_p = lon;
+    }
+
+    if (lat_next_p != cm.getData("Lat_next_point") && lat_next_p != 0 && lat_next_p != 404){
+        lat_prev_p = lat_next_p;
+        cm.setData("Lat_prev_point", lat_prev_p);
+    }
+    lat_next_p = cm.getData("Lat_next_point");
+
+    if (lon_next_p != cm.getData("Lon_next_point") && lon_next_p != 0 && lon_next_p != 404){
+        lon_prev_p = lon_next_p;
+        cm.setData("Lat_prev_point", lon_prev_p);
+    }
+    lon_next_p = cm.getData("Lon_next_point");
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
         ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
@@ -116,19 +133,19 @@ void MainWindow::updateBoatPosition()
            ligne3->setLine((lon_next_p-lon_ofset)/scale, -(lat_next_p-lat_ofset)/scale, (lon_prev_p-lon_ofset)/scale, -(lat_prev_p-lat_ofset)/scale);
         }
 
-        int heading_ = cm.getData("Cap");
+        int heading_ = cm.getData("Course");
         if (heading_ != 404)
         {
             label_cap->setPos(sin(M_PI*heading_/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*heading_/180)*40-(lat-lat_ofset)/scale);
             cap->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale, sin(M_PI*heading_/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*heading_/180)*40-(lat-lat_ofset)/scale);
         }
-        int wind_angle = cm.getData("Angle_regulateur");
+        int wind_angle = cm.getData("Regulator_angle");
         if (wind_angle != 404)
         {
             if (wind_angle < 0){
                 wind_angle += 180;
             }
-            wind_angle += heading_;
+            wind_angle = heading_ - wind_angle;
 
             if (wind_angle > 360)
             {
@@ -223,6 +240,10 @@ void MainWindow::handleButton()
 }
 
 MainWindow::MainWindow()
+    : lat_next_p(0)
+    , lon_next_p(0)
+    , lat_prev_p(0)
+    , lon_prev_p(0)
 {
     QWidget *zoneCentrale = new QWidget;
 
@@ -261,6 +282,6 @@ MainWindow::MainWindow()
     setCentralWidget(zoneCentrale);
 
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateView));
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateView);
     timer->start(1500);
 }

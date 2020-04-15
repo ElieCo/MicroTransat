@@ -1,4 +1,11 @@
-#include "/home/elie/Projets/Bateau/MicroTransat/src/navigation/navigation.ino"
+#define IDENT(x) x
+#define XSTR(x) #x
+#define STR(x) XSTR(x)
+#define PATH(x,y) STR(IDENT(x)IDENT(y))
+
+#define REPO /home/elie/Projets/MicroTransat/
+
+#include PATH(REPO,src/navigation/navigation.ino)
 
 bool first_test_loop;
 
