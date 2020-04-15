@@ -17,7 +17,7 @@ class LightManager : public BaseManager
     // Led binking if not.
     bool gps_ready;
     bool has_data = m_db->getData("Gps_ready", gps_ready);
-    if (has_data && gps_ready) {
+    if (has_data && gps_ready && false) {
       m_btn_led.on();
     } else {
       m_btn_led.reverse();

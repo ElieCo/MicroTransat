@@ -9,10 +9,7 @@ class Captain : public BaseManager
 
   void init(){
     m_behaviour = ACQUISITION;
-    m_max_upwind = 30;
-    m_db->initData("Max_upwind", m_max_upwind);
     m_db->initData("Regulator_angle", float());
-    m_max_downwind = 130;
   }
 
   void go(){
@@ -35,6 +32,15 @@ class Captain : public BaseManager
   void stop(){}
 
   private:
+
+  void config(){
+    m_db->getData("Max_upwind", m_max_upwind);
+    m_db->getData("Max_downwind", m_max_downwind);
+  }
+
+  BEHAVIOUR m_behaviour;
+
+  double m_max_upwind, m_max_downwind;
 
   void state_sleep(){
     m_behaviour = ACQUISITION;
@@ -82,8 +88,4 @@ class Captain : public BaseManager
   void state_process(){
     m_behaviour = SLEEP;
   }
-
-  BEHAVIOUR m_behaviour;
-
-  float m_max_upwind, m_max_downwind;
 };

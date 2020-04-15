@@ -1,5 +1,5 @@
 
-#define BASIC_CONSTRUCTOR(className) className(String name, unsigned long inter) : BaseManager(name, inter){}
+#define BASIC_CONSTRUCTOR(className) className(String name, unsigned long inter = 1000) : BaseManager(name, inter){}
 
 class BaseManager{
 
@@ -14,6 +14,13 @@ class BaseManager{
 
   void baseInit(){
     print("Init manager:", m_name);
+    
+    double inter = m_runInterval;
+    m_db->getData(m_name, inter);
+    m_runInterval = inter;
+
+    config();
+    
     init();
   }
 
@@ -43,6 +50,14 @@ class BaseManager{
 
   protected:
 
+  String m_name;
+  unsigned long m_timer;
+  unsigned long m_runInterval;
+  DataBase * m_db;
+  
+  private:
+
+  virtual void config(){}
   virtual void init(){}
   virtual void go(){}
   virtual void stop(){}
@@ -60,10 +75,5 @@ class BaseManager{
       return false;
     }
   }
-
-  String m_name;
-  unsigned long m_timer;
-  unsigned long m_runInterval;
-  DataBase * m_db;
 
 };

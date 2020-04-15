@@ -9,12 +9,9 @@ class HelmManager : public BaseManager
   void init() {
     m_db->initData("Cmd_helm", float());
 
-    m_normal_angle_speed = 45;
-    m_tack_angle_speed = 180;
     m_last_time = -1;
 
-    int ratio = (1.0/2.0) * (180.0 / 170.0) * (21.0 / 35.0);
-    m_servo.init(7, ratio, 180);
+    m_servo.init(7, m_helm_ratio, m_helm_offset);
   }
 
   void go(){
@@ -23,7 +20,7 @@ class HelmManager : public BaseManager
     m_db->getData("Regulator_angle", helm_cmd);
 
     // Choose the speed in function of the angle to the wind
-    float max_upwind = 30;
+    double max_upwind = 30;
     m_db->getData("Max_upwind", max_upwind);
     float angle_speed;
     if (abs(m_helm_angle) <= max_upwind) angle_speed = m_tack_angle_speed;
@@ -57,16 +54,24 @@ class HelmManager : public BaseManager
 
   private:
 
+  void config(){
+    m_db->getData("Helm_ratio", m_helm_ratio);
+    m_db->getData("Helm_offset", m_helm_offset);
+    m_db->getData("Helm_normal_speed", m_normal_angle_speed);
+    m_db->getData("Helm_tack_speed", m_tack_angle_speed);
+  }
+
+  double m_normal_angle_speed, m_tack_angle_speed; // deg/s
+  double m_helm_ratio, m_helm_offset;
+  float m_helm_angle;
+  int m_last_time;
+
+  ServoMotor m_servo;
+
   void cmd_helm(){
     // Set in the DB the value of this angle.
     m_db->setData("Cmd_helm", m_helm_angle);
     // Command the servo-motor.
     m_servo.write(m_helm_angle);
   }
-
-  float m_normal_angle_speed, m_tack_angle_speed; // deg/s
-  float m_helm_angle;
-  int m_last_time;
-
-  ServoMotor m_servo;
 };

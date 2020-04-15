@@ -9,9 +9,8 @@ class WingManager : public BaseManager
   void init(){
     m_db->initData("Wing_angle", float());
 
-    int angle = 10;
-    m_starbord_angle = 90 + angle;
-    m_port_angle = 90 - angle;
+    m_starbord_angle = 90 + m_wing_delta;
+    m_port_angle = 90 - m_wing_delta;
 
     m_servo.init(5);
   }
@@ -38,6 +37,11 @@ class WingManager : public BaseManager
 
   private:
 
+  void config(){
+    m_db->getData("Wing_delta", m_wing_delta);
+  }
+
   int m_starbord_angle, m_port_angle;
+  double m_wing_delta;
   ServoMotor m_servo;
 };
