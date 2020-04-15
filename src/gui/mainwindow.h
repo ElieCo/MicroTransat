@@ -16,7 +16,6 @@ class MainWindow : public QMainWindow
 
     private:
     QPolygon createBackground();
-    void updateView();
     void setVarDisplay(QGridLayout *);
     void setButtonDisplay(QGridLayout *);
 
@@ -65,6 +64,13 @@ class MainWindow : public QMainWindow
     int lat_ofset;
     int lon_ofset;
     int scale;
+
+    int lat_next_p, lon_next_p;
+    int lat_prev_p, lon_prev_p;
+
+public slots:
+
+    void updateView();
 };
 
 #endif
