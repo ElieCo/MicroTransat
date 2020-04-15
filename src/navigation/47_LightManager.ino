@@ -24,6 +24,8 @@ class LightManager : public BaseManager
     }
   }
 
+  void stop(){}
+
   private:
 
   Led m_btn_led;
