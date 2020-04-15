@@ -16,7 +16,6 @@ class MainWindow : public QMainWindow
 
     private:
     QPolygon createBackground();
-    void updateView();
     void updateRawData();
     void updateBoatPosition();
     void setVarDisplay(QGridLayout *);
@@ -24,6 +23,7 @@ class MainWindow : public QMainWindow
 
     QGraphicsScene scene;
     QGraphicsView * view;
+    QPainterPath track;
     QGraphicsLineItem * ligne1;
     QGraphicsLineItem * ligne2;
     QGraphicsLineItem * ligne3;

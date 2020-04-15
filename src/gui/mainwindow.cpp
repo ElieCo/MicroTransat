@@ -97,6 +97,7 @@ void MainWindow::updateBoatPosition()
     int lat = cm.getData("Latittude");
     int lon = cm.getData("Longitude");
 
+
     if ((cm.getData("Lat_prev_point") == 404 || cm.getData("Lat_prev_point") == 0) && lat != 404 && lat !=0) {
         cm.setData("Lat_prev_point", lat);
         lat_prev_p = lat;
@@ -119,6 +120,12 @@ void MainWindow::updateBoatPosition()
     lon_next_p = cm.getData("Lon_next_point");
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
+        if (track.length()>0){
+            track.lineTo(lon,-lat);
+        }
+        else {
+            track.moveTo(lon,-lat);
+        }
         ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
         ligne2->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale-5, (lon-lon_ofset)/scale, -(lat-lat_ofset)/scale+5);
     }
@@ -250,8 +257,10 @@ MainWindow::MainWindow()
     cm.openSerialPort("//./COM6");
 
     // lecture de fichier
-    QPolygon fond_carte = createBackground();
-    scene.addPolygon(fond_carte);
+    scene.addPolygon(createBackground());
+
+    // add the boat track in the scetch
+    scene.addPath(track);
 
     // draw the cross representing the boat
     ligne1 = scene.addLine(QLine(-5,0,5,0));
