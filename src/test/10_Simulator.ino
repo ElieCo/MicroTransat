@@ -107,28 +107,18 @@ class Simulator{
   Average<float> m_average_course;
 
   void calculateSpeed(float wing_angle){
-    print("========================================");
-    print("wing_angle", wing_angle);
-    print("m_wind_origin", m_wind_origin);
-    print("m_actual_speed", m_actual_speed);
-    print("m_actual_cap", m_actual_cap);
-
+    
     float wind_direction = m_wind_origin + 180;
     float sail_angle = wind_direction - (wing_angle - 90);
-    print("sail_angle", sail_angle);
     
     float lift_angle = (wind_direction - sail_angle) > 0 ? sail_angle+90 : sail_angle-90;
     from0to360(lift_angle);
-    print("lift_angle", lift_angle);
 
     float diff_angle = abs(m_actual_cap - lift_angle);
-    print("diff_angle", diff_angle);
     float prop_coeff = cos(radians(diff_angle));
-    print("prop_coeff", prop_coeff);
     
     float max_speed = 5;
     float theorical_speed = max_speed * prop_coeff;
-    print("theorical_speed", theorical_speed);
 
     m_actual_speed = m_actual_speed + 0.3*(theorical_speed - m_actual_speed);
   }
