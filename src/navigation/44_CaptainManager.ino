@@ -13,6 +13,8 @@ class Captain : public BaseManager
     m_db->initData("Dist_to_axis", float(), true);
     m_db->initData("In_corridor", bool(), true);
     m_db->initData("Cmd_helm_applied", bool());
+    
+    m_prev_average_course = 0;
   }
 
   void go(){
@@ -44,13 +46,24 @@ class Captain : public BaseManager
   BEHAVIOUR m_behaviour;
 
   double m_max_upwind, m_max_downwind;
+  float m_prev_average_course;
 
   void state_sleep(){
     m_behaviour = ACQUISITION;
   }
 
   void state_acquisition(){
-    m_behaviour = DECIDE;
+    float course = 0;
+    m_db->getData("Average_course", course);
+
+    // Wait that the course average is stable to take a decision.
+    if(m_prev_average_course != 0 && abs(m_prev_average_course - course) < 5) {
+      m_behaviour = DECIDE;
+      m_prev_average_course = 0;
+    } else {
+      m_prev_average_course = course;
+    }
+    
   }
 
   void state_decide(){
