@@ -47,11 +47,20 @@ class MissionManager : public BaseManager
     m_db->setData("Wpt_angle", angleToWaypoint);
     m_db->setData("Lat_next_point", int(m_waypoints.at(m_index).lat * 1000000));
     m_db->setData("Lon_next_point", int(m_waypoints.at(m_index).lng * 1000000));
+    m_db->setData("Lat_prev_point", int(m_waypoints.at(m_index - 1).lat * 1000000));
+    m_db->setData("Lon_prev_point", int(m_waypoints.at(m_index - 1).lng * 1000000));
   }
 
   void stop(){}
 
   private:
+
+  Vector<Coord> m_waypoints;
+  int m_index = 0;
+  int m_valid_wpt = 25;
+  int m_corridor_width = 60;
+
+  SDfile m_mission_file;
 
   void parseMission(){
     String text = m_mission_file.readAll();
@@ -71,6 +80,9 @@ class MissionManager : public BaseManager
     
     m_db->setData("Lat_next_point", int(m_waypoints.at(m_index).lat * 1000000));
     m_db->setData("Lon_next_point", int(m_waypoints.at(m_index).lng * 1000000));
+    m_db->setData("Lat_prev_point", int(m_waypoints.at(m_index - 1).lat * 1000000));
+    m_db->setData("Lon_prev_point", int(m_waypoints.at(m_index - 1).lng * 1000000));
+    m_db->setData("Corridor_width", m_corridor_width);
   }
 
   boolean next_point(float dist) { // unité : mètres
@@ -78,26 +90,12 @@ class MissionManager : public BaseManager
     // Note : we consider that if dist==0 there should be an error.
     if (dist <= m_valid_wpt && dist != 0) {
       // Change the index.
-      if (m_index < m_waypoints.size() - 1) {
-        m_index ++;
-      }
-      else {
-        m_index = 0;
-      }
+      m_index = (m_index+1) % m_waypoints.size();
       // Set in the DB the new index.
       m_db->setData("Wpt_index", m_index);
       return true;
     }
     return false;
   }
-
-
-  //float wp_lat[2] = {47.731309, 47.730627};
-  //float wp_lon[2] = { -3.395384, -3.390921};
-  Vector<Coord> m_waypoints;
-  int m_index = 0;
-  int m_valid_wpt = 25;
-
-  SDfile m_mission_file;
 
 };
