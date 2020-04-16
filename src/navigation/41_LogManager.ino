@@ -31,7 +31,7 @@ class LogManager: public BaseManager
         }
       }
       // Log a first line all the names.
-      m_log_csv_file.write(line);
+      m_log_csv_file.write(line.replace("\n","").replace("\r",""));
 
       // Remember that we did it.
       m_not_initialized = false;
