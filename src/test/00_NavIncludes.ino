@@ -92,4 +92,5 @@ class SensorsManager: public BaseManager
 };
 
 #include PATH(NAVREPO,47_LightManager.ino)
+#include PATH(NAVREPO,48_ConfigManager.ino)
 #include PATH(NAVREPO,50_GlobalManager.ino)
