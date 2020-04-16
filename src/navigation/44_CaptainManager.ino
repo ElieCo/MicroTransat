@@ -10,6 +10,8 @@ class Captain : public BaseManager
   void init(){
     m_behaviour = ACQUISITION;
     m_db->initData("Regulator_angle", float(), true);
+    m_db->initData("Dist_to_axis", float(), true);
+    m_db->initData("In_corridor", bool(), true);
   }
 
   void go(){
@@ -60,9 +62,6 @@ class Captain : public BaseManager
     m_db->getData("Wpt_angle", angleToWaypoint);
 
     // Get the angle of the regulator.
-    // We ue this data as if it was the real wind cap of the boat,
-    // so we have to take the helm cmd, not the regulator angle,
-    // because it's more close to the wind cap.
     float reg_angle;
     m_db->getData("Cmd_helm", reg_angle);
     from180to180(reg_angle);
@@ -74,9 +73,13 @@ class Captain : public BaseManager
     float new_reg = reg_angle + diff;
     from180to180(new_reg);
 
+    // if she's on the corridor, she go on the same direction as the previous regul, else as the new one
+    bool isPositive = isInCorridor() ? reg_angle >= 0 : new_reg >= 0;
+    int sign = isPositive ? 1 : -1;
+
     // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
-    if (abs(new_reg) < m_max_upwind) new_reg = (reg_angle >= 0) ? m_max_upwind : -m_max_upwind;
-    if (abs(new_reg) > m_max_downwind) new_reg = (reg_angle >= 0) ? m_max_downwind : -m_max_downwind;
+    if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
+    if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
 
     // Set in the DB the regulator angle.
     m_db->setData("Regulator_angle", new_reg);
@@ -87,5 +90,40 @@ class Captain : public BaseManager
 
   void state_process(){
     m_behaviour = SLEEP;
+  }
+
+  bool isInCorridor(){
+    
+    float angleToWaypoint = 0;
+    m_db->getData("Wpt_angle", angleToWaypoint);
+    
+    float distToWaypoint = 0;
+    m_db->getData("Wpt_dist", distToWaypoint);
+    
+    int lat_next_point = 0;
+    m_db->getData("Lat_next_point", lat_next_point);
+    
+    int lon_next_point = 0;
+    m_db->getData("Lon_next_point", lon_next_point);
+    
+    int lat_prev_point = 0;
+    m_db->getData("Lat_prev_point", lat_prev_point);
+    
+    int lon_prev_point = 0;
+    m_db->getData("Lon_prev_point", lon_prev_point);
+    
+    int corridor_width = 0;
+    m_db->getData("Corridor_width", corridor_width);
+
+    float angle_btw_wpt = get_course(float(lat_prev_point)/1000000, float(lon_prev_point)/1000000, float(lat_next_point)/1000000, float(lon_next_point)/1000000);
+    float dist_to_axis = sin(radians(angle_btw_wpt - angleToWaypoint)) * distToWaypoint;
+    
+    bool in_corridor = abs(dist_to_axis) <= corridor_width/2;
+    
+    m_db->setData("Dist_to_axis", dist_to_axis);
+    m_db->setData("In_corridor", in_corridor);
+
+    return in_corridor;
+    
   }
 };
