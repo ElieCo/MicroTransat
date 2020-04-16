@@ -20,16 +20,18 @@
           }                                                           \
           VAR_NAME(type).set(name, data);                             \
         }                                                             \
-        void initData(String name, type data) {                       \
+        void initData(String name, type data, int select = false) {   \
           if (!VAR_NAME(type).contains(name))                         \
             VAR_NAME(type).set(name, data);                           \
+            selected.set(name, select);                               \
         }
 
 #define MAP(type) MAP_TYPE(type) VAR_NAME(type);
 
-#define ADD_TO_MAP_AS_STRING(map_name, type)                                                            \
-        for (int i = 0; i < VAR_NAME(type).size(); i++){                                                \
-                map_name.set(VAR_NAME(type).keyAt(i), String(VAR_NAME(type).valueAt(i)));               \
+#define ADD_TO_MAP_AS_STRING(map_name, type, only_selected)                                         \
+        for (int i = 0; i < VAR_NAME(type).size(); i++){                                            \
+          if (!only_selected || selected.get(VAR_NAME(type).keyAt(i)))                              \
+            map_name.set(VAR_NAME(type).keyAt(i), String(VAR_NAME(type).valueAt(i)));               \
         }
 
 class DataBase {
@@ -44,16 +46,16 @@ class DataBase {
     GET_SET_AND_INIT(double)
     GET_SET_AND_INIT(bool)
 
-    Map<String, String> getAllData(){
+    Map<String, String> getAllData(bool only_selected = false){
         Map<String, String> map_string;
 
-        ADD_TO_MAP_AS_STRING(map_string, String)
-        ADD_TO_MAP_AS_STRING(map_string, int)
-        ADD_TO_MAP_AS_STRING(map_string, unsigned)
-        ADD_TO_MAP_AS_STRING(map_string, long)
-        ADD_TO_MAP_AS_STRING(map_string, float)
-        ADD_TO_MAP_AS_STRING(map_string, double)
-        ADD_TO_MAP_AS_STRING(map_string, bool)
+        ADD_TO_MAP_AS_STRING(map_string, int, only_selected)
+        ADD_TO_MAP_AS_STRING(map_string, unsigned, only_selected)
+        ADD_TO_MAP_AS_STRING(map_string, long, only_selected)
+        ADD_TO_MAP_AS_STRING(map_string, float, only_selected)
+        ADD_TO_MAP_AS_STRING(map_string, double, only_selected)
+        ADD_TO_MAP_AS_STRING(map_string, bool, only_selected)
+        ADD_TO_MAP_AS_STRING(map_string, String, only_selected)
 
         return map_string;
     }
@@ -67,4 +69,6 @@ class DataBase {
     MAP(float)
     MAP(double)
     MAP(bool)
+
+    Map<String, int> selected;
 };
