@@ -11,6 +11,7 @@
 #define REPO /home/elie/Projets/Bateau/MicroTransat/
 #define NAVREPO CONCAT(REPO,src/navigation/)
 
+#define SIMU true
 
 
 /////////////////////////////////////////////////
