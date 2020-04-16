@@ -53,7 +53,10 @@ class Vector{
    * @return value
    */
   T at(int place){
-    if (place >= size()) return T();
+    int s = size();
+    if (s <= 0) return T();
+    while(place < 0) place += s;
+    while(place >= s) place -= s;
     Element* element = recursiveAt(m_first_element, place);
     return element->value;
   }

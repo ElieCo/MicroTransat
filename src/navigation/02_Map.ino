@@ -43,7 +43,10 @@ public:
    * @return key
    */
   T1 keyAt(int place){
-    if (place >= size()) return T1();
+    int s = size();
+    if (s <= 0) return T1();
+    while(place < 0) place += s;
+    while(place >= s) place -= s;
     Element* element = recursiveAt(m_first_element, place);
     return element->key;
   }
@@ -54,7 +57,10 @@ public:
    * @return value
    */
   T2 valueAt(int place){
-    if (place >= size()) return T2();
+    int s = size();
+    if (s <= 0) return T2();
+    while(place < 0) place += s;
+    while(place >= s) place -= s;
     Element* element = recursiveAt(m_first_element, place);
     return element->value;
   }
