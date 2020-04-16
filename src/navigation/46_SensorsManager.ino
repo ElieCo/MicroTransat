@@ -8,20 +8,20 @@ class SensorsManager: public BaseManager
 
   void init(){
     m_db->initData("Gps_recent_data", bool());
-    m_db->initData("Latitude", long());
-    m_db->initData("Longitude", long());
+    m_db->initData("Latitude", long(), true);
+    m_db->initData("Longitude", long(), true);
     m_db->initData("Fix_age", int());
     m_db->initData("Time", int());
     m_db->initData("Date", int());
-    m_db->initData("Speed", float());
-    m_db->initData("Course", float());
-    m_db->initData("Average_course", float());
+    m_db->initData("Speed", float(), true);
+    m_db->initData("Course", float(), true);
+    m_db->initData("Average_course", float(), true);
     m_db->initData("Chars", int());
     m_db->initData("Sentences", unsigned());
     m_db->initData("Failed_checksum", unsigned());
-    m_db->initData("HDOP", int());
-    m_db->initData("Gps_ready", bool());
-    m_db->initData("Battery", double());
+    m_db->initData("HDOP", int(), true);
+    m_db->initData("Gps_ready", bool(), true);
+    m_db->initData("Battery", double(), true);
 
     // Initialize attributs needed to make the course average.
     m_course_tab_size = sizeof(m_course_tab) / sizeof(m_course_tab[0]);

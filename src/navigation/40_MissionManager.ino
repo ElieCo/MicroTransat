@@ -8,11 +8,14 @@ class MissionManager : public BaseManager
   ~MissionManager(){}
 
   void init(){
-    m_db->initData("Wpt_dist", float());
-    m_db->initData("Wpt_angle", float());
-    m_db->initData("Lat_next_point", int());
-    m_db->initData("Lon_next_point", int());
-    m_db->initData("Wpt_index", int());
+    m_db->initData("Wpt_dist", float(), true);
+    m_db->initData("Wpt_angle", float(), true);
+    m_db->initData("Lat_next_point", int(), true);
+    m_db->initData("Lon_next_point", int(), true);
+    m_db->initData("Lat_prev_point", int(), true);
+    m_db->initData("Lon_prev_point", int(), true);
+    m_db->initData("Corridor_width", int(), true);
+    m_db->initData("Wpt_index", int(), true);
     m_db->initData("SD_ready", false);
 
     bool sd_ready = false;

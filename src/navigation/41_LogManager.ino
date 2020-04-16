@@ -22,7 +22,7 @@ class LogManager: public BaseManager
     // If the first line is not initialized.
     if (m_not_initialized) {
       // Get all the data names.
-      Map<String, String> data = m_db->getAllData();
+      Map<String, String> data = m_db->getAllData(DEBUGLEVEL == 0);
       String line = "";
       for (int i = 0; i < data.size(); i++){
         line += data.keyAt(i).c_str();
@@ -41,7 +41,7 @@ class LogManager: public BaseManager
     else {
 
       // Get all data.
-      Map<String, String> data = m_db->getAllData();
+      Map<String, String> data = m_db->getAllData(DEBUGLEVEL == 0);
       // Make a string line with all this data.
       String line = "";
       for (int i = 0; i < data.size(); i++){

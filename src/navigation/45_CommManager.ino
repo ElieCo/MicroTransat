@@ -49,7 +49,7 @@ class CommManager : public BaseManager
    * @return line the string with all data in it.
    */
   String getLine(){
-    Map<String, String> data = m_db->getAllData();
+    Map<String, String> data = m_db->getAllData(true);
     String line = "";
     for (int i = 0; i < data.size(); i++){
       line += data.valueAt(i).c_str();

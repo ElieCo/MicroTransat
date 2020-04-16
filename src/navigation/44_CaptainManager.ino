@@ -9,7 +9,7 @@ class Captain : public BaseManager
 
   void init(){
     m_behaviour = ACQUISITION;
-    m_db->initData("Regulator_angle", float());
+    m_db->initData("Regulator_angle", float(), true);
   }
 
   void go(){
