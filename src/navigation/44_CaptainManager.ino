@@ -12,6 +12,7 @@ class Captain : public BaseManager
     m_db->initData("Regulator_angle", float(), true);
     m_db->initData("Dist_to_axis", float(), true);
     m_db->initData("In_corridor", bool(), true);
+    m_db->initData("Cmd_helm_applied", bool());
   }
 
   void go(){
@@ -84,12 +85,18 @@ class Captain : public BaseManager
     // Set in the DB the regulator angle.
     m_db->setData("Regulator_angle", new_reg);
 
+    // make sure to wait that the helm manager process
+    m_db->setData("Cmd_helm_applied", false);
+
     // Change the behaviour.
     m_behaviour = PROCESS;
   }
 
   void state_process(){
-    m_behaviour = SLEEP;
+    bool helm_applied = true;
+    m_db->getData("Cmd_helm_applied", helm_applied);
+    if (helm_applied)
+      m_behaviour = SLEEP;
   }
 
   bool isInCorridor(){

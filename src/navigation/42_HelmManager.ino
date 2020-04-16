@@ -8,6 +8,7 @@ class HelmManager : public BaseManager
 
   void init() {
     m_db->initData("Cmd_helm", float(), true);
+    m_db->initData("Cmd_helm_applied", bool());
 
     m_last_time = -1;
 
@@ -47,6 +48,8 @@ class HelmManager : public BaseManager
 
       cmd_helm();
     }
+
+    m_db->setData("Cmd_helm_applied", m_helm_angle == helm_cmd);
 
   }
 
