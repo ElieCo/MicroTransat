@@ -53,6 +53,13 @@ class Simulator{
     else
       return;
 
+    double prev_lat = 0;
+    m_db->getData("Latitude", prev_lat);
+    double prev_lng = 0;
+    m_db->getData("Longitude", prev_lng);
+    float course = 0.0;
+    if(prev_lat != 0 && prev_lng != 0) course = get_course(prev_lat, prev_lng, m_actual_position.lat, m_actual_position.lng);
+
     m_db->setData("Latitude", m_actual_position.lat);
     m_db->setData("Longitude", m_actual_position.lng);
     m_db->setData("Fix_age", int(0));
@@ -66,8 +73,8 @@ class Simulator{
     m_db->setData("Time", time);
     m_db->setData("Date", int(0));
     m_db->setData("Speed", toKnots(m_actual_speed));
-    m_db->setData("Course", m_actual_cap);
-    m_db->setData("Average_course", m_average_course.average(m_actual_cap));
+    m_db->setData("Course", course);
+    m_db->setData("Average_course", m_average_course.average(course));
     m_db->setData("HDOP", int(42));
     m_db->setData("Gps_ready", true);
   }
