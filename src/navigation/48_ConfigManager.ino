@@ -10,12 +10,8 @@ class ConfigManager: public BaseManager
   void init(){
     if (m_config.length() > 0) return;
 
-    m_db->initData("SD_ready", false);
-
-    bool sd_ready = false;
-    m_db->getData("SD_ready", sd_ready);
-    sd_ready = m_config_file.init("config.txt", sd_ready);
-    m_db->setData("SD_ready", sd_ready);
+    bool *sd_ready = m_db->initData("SD_ready", false);
+    *sd_ready = m_config_file.init("config.txt", *sd_ready);
     parseConfig();
   }
 
@@ -39,10 +35,10 @@ class ConfigManager: public BaseManager
         double interval = m_config[i]["interval"];
         m_db->initData(name, interval);
       }
-      
+
       if (m_config[i].hasOwnProperty("parameters")){
         JSONVar parameters = m_config[i]["parameters"];
-        
+
         for (int j = 0; j < parameters.length(); j++){
           if (parameters[j].hasOwnProperty("key")) {
             String key = (const char*) parameters[j]["key"];

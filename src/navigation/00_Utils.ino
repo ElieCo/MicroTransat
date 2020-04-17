@@ -64,6 +64,26 @@ void from180to180(float &angle){
   limit_angle(angle, 180.0);
 }
 
+/**
+ * Move the angle between 0 and 360 deg.
+ * @param angle a pointer to the angle.
+ */
+void from0to360(float *angle){
+  float a = *angle;
+  limit_angle(a, 360.0);
+  *angle = a;
+}
+
+/**
+ * Move the angle between -180 and 180 deg.
+ * @param angle a pointer to the angle.
+ */
+void from180to180(float *angle){
+  float a = *angle;
+  limit_angle(a, 180.0);
+  *angle = a;
+}
+
 template <class T>
 class Average{
   public:

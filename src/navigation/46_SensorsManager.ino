@@ -7,21 +7,21 @@ class SensorsManager: public BaseManager
   ~SensorsManager(){}
 
   void init(){
-    m_db->initData("Gps_recent_data", false);
-    m_db->initData("Latitude", double(0), true);
-    m_db->initData("Longitude", double(0), true);
-    m_db->initData("Fix", false, true);
-    m_db->initData("Fix_quality", int(0));
-    m_db->initData("Satellites", int(0));
-    m_db->initData("Fix_age", unsigned(0));
-    m_db->initData("Time", unsigned(0));
-    m_db->initData("Date", unsigned(0));
-    m_db->initData("Speed", float(0), true);
-    m_db->initData("Course", float(0), true);
-    m_db->initData("Average_course", float(0), true);
-    m_db->initData("HDOP", int(0), true);
-    m_db->initData("Gps_ready", false, true);
-    m_db->initData("Battery", double(0), true);
+    db_gps_recent_data.init(m_db, "Gps_recent_data", false);
+    db_latitude.init(m_db, "Latitude", double(0), true);
+    db_longitude.init(m_db, "Longitude", double(0), true);
+    db_fix.init(m_db, "Fix", false, true);
+    db_fix_quality.init(m_db, "Fix_quality", int(0));
+    db_satellites.init(m_db, "Satellites", int(0));
+    db_fix_age.init(m_db, "Fix_age", unsigned(0));
+    db_time.init(m_db, "Time", unsigned(0));
+    db_date.init(m_db, "Date", unsigned(0));
+    db_speed.init(m_db, "Speed", float(0), true);
+    db_course.init(m_db, "Course", float(0), true);
+    db_average_course.init(m_db, "Average_course", float(0), true);
+    db_hdop.init(m_db, "HDOP", int(0), true);
+    db_gps_ready.init(m_db, "Gps_ready", false, true);
+    db_battery.init(m_db, "Battery", double(0), true);
 
     // Initialize attributs needed to make the course average.
     m_course_tab_size = sizeof(m_course_tab) / sizeof(m_course_tab[0]);
@@ -36,35 +36,49 @@ class SensorsManager: public BaseManager
   void go(){
 
     // Manage GPS
-    bool has_data = m_gps.updateGpsData();
-    m_db->setData("Gps_recent_data", has_data);
+    db_gps_recent_data.set(m_gps.updateGpsData());
 
-    if (has_data){
-      m_db->setData("Latitude", m_gps.lat);
-      m_db->setData("Longitude", m_gps.lng);
-      m_db->setData("Fix",m_gps.fix);
-      m_db->setData("Fix_quality", m_gps.fix_quality);
-      m_db->setData("Satellites", m_gps.satellites);
-      m_db->setData("Fix_age", int(m_gps.fix_age));
-      m_db->setData("Time", int(m_gps.time));
-      m_db->setData("Date", int(m_gps.date));
-      m_db->setData("Speed", m_gps.speed);
-      m_db->setData("Course", m_gps.course);
-      m_db->setData("Average_course", averageCourse(m_gps.course));
-      m_db->setData("HDOP", int(m_gps.hdop));
-      if (m_gps.fix_quality > 0 && m_gps.hdop > 0 && m_gps.hdop < 500) m_db->setData("Gps_ready", true);
-      else m_db->setData("Gps_ready", false);
+    if (db_gps_recent_data.get()){
+      db_latitude.set(m_gps.lat);
+      db_longitude.set(m_gps.lng);
+      db_fix.set(m_gps.fix);
+      db_fix_quality.set(m_gps.fix_quality);
+      db_satellites.set(m_gps.satellites);
+      db_fix_age.set(int(m_gps.fix_age));
+      db_time.set(int(m_gps.time));
+      db_date.set(int(m_gps.date));
+      db_speed.set(m_gps.speed);
+      db_course.set(m_gps.course);
+      db_average_course.set(averageCourse(m_gps.course));
+      db_hdop.set(int(m_gps.hdop));
+      if (m_gps.fix_quality > 0 && m_gps.hdop > 0 && m_gps.hdop < 500) db_gps_ready.set(true);
+      else db_gps_ready.set(false);
     }
 
     // Manage battery
     double bat_val = m_bat.getValue();
-
-    m_db->setData("Battery", bat_val);
+    db_battery.set(bat_val);
   }
 
   void stop(){}
 
   private:
+
+  DBData<bool> db_gps_recent_data;
+  DBData<double> db_latitude;
+  DBData<double> db_longitude;
+  DBData<bool> db_fix;
+  DBData<int> db_fix_quality;
+  DBData<int> db_satellites;
+  DBData<unsigned> db_fix_age;
+  DBData<unsigned> db_time;
+  DBData<unsigned> db_date;
+  DBData<float> db_speed;
+  DBData<float> db_course;
+  DBData<float> db_average_course;
+  DBData<int> db_hdop;
+  DBData<bool> db_gps_ready;
+  DBData<double> db_battery;
 
   float averageCourse(float new_course){
     m_course_tab[m_course_index] = new_course;

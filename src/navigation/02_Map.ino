@@ -38,6 +38,17 @@ public:
   }
 
   /**
+   * Get a pointer to the value of this key.
+   * @param key
+   * @return pointer to the value
+   */
+  T2* getPtr(T1 key){
+    Element* element = findElement(key);
+    if (element) return &element->value;
+    else return NULL;
+  }
+
+  /**
    * Get the key at this place in the list.
    * @param place in the map
    * @return key

@@ -7,13 +7,10 @@ class LogManager: public BaseManager
   ~LogManager(){}
 
   void init(){
-    m_db->initData("SD_ready", false);
+    bool *sd_ready = m_db->initData("SD_ready", false);
 
     // Initialize the SD card.
-    bool sd_ready = false;
-    m_db->getData("SD_ready", sd_ready);
-    sd_ready = m_log_csv_file.init("log.csv", sd_ready, false);
-    m_db->setData("SD_ready", sd_ready);
+    *sd_ready = m_log_csv_file.init("log.csv", *sd_ready, false);
 
     m_not_initialized = true;
   }

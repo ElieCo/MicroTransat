@@ -20,10 +20,12 @@
           }                                                           \
           VAR_NAME(type).set(name, data);                             \
         }                                                             \
-        void initData(String name, type data, int select = false) {   \
-          if (!VAR_NAME(type).contains(name))                         \
+        type* initData(String name, type data, int select = false) {  \
+          if (!VAR_NAME(type).contains(name)) {                       \
             VAR_NAME(type).set(name, data);                           \
             selected.set(name, select);                               \
+          } else selected.set(name, (select || selected.get(name)));  \
+          return VAR_NAME(type).getPtr(name);                         \
         }
 
 #define MAP(type) MAP_TYPE(type) VAR_NAME(type);
@@ -77,4 +79,32 @@ class DataBase {
     MAP(bool)
 
     Map<String, int> selected;
+};
+
+template <class T>
+class DBData {
+  public:
+  DBData(){
+    data_ptr = NULL;
+  }
+  ~DBData(){}
+
+    void init(DataBase* db, String name, T value, bool selected = false){
+      data_ptr = db->initData(name, value, selected);
+    }
+
+  T get(){
+    if (data_ptr) return *data_ptr;
+    else return T();
+  }
+
+  void set(T value){
+    if (data_ptr) *data_ptr = value;
+  }
+
+  void add(T value){
+    if (data_ptr) *data_ptr += value;
+  }
+
+  T* data_ptr;
 };
