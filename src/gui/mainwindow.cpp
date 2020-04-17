@@ -88,8 +88,8 @@ void MainWindow::updateRawData()
     battery->setText("battery : " + QString::number(cm.getData("Battery")));
 
     corridor_width->setText("corridor_width : " + QString::number(cm.getData("Corridor_width")));
-    ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("ecart_axe")));
-    Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("Presence_couloir")));
+    ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("Dist_to_axis")));
+    Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("In_corridor")));
 }
 
 void MainWindow::updateBoatPosition()
