@@ -7,21 +7,21 @@ class SensorsManager: public BaseManager
   ~SensorsManager(){}
 
   void init(){
-    m_db->initData("Gps_recent_data", bool());
-    m_db->initData("Latitude", long(), true);
-    m_db->initData("Longitude", long(), true);
-    m_db->initData("Fix", bool(), true);
-    m_db->initData("Fix_quality", int());
-    m_db->initData("Satellites", int());
-    m_db->initData("Fix_age", unsigned());
-    m_db->initData("Time", unsigned());
-    m_db->initData("Date", unsigned());
-    m_db->initData("Speed", float(), true);
-    m_db->initData("Course", float(), true);
-    m_db->initData("Average_course", float(), true);
-    m_db->initData("HDOP", int(), true);
-    m_db->initData("Gps_ready", bool(), true);
-    m_db->initData("Battery", double(), true);
+    m_db->initData("Gps_recent_data", false);
+    m_db->initData("Latitude", long(0), true);
+    m_db->initData("Longitude", long(0), true);
+    m_db->initData("Fix", false, true);
+    m_db->initData("Fix_quality", int(0));
+    m_db->initData("Satellites", int(0));
+    m_db->initData("Fix_age", unsigned(0));
+    m_db->initData("Time", unsigned(0));
+    m_db->initData("Date", unsigned(0));
+    m_db->initData("Speed", float(0), true);
+    m_db->initData("Course", float(0), true);
+    m_db->initData("Average_course", float(0), true);
+    m_db->initData("HDOP", int(0), true);
+    m_db->initData("Gps_ready", false, true);
+    m_db->initData("Battery", double(0), true);
 
     // Initialize attributs needed to make the course average.
     m_course_tab_size = sizeof(m_course_tab) / sizeof(m_course_tab[0]);

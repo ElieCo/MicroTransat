@@ -7,8 +7,8 @@ class HelmManager : public BaseManager
   ~HelmManager(){}
 
   void init() {
-    m_db->initData("Cmd_helm", float(), true);
-    m_db->initData("Cmd_helm_applied", bool());
+    m_db->initData("Cmd_helm", float(0), true);
+    m_db->initData("Cmd_helm_applied", true);
 
     m_last_time = -1;
 

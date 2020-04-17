@@ -7,7 +7,7 @@ class WingManager : public BaseManager
   ~WingManager(){}
 
   void init(){
-    m_db->initData("Wing_angle", float(), true);
+    m_db->initData("Wing_angle", float(0), true);
 
     m_starbord_angle = 90 + m_wing_delta;
     m_port_angle = 90 - m_wing_delta;

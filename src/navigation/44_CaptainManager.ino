@@ -9,10 +9,10 @@ class Captain : public BaseManager
 
   void init(){
     m_behaviour = ACQUISITION;
-    m_db->initData("Regulator_angle", float(), true);
-    m_db->initData("Dist_to_axis", float(), true);
-    m_db->initData("In_corridor", bool(), true);
-    m_db->initData("Cmd_helm_applied", bool());
+    m_db->initData("Regulator_angle", float(0), true);
+    m_db->initData("Dist_to_axis", float(0), true);
+    m_db->initData("In_corridor", true, true);
+    m_db->initData("Cmd_helm_applied", true);
     
     m_prev_average_course = 0;
   }

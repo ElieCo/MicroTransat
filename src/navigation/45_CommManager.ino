@@ -7,7 +7,7 @@ class CommManager : public BaseManager
   ~CommManager(){}
 
   void init(){
-    m_db->initData("Msg_received", String());
+    m_db->initData("Msg_received", String(""));
 
     m_lora.init();
 
