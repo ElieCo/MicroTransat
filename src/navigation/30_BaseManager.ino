@@ -30,7 +30,7 @@ class BaseManager{
    */
   void run(){
     if (isTimeToRun()) {
-      if (DEBUGLEVEL>= 1) print("Run: ",m_name);
+      if (DEBUGLEVEL>= 2) print("Run: ",m_name);
       go();
     }
   }
