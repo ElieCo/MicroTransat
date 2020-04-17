@@ -34,6 +34,12 @@
             map_name.set(VAR_NAME(type).keyAt(i), String(VAR_NAME(type).valueAt(i)));               \
         }
 
+#define ADD_TO_MAP_AS_STRING_WITH_DECIMAL(map_name, type, only_selected, decimals)                  \
+        for (int i = 0; i < VAR_NAME(type).size(); i++){                                            \
+          if (!only_selected || selected.get(VAR_NAME(type).keyAt(i)))                              \
+            map_name.set(VAR_NAME(type).keyAt(i), String(VAR_NAME(type).valueAt(i), decimals));     \
+        }
+
 class DataBase {
 
   public:
@@ -53,7 +59,7 @@ class DataBase {
         ADD_TO_MAP_AS_STRING(map_string, unsigned, only_selected)
         ADD_TO_MAP_AS_STRING(map_string, long, only_selected)
         ADD_TO_MAP_AS_STRING(map_string, float, only_selected)
-        ADD_TO_MAP_AS_STRING(map_string, double, only_selected)
+        ADD_TO_MAP_AS_STRING_WITH_DECIMAL(map_string, double, only_selected, 7)
         ADD_TO_MAP_AS_STRING(map_string, bool, only_selected)
         ADD_TO_MAP_AS_STRING(map_string, String, only_selected)
 

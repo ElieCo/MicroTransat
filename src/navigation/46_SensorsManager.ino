@@ -8,8 +8,8 @@ class SensorsManager: public BaseManager
 
   void init(){
     m_db->initData("Gps_recent_data", false);
-    m_db->initData("Latitude", long(0), true);
-    m_db->initData("Longitude", long(0), true);
+    m_db->initData("Latitude", double(0), true);
+    m_db->initData("Longitude", double(0), true);
     m_db->initData("Fix", false, true);
     m_db->initData("Fix_quality", int(0));
     m_db->initData("Satellites", int(0));

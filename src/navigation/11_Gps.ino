@@ -38,8 +38,8 @@ class Gps
       if (GPS.newNMEAreceived()) {
         if (GPS.parse(GPS.lastNMEA())) {
 
-          lat = GPS.latitudeDegrees * 1000000;
-          lng = GPS.longitudeDegrees * 1000000;
+          lat = GPS.latitudeDegrees;
+          lng = GPS.longitudeDegrees;
           altitude = GPS.altitude;
           fix = GPS.fix;
           fix_quality = GPS.fixquality_3d;
@@ -61,7 +61,7 @@ class Gps
     return has_new_data;
   }
 
-  long lat, lng;
+  double lat, lng;
   float altitude;
   bool fix;
   int fix_quality;

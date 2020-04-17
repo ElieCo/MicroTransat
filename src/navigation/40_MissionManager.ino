@@ -10,10 +10,10 @@ class MissionManager : public BaseManager
   void init(){
     m_db->initData("Wpt_dist", float(0), true);
     m_db->initData("Wpt_angle", float(0), true);
-    m_db->initData("Lat_next_point", int(0), true);
-    m_db->initData("Lon_next_point", int(0), true);
-    m_db->initData("Lat_prev_point", int(0), true);
-    m_db->initData("Lon_prev_point", int(0), true);
+    m_db->initData("Lat_next_point", double(0), true);
+    m_db->initData("Lon_next_point", double(0), true);
+    m_db->initData("Lat_prev_point", double(0), true);
+    m_db->initData("Lon_prev_point", double(0), true);
     m_db->initData("Corridor_width", int(100), true);
     m_db->initData("Wpt_index", int(0), true);
     m_db->initData("SD_ready", false);
@@ -27,28 +27,28 @@ class MissionManager : public BaseManager
 
   void go(){
     // Get actual coordintes.
-    long lat, lng;
+    double lat, lng;
     m_db->getData("Latitude", lat);
     m_db->getData("Longitude", lng);
 
     // Calcul the distance to the next waypoint.
-    float distanceToWaypoint = get_distance(float(lat) / 1000000, float(lng) / 1000000, m_waypoints.at(m_index).lat, m_waypoints.at(m_index).lng);
+    float distanceToWaypoint = get_distance(lat, lng, m_waypoints.at(m_index).lat, m_waypoints.at(m_index).lng);
 
     // Check if the actual waypoint is validated and select the next one if needed.
     if (next_point(distanceToWaypoint)) {
       // Calcul the distance to the new waypoint.
-      distanceToWaypoint = get_distance(float(lat) / 1000000, float(lng) / 1000000, m_waypoints.at(m_index).lat, m_waypoints.at(m_index).lng);
+      distanceToWaypoint = get_distance(lat, lng, m_waypoints.at(m_index).lat, m_waypoints.at(m_index).lng);
     }
     // Calcul the course to the next waypoint.
-    float angleToWaypoint = get_course(float(lat) / 1000000, float(lng) / 1000000, m_waypoints.at(m_index).lat, m_waypoints.at(m_index).lng);
+    float angleToWaypoint = get_course(lat, lng, m_waypoints.at(m_index).lat, m_waypoints.at(m_index).lng);
 
     // Set all this data in the DB.
     m_db->setData("Wpt_dist", distanceToWaypoint);
     m_db->setData("Wpt_angle", angleToWaypoint);
-    m_db->setData("Lat_next_point", int(m_waypoints.at(m_index).lat * 1000000));
-    m_db->setData("Lon_next_point", int(m_waypoints.at(m_index).lng * 1000000));
-    m_db->setData("Lat_prev_point", int(m_waypoints.at(m_index - 1).lat * 1000000));
-    m_db->setData("Lon_prev_point", int(m_waypoints.at(m_index - 1).lng * 1000000));
+    m_db->setData("Lat_next_point", m_waypoints.at(m_index).lat);
+    m_db->setData("Lon_next_point", m_waypoints.at(m_index).lng);
+    m_db->setData("Lat_prev_point", m_waypoints.at(m_index - 1).lat);
+    m_db->setData("Lon_prev_point", m_waypoints.at(m_index - 1).lng);
   }
 
   void stop(){}
@@ -78,10 +78,10 @@ class MissionManager : public BaseManager
       }
     }
     
-    m_db->setData("Lat_next_point", int(m_waypoints.at(m_index).lat * 1000000));
-    m_db->setData("Lon_next_point", int(m_waypoints.at(m_index).lng * 1000000));
-    m_db->setData("Lat_prev_point", int(m_waypoints.at(m_index - 1).lat * 1000000));
-    m_db->setData("Lon_prev_point", int(m_waypoints.at(m_index - 1).lng * 1000000));
+    m_db->setData("Lat_next_point", m_waypoints.at(m_index).lat);
+    m_db->setData("Lon_next_point", m_waypoints.at(m_index).lng);
+    m_db->setData("Lat_prev_point", m_waypoints.at(m_index - 1).lat);
+    m_db->setData("Lon_prev_point", m_waypoints.at(m_index - 1).lng);
     m_db->setData("Corridor_width", m_corridor_width);
   }
 

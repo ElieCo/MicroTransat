@@ -94,30 +94,30 @@ void MainWindow::updateRawData()
 
 void MainWindow::updateBoatPosition()
 {
-    int lat = cm.getData("Latitude");
-    int lon = cm.getData("Longitude");
+    int lat = cm.getData("Latitude")*1000000;
+    int lon = cm.getData("Longitude")*1000000;
 
 
     if ((cm.getData("Lat_prev_point") == 404 || cm.getData("Lat_prev_point") == 0) && lat != 404 && lat !=0) {
-        cm.setData("Lat_prev_point", lat);
+        cm.setData("Lat_prev_point", lat/1000000);
         lat_prev_p = lat;
     }
     if ((cm.getData("Lon_prev_point") == 404 || cm.getData("Lon_prev_point") == 0) && lon != 404 && lon !=0) {
-        cm.setData("Lon_prev_point", lon);
+        cm.setData("Lon_prev_point", lon/1000000);
         lon_prev_p = lon;
     }
 
-    if (lat_next_p != cm.getData("Lat_next_point") && lat_next_p != 0 && lat_next_p != 404){
+    if (lat_next_p != cm.getData("Lat_next_point")*1000000 && lat_next_p != 0 && lat_next_p != 404){
         lat_prev_p = lat_next_p;
-        cm.setData("Lat_prev_point", lat_prev_p);
+        cm.setData("Lat_prev_point", lat_prev_p/1000000);
     }
-    lat_next_p = cm.getData("Lat_next_point");
+    lat_next_p = cm.getData("Lat_next_point")*1000000;
 
-    if (lon_next_p != cm.getData("Lon_next_point") && lon_next_p != 0 && lon_next_p != 404){
+    if (lon_next_p != cm.getData("Lon_next_point")*1000000 && lon_next_p != 0 && lon_next_p != 404){
         lon_prev_p = lon_next_p;
-        cm.setData("Lat_prev_point", lon_prev_p);
+        cm.setData("Lat_prev_point", lon_prev_p/1000000);
     }
-    lon_next_p = cm.getData("Lon_next_point");
+    lon_next_p = cm.getData("Lon_next_point")*1000000;
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
         if (track.length()>0){

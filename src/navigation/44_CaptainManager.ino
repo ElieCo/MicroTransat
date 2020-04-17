@@ -120,22 +120,22 @@ class Captain : public BaseManager
     float distToWaypoint = 0;
     m_db->getData("Wpt_dist", distToWaypoint);
     
-    int lat_next_point = 0;
+    double lat_next_point = 0;
     m_db->getData("Lat_next_point", lat_next_point);
     
-    int lon_next_point = 0;
+    double lon_next_point = 0;
     m_db->getData("Lon_next_point", lon_next_point);
     
-    int lat_prev_point = 0;
+    double lat_prev_point = 0;
     m_db->getData("Lat_prev_point", lat_prev_point);
     
-    int lon_prev_point = 0;
+    double lon_prev_point = 0;
     m_db->getData("Lon_prev_point", lon_prev_point);
     
     int corridor_width = 0;
     m_db->getData("Corridor_width", corridor_width);
 
-    float angle_btw_wpt = get_course(float(lat_prev_point)/1000000, float(lon_prev_point)/1000000, float(lat_next_point)/1000000, float(lon_next_point)/1000000);
+    float angle_btw_wpt = get_course(lat_prev_point, lon_prev_point, lat_next_point, lon_next_point);
     float dist_to_axis = sin(radians(angle_btw_wpt - angleToWaypoint)) * distToWaypoint;
     
     bool in_corridor = abs(dist_to_axis) <= corridor_width/2;
