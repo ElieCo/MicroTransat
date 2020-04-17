@@ -12,6 +12,7 @@ class MainWindow : public QMainWindow
 
     private slots:
     void handleButton();
+    void resetHit();
     void update_val(int);
 
     private:
@@ -38,6 +39,7 @@ class MainWindow : public QMainWindow
     QGraphicsTextItem * label_cap;
     QGraphicsTextItem * label_wind;
 
+    QPushButton * resetTrack;
     QPushButton * test_button;
     QSpinBox * val_selection;
 

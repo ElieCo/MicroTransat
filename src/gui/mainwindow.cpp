@@ -234,11 +234,22 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
     connect(test_button, SIGNAL (released()), this, SLOT (handleButton()));
     grid->addWidget(test_button,0,1);
 
-    layout->addLayout(grid,0,1);
+
+    // track display
+    resetTrack = new QPushButton("Reset Track", this);
+    connect(resetTrack, SIGNAL (released()), this, SLOT (resetHit()));
+    grid->addWidget(resetTrack,1,0);
+
+    layout->addLayout(grid, 0, 1);
 }
 
 void MainWindow::update_val(int i){
         qDebug()<< "valeur de la box : "<< i;
+}
+
+void MainWindow::resetHit()
+{
+   track.clear();
 }
 
 void MainWindow::handleButton()
