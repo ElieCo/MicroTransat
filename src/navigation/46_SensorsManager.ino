@@ -30,7 +30,7 @@ class SensorsManager: public BaseManager
     m_course_index = 0;
 
     // Initialize the battery.
-    m_bat.init(A14);
+    m_bat.init(A16);
   }
 
   void go(){

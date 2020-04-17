@@ -8,7 +8,7 @@ class LightManager : public BaseManager
 
   void init(){
     m_btn_led.init(13);
-    m_nav_led.init(33);
+    m_nav_led.init(39);
     m_nav_led.on();
   }
 
