@@ -55,24 +55,24 @@ class SensorsManager: public BaseManager
   ~SensorsManager(){}
 
   void init(){
-    m_db->initData("Gps_recent_data", bool());
-    m_db->initData("Latitude", long(), true);
-    m_db->initData("Longitude", long(), true);
-    m_db->initData("Fix_age", int());
-    m_db->initData("Time", int());
-    m_db->initData("Date", int());
-    m_db->initData("Speed", float(), true);
-    m_db->initData("Course", float(), true);
-    m_db->initData("Average_course", float(), true);
-    m_db->initData("Chars", int());
-    m_db->initData("Sentences", unsigned());
-    m_db->initData("Failed_checksum", unsigned());
-    m_db->initData("HDOP", int(), true);
-    m_db->initData("Gps_ready", bool(), true);
-    m_db->initData("Battery", double(), true);
+    m_db->initData("Gps_recent_data", false);
+    m_db->initData("Latitude", double(0), true);
+    m_db->initData("Longitude", double(0), true);
+    m_db->initData("Fix", false, true);
+    m_db->initData("Fix_quality", int(0));
+    m_db->initData("Satellites", int(0));
+    m_db->initData("Fix_age", unsigned(0));
+    m_db->initData("Time", unsigned(0));
+    m_db->initData("Date", unsigned(0));
+    m_db->initData("Speed", float(0), true);
+    m_db->initData("Course", float(0), true);
+    m_db->initData("Average_course", float(0), true);
+    m_db->initData("HDOP", int(0), true);
+    m_db->initData("Gps_ready", false, true);
+    m_db->initData("Battery", double(0), true);
 
     // Initialize the battery.
-    m_bat.init(A14);
+    m_bat.init(A16);
   }
 
   void go(){
