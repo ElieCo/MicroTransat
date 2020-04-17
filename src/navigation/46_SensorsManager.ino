@@ -10,15 +10,15 @@ class SensorsManager: public BaseManager
     m_db->initData("Gps_recent_data", bool());
     m_db->initData("Latitude", long(), true);
     m_db->initData("Longitude", long(), true);
-    m_db->initData("Fix_age", int());
-    m_db->initData("Time", int());
-    m_db->initData("Date", int());
+    m_db->initData("Fix", bool(), true);
+    m_db->initData("Fix_quality", int());
+    m_db->initData("Satellites", int());
+    m_db->initData("Fix_age", unsigned());
+    m_db->initData("Time", unsigned());
+    m_db->initData("Date", unsigned());
     m_db->initData("Speed", float(), true);
     m_db->initData("Course", float(), true);
     m_db->initData("Average_course", float(), true);
-    m_db->initData("Chars", int());
-    m_db->initData("Sentences", unsigned());
-    m_db->initData("Failed_checksum", unsigned());
     m_db->initData("HDOP", int(), true);
     m_db->initData("Gps_ready", bool(), true);
     m_db->initData("Battery", double(), true);
@@ -41,18 +41,18 @@ class SensorsManager: public BaseManager
 
     if (has_data){
       m_db->setData("Latitude", m_gps.lat);
-      m_db->setData("Longitude", m_gps.lon);
+      m_db->setData("Longitude", m_gps.lng);
+      m_db->setData("Fix",m_gps.fix);
+      m_db->setData("Fix_quality", m_gps.fix_quality);
+      m_db->setData("Satellites", m_gps.satellites);
       m_db->setData("Fix_age", int(m_gps.fix_age));
       m_db->setData("Time", int(m_gps.time));
       m_db->setData("Date", int(m_gps.date));
       m_db->setData("Speed", m_gps.speed);
       m_db->setData("Course", m_gps.course);
       m_db->setData("Average_course", averageCourse(m_gps.course));
-      m_db->setData("Chars", int(m_gps.chars));
-      m_db->setData("Sentences", m_gps.sentences);
-      m_db->setData("Failed_checksum", m_gps.failed_checksum);
       m_db->setData("HDOP", int(m_gps.hdop));
-      if (m_gps.hdop > 0 && m_gps.hdop < 500) m_db->setData("Gps_ready", true);
+      if (m_gps.fix_quality > 0 && m_gps.hdop > 0 && m_gps.hdop < 500) m_db->setData("Gps_ready", true);
       else m_db->setData("Gps_ready", false);
     }
 
