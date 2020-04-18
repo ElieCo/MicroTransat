@@ -28,11 +28,11 @@ void print(String s1, String s2, String s3){
   serialDebug.println(s3);
 }
 
-float toMS(float speed){
+float knotsToMs(float speed){
   return speed/1.94384;
 }
 
-float toKnots(float speed){
+float msToKnots(float speed){
   return speed*1.94384;
 }
 
