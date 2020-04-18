@@ -1,7 +1,14 @@
-{
-	"waypoints":
-	[
-		[47.731309, -3.395384],
-		[47.730627, -3.390921]
-	]
-}
+[
+	{
+	"latitude": 47.731309,
+	"longitude": -3.395384,
+	"corridor_width": 60,
+	"validation_distance": 25
+	},
+	{
+	"latitude": 47.730627,
+	"longitude": -3.390921,
+	"corridor_width": 60,
+	"validation_distance": 25
+	}
+]

@@ -1,5 +1,10 @@
 #include <Arduino_JSON.h>
 
+struct Waypoint{
+  Coord coord;
+  double corridor_width;
+  double valid_dist;
+};
 
 class MissionManager : public BaseManager
 {
@@ -26,28 +31,34 @@ class MissionManager : public BaseManager
 
   void go(){
     // Calcul the distance to the next waypoint.
-    float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).lat, m_waypoints.at(db_wpt_index.get()).lng);
+    float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).coord.lat, m_waypoints.at(db_wpt_index.get()).coord.lng);
 
     // Check if the actual waypoint is validated and select the next one if needed.
     if (next_point(distanceToWaypoint)) {
       // Calcul the distance to the new waypoint.
-      distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).lat, m_waypoints.at(db_wpt_index.get()).lng);
+      distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).coord.lat, m_waypoints.at(db_wpt_index.get()).coord.lng);
     }
     // Calcul the course to the next waypoint.
-    float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).lat, m_waypoints.at(db_wpt_index.get()).lng);
+    float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).coord.lat, m_waypoints.at(db_wpt_index.get()).coord.lng);
 
     // Set all this data in the DB.
     db_dist_to_wpt.set(distanceToWaypoint);
     db_angle_to_wpt.set(angleToWaypoint);
-    db_lat_next.set(m_waypoints.at(db_wpt_index.get()).lat);
-    db_lng_next.set(m_waypoints.at(db_wpt_index.get()).lng);
-    db_lat_prev.set(m_waypoints.at(db_wpt_index.get() - 1).lat);
-    db_lng_prev.set(m_waypoints.at(db_wpt_index.get() - 1).lng);
+    db_lat_next.set(m_waypoints.at(db_wpt_index.get()).coord.lat);
+    db_lng_next.set(m_waypoints.at(db_wpt_index.get()).coord.lng);
+    db_lat_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lat);
+    db_lng_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lng);
+    db_corridor_width.set(m_waypoints.at(db_wpt_index.get()).corridor_width);
   }
 
   void stop(){}
 
   private:
+
+  void config(){
+    m_db->getData("Default_corridor_width", m_default_corridor_width);
+    m_db->getData("Default_validation_distance", m_default_validation_distance);
+  }
 
   DBData<float> db_dist_to_wpt;
   DBData<float> db_angle_to_wpt;
@@ -60,9 +71,9 @@ class MissionManager : public BaseManager
   DBData<double> db_latitude;
   DBData<double> db_longitude;
 
-  Vector<Coord> m_waypoints;
-  int m_valid_wpt = 25;
-  int m_corridor_width = 60;
+  Vector<Waypoint> m_waypoints;
+  int m_default_validation_distance;
+  int m_default_corridor_width;
 
   SDfile m_mission_file;
 
@@ -71,28 +82,35 @@ class MissionManager : public BaseManager
 
     JSONVar mission = JSON.parse(text);
 
-    if (mission.hasOwnProperty("waypoints")) {
-      JSONVar waypoints = mission["waypoints"];
-      m_waypoints.clear();
-      for (int i = 0; i < waypoints.length(); i++){
-        Coord wp;
-        wp.lat = double(waypoints[i][0]);
-        wp.lng = double(waypoints[i][1]);
+    for (int i = 0; i < mission.length(); i++){
+
+      if(mission[i].hasOwnProperty("latitude") && mission[i].hasOwnProperty("longitude")){
+        Waypoint wp;
+        wp.coord.lat = mission[i]["latitude"];
+        wp.coord.lng = mission[i]["longitude"];
+
+        if (mission[i].hasOwnProperty("corridor_width")) wp.corridor_width = mission[i]["corridor_width"];
+        else wp.corridor_width = m_default_corridor_width;
+
+        if (mission[i].hasOwnProperty("validation_distance")) wp.valid_dist = mission[i]["validation_distance"];
+        else wp.valid_dist = m_default_validation_distance;
+
         m_waypoints.push_back(wp);
       }
     }
 
-    db_lat_next.set(m_waypoints.at(db_wpt_index.get()).lat);
-    db_lng_next.set(m_waypoints.at(db_wpt_index.get()).lng);
-    db_lat_prev.set(m_waypoints.at(db_wpt_index.get() - 1).lat);
-    db_lng_prev.set(m_waypoints.at(db_wpt_index.get() - 1).lng);
-    db_corridor_width.set(m_corridor_width);
+
+    db_lat_next.set(m_waypoints.at(db_wpt_index.get()).coord.lat);
+    db_lng_next.set(m_waypoints.at(db_wpt_index.get()).coord.lng);
+    db_lat_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lat);
+    db_lng_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lng);
+    db_corridor_width.set(m_waypoints.at(db_wpt_index.get()).corridor_width);
   }
 
   boolean next_point(float dist) { // unité : mètres
     // If the distance between the boat and the waypoint is less than *m_valid_wpt* m.
     // Note : we consider that if dist==0 there should be an error.
-    if (dist <= m_valid_wpt && dist != 0) {
+    if (dist <= m_waypoints.at(db_wpt_index.get()).valid_dist && dist != 0) {
       // Change the index.
       db_wpt_index.set((db_wpt_index.get()+1) % m_waypoints.size());
       return true;

@@ -1,7 +1,12 @@
 [
   {
     "name": "MissionManager",
-    "interval": 1000
+    "interval": 1000,
+    "parameters":
+      [
+        { "key": "Default_corridor_width", "value": 40 },
+        { "key": "Default_validation_distance", "value": 25 }
+      ]
   },
   {
     "name": "LogManager",
