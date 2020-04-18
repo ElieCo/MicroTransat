@@ -9,8 +9,16 @@ float get_distance(double lat1, double lng1, double lat2, double lng2){
   return TinyGPS::distance_between(lat1, lng1, lat2, lng2);
 }
 
+float get_distance(Coord coord1, Coord coord2){
+  return get_distance(coord1.lat, coord1.lng, coord2.lat, coord2.lng);
+}
+
 float get_course(double lat1, double lng1, double lat2, double lng2){
   return TinyGPS::course_to(lat1, lng1, lat2, lng2);
+}
+
+float get_course(Coord coord1, Coord coord2){
+  return get_course(coord1.lat, coord1.lng, coord2.lat, coord2.lng);
 }
 
 /**
@@ -30,4 +38,8 @@ void getPointAtDistAndBearing(double actual_lat, double actual_lon, double dista
   new_lon = actual_lon + atan2( sin(bearing) * sin(distance / R) * cos(actual_lat), cos(distance / R) - sin(actual_lat) * sin(new_lat));
   new_lat = degrees(new_lat);
   new_lon = degrees(new_lon);
+}
+
+void getPointAtDistAndBearing(Coord actual_coord, double distance, double bearing, Coord &new_coord) {
+  getPointAtDistAndBearing(actual_coord.lat, actual_coord.lng, distance, bearing, new_coord.lat, new_coord.lng);
 }
