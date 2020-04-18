@@ -72,7 +72,7 @@ class Simulator{
     
     m_db->setData("Time", time);
     m_db->setData("Date", unsigned(200101));
-    m_db->setData("Speed", toKnots(m_actual_speed));
+    m_db->setData("Speed", msToKnots(m_actual_speed));
     m_db->setData("Course", course);
     m_db->setData("Average_course", averageCourse(course));
     m_db->setData("HDOP", int(42));
@@ -143,11 +143,7 @@ class Simulator{
     float average_course = m_course_average.average(new_course);
     from0to360(average_course);
 
-    if (db_just_wake_up.hasChanged() && db_just_wake_up.get()) {
-      db_average_course_full.set(false);
-      m_course_average.clear();
-    }
-    if(m_course_average.isFull()) db_average_course_full.set(true);
+    m_db->setData("Average_course_full", true);
 
     return average_course;
   }
