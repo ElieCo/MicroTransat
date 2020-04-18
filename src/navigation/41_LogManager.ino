@@ -7,14 +7,14 @@ class LogManager: public BaseManager
   ~LogManager(){}
 
   void init(){
-    
+
 
     m_not_initialized = true;
   }
 
   void go(){
     if (!prepareLogFile()) return;
-    
+
     // If the first line is not initialized.
     if (m_not_initialized) {
       // Get all the data names.
@@ -47,7 +47,7 @@ class LogManager: public BaseManager
         }
       }
       // Log this line.
-      m_log_csv_file.write(line);
+      m_log_csv_file.write(line.replace("\n","").replace("\r",""));
     }
   }
 
