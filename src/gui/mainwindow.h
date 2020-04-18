@@ -4,6 +4,11 @@
 #include <QtWidgets>
 #include "comm_manager.h"
 
+namespace Ui {
+    class MainWindow;
+}
+
+
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
@@ -16,10 +21,11 @@ class MainWindow : public QMainWindow
     void update_val(int);
 
     private:
+    Ui::MainWindow *ui;
     QPolygon createBackground();
     void updateRawData();
     void updateBoatPosition();
-    void setVarDisplay(QGridLayout *);
+    void setVarDisplay();
     void setButtonDisplay(QGridLayout *);
 
     QGraphicsScene scene;
@@ -43,29 +49,11 @@ class MainWindow : public QMainWindow
     QPushButton * test_button;
     QSpinBox * val_selection;
 
+    QList<QLabel*> raw_values;
+
     CommManager cm;
 
-    QLabel * hdop;
-    QLabel * latittude;
-    QLabel * longitude;
-    QLabel * lat_next_point;
-    QLabel * lon_next_point;
-    QLabel * lat_prev_point;
-    QLabel * lon_prev_point;
-    QLabel * wpt_angle;
-    QLabel * wpt_dist;
-    QLabel * Index_wpt;
-
-    QLabel * speed;
-    QLabel * heading;
-
-    QLabel * reg_angle;
-    QLabel * winglet_pos;
-    QLabel * battery;
-
-    QLabel * corridor_width;
-    QLabel * ecart_axe;
-    QLabel * Presence_couloir;
+    QStringList header;
 
     int lat_ofset;
     int lon_ofset;

@@ -4,6 +4,11 @@
 CommManager::CommManager(QObject *parent)
     : QObject(parent)
 {
+    // definition de la liste des entrée (oui c'est un peu caca mais je vais revenir dessus !)
+    header = QStringList({"Msg_received", "Lat_next_point", "Lon_next_point", "Wpt_index", "Fix_age", "Time", "Date", "Chars", "HDOP", "Sentences", "Failed_checksum", "Latitude", "Longitude", "Wpt_dist", "Wpt_angle", "Cmd_helm", "Wing_angle", "Speed", "Course", "Average_course", "Max_upwind", "Regulator_angle", "Battery", "SD_ready", "Gps_recent_data", "Gps_ready"});
+    for (int i=0; i<header.size(); i++){
+        m_serialData.insert(header.at(i), 0);
+    }
 }
 
 CommManager::~CommManager()
@@ -32,14 +37,12 @@ void CommManager::openSerialPort(QString nameport)
           m_serial->setParity(QSerialPort::NoParity);
           m_serial->setDataBits(QSerialPort::Data8);
           m_serial->setFlowControl(QSerialPort::NoFlowControl);
-
-          // definition de la liste des entrée (oui c'est un peu caca)
-//          header = QStringList({"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"});
-          header = QStringList({"Msg_received", "Lat_next_point", "Lon_next_point", "Wpt_index", "Fix_age", "Time", "Date", "Chars", "HDOP", "Sentences", "Failed_checksum", "Latitude", "Longitude", "Wpt_dist", "Wpt_angle", "Cmd_helm", "Wing_angle", "Speed", "Course", "Average_course", "Max_upwind", "Regulator_angle", "Battery", "SD_ready", "Gps_recent_data", "Gps_ready"});
-          for (int i=0; i<header.size(); i++){
-              m_serialData.insert(header.at(i), 0);
-          }
      }
+}
+
+QStringList CommManager::getHeader()
+{
+    return header;
 }
 
 void CommManager::closeSerialPort()
@@ -57,6 +60,11 @@ void CommManager::decryptMsg(QString msg)
             m_serialData[header.at(i)] = dataList[i].toFloat();
         }
     }
+}
+
+QList<float> CommManager::getFullList()
+{
+    return m_serialData.values();
 }
 
 int CommManager::getData(QString name)

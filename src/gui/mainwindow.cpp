@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include <QFile>
 #include <QGraphicsTextItem>
 
@@ -69,27 +70,10 @@ QPolygon MainWindow::createBackground(){
 
 void MainWindow::updateRawData()
 {
-    hdop->setText("HDOP : " + QString::number(cm.getData("HDOP")));
-    latittude->setText("latitude : " + QString::number(cm.getData("Latitude")));
-    longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));
-    lat_next_point->setText("lat_next_point : " + QString::number(cm.getData("Lat_next_point")));
-    lon_next_point->setText("lon_next_point : " + QString::number(cm.getData("Lon_next_point")));
-    lat_prev_point->setText("lat_prev_point : " + QString::number(cm.getData("Lat_prev_point")));
-    lon_prev_point->setText("lon_prev_point : " + QString::number(cm.getData("Lon_prev_point")));
-    wpt_angle->setText("wpt_angle : " + QString::number(cm.getData("Wpt_angle")));
-    wpt_dist->setText("wpt_dist : " + QString::number(cm.getData("Wpt_dist")));
-    Index_wpt->setText("Index_wpt : " + QString::number(cm.getData("Wpt_index")));
-
-    speed->setText("speed : " + QString::number(cm.getData("Speed")));
-    heading->setText("heading : " + QString::number(cm.getData("Course")));
-
-    reg_angle->setText("reg_angle : " + QString::number(cm.getData("Regulator_angle")));
-    winglet_pos->setText("winglet_pos : " + QString::number(cm.getData("Wing_angle")));
-    battery->setText("battery : " + QString::number(cm.getData("Battery")));
-
-    corridor_width->setText("corridor_width : " + QString::number(cm.getData("Corridor_width")));
-    ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("ecart_axe")));
-    Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("Presence_couloir")));
+    QList<float> newList = cm.getFullList();
+    for (int i=0; i< raw_values.count(); i++){
+        raw_values[i]->setText(header[i]+" : " + newList.at(i));
+    }
 }
 
 void MainWindow::updateBoatPosition()
@@ -171,52 +155,17 @@ void MainWindow::updateView()
     cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
 
     updateRawData();
-    updateBoatPosition();
+    //updateBoatPosition();
     path->setPath(track);
 }
 
-void MainWindow::setVarDisplay(QGridLayout * layout)
+void MainWindow::setVarDisplay()
 {
-    QGridLayout * grid = new QGridLayout();
-
-    hdop = new QLabel();
-    grid->addWidget(hdop,0,0);
-    latittude = new QLabel();
-    grid->addWidget(latittude,1,0);
-    longitude = new QLabel();
-    grid->addWidget(longitude,2,0);
-    lat_next_point = new QLabel();
-    grid->addWidget(lat_next_point,3,0);
-    lon_next_point= new QLabel();
-    grid->addWidget(lon_next_point,4,0);
-    lat_prev_point= new QLabel();
-    grid->addWidget(lat_prev_point,5,0);
-    lon_prev_point= new QLabel();
-    grid->addWidget(lon_prev_point,6,0);
-    wpt_angle = new QLabel();
-    grid->addWidget(wpt_angle,7,0);
-    wpt_dist = new QLabel();
-    grid->addWidget(wpt_dist,8,0);
-    Index_wpt = new QLabel();
-    grid->addWidget(Index_wpt,9,0);
-    speed = new QLabel();
-    grid->addWidget(speed,10,0);
-    heading = new QLabel();
-    grid->addWidget(heading,11,0);
-    reg_angle = new QLabel();
-    grid->addWidget(reg_angle,12,0);
-    winglet_pos = new QLabel();
-    grid->addWidget(winglet_pos,13,0);
-    battery = new QLabel();
-    grid->addWidget(battery,14,0);
-    corridor_width = new QLabel();
-    grid->addWidget(corridor_width,15,0);
-    ecart_axe = new QLabel();
-    grid->addWidget(ecart_axe,16,0);
-    Presence_couloir = new QLabel();
-    grid->addWidget(Presence_couloir,17,0);
-
-    layout->addLayout(grid,0,0);
+    for (int i=0; i<header.size(); i++){
+        QLabel *raw = new QLabel(header.at(i)+" : ");
+        ui->rawDataLayout->addWidget(raw);
+        raw_values << raw;
+    }
 }
 
 void MainWindow::setButtonDisplay(QGridLayout * layout)
@@ -259,15 +208,20 @@ void MainWindow::handleButton()
    cm.setrequest("c"+QString::number(val_selection->value()));
 }
 
-MainWindow::MainWindow()
-    : lat_next_p(0)
+
+
+MainWindow::MainWindow() :
+    lat_next_p(0)
     , lon_next_p(0)
     , lat_prev_p(0)
     , lon_prev_p(0)
+    ,ui(new Ui::MainWindow)
 {
-    QWidget *zoneCentrale = new QWidget;
+    ui->setupUi(this);
 
     cm.openSerialPort("//./COM6");
+
+    header = cm.getHeader();
 
     // lecture de fichier
     scene.addPolygon(createBackground());
@@ -291,17 +245,9 @@ MainWindow::MainWindow()
     wpt_circle2 = scene.addEllipse(0,0,10,10);
     ligne3 = scene.addLine(QLine(0,1,0,2));
 
-    view = new QGraphicsView(&scene);
-    view->show();
+    ui->graphicMap->setScene(&scene);
 
-    QGridLayout  *layout = new QGridLayout();
-
-    setVarDisplay(layout);
-    setButtonDisplay(layout);
-
-    layout->addWidget(view,1,1);
-    zoneCentrale->setLayout(layout);
-    setCentralWidget(zoneCentrale);
+    setVarDisplay();
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateView);

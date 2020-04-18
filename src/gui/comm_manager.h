@@ -15,6 +15,8 @@ public:
     ~CommManager();
 
     void openSerialPort(QString nameport);
+    QStringList getHeader();
+    QList<float> getFullList();
     void send();
     void setrequest(QString text);
     int getData(QString name);
