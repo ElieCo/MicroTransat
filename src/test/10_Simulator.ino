@@ -62,16 +62,16 @@ class Simulator{
 
     m_db->setData("Latitude", m_actual_position.lat);
     m_db->setData("Longitude", m_actual_position.lng);
-    m_db->setData("Fix_age", int(0));
+    m_db->setData("Fix_age", unsigned(0));
 
-    int time = millis()/1000;
+    unsigned time = millis()/1000;
     int second = time % 60;
     int min = ((time - second)/60) % 60;
     int hour = (time - second - min*60) / 3600;
     time = String(String(hour)+(min<10 ? "0" : "")+String(min)+(second<10 ? "0" : "")+String(second)).toInt();
     
     m_db->setData("Time", time);
-    m_db->setData("Date", int(0));
+    m_db->setData("Date", unsigned(0));
     m_db->setData("Speed", toKnots(m_actual_speed));
     m_db->setData("Course", course);
     m_db->setData("Average_course", m_average_course.average(course));
