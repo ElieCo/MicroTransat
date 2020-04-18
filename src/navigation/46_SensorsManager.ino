@@ -82,7 +82,8 @@ class SensorsManager: public BaseManager
     float x_cap = m_x_course.average(float(cos(radians(new_course))));
     float y_cap = m_y_course.average(float(sin(radians(new_course))));
     
-    float average_course = atan2(y_cap, x_cap);
+    float average_course = degrees(atan2(y_cap, x_cap));
+    from180to180(average_course);
 
     return average_course;
   }
