@@ -24,10 +24,8 @@ class SensorsManager: public BaseManager
     db_battery.init(m_db, "Battery", double(0), true);
 
     // Initialize attributs needed to make the course average.
-    m_course_tab_size = sizeof(m_course_tab) / sizeof(m_course_tab[0]);
-    for (int i = 0; i < m_course_tab_size; i++)
-      m_course_tab[i] = 0.0;
-    m_course_index = 0;
+    m_x_course.init(10);
+    m_y_course.init(10);
 
     // Initialize the battery.
     m_bat.init(A16);
@@ -81,26 +79,17 @@ class SensorsManager: public BaseManager
   DBData<double> db_battery;
 
   float averageCourse(float new_course){
-    m_course_tab[m_course_index] = new_course;
-    m_course_index = (m_course_index + 1) % m_course_tab_size;
-
-    float x_cap = 0;
-    float y_cap = 0;
-
-    for (int i = 0; i < m_course_tab_size; i++) {
-      x_cap += cos(radians(m_course_tab[i]));
-      y_cap += sin(radians(m_course_tab[i]));
-    }
-
+    float x_cap = m_x_course.average(float(cos(radians(new_course))));
+    float y_cap = m_y_course.average(float(sin(radians(new_course))));
+    
     float average_course = atan2(y_cap, x_cap);
 
     return average_course;
   }
 
   Gps m_gps;
-  float m_course_tab[10];
-  int m_course_index;
-  int m_course_tab_size;
+  Average<float> m_x_course;
+  Average<float> m_y_course;
 
   Battery m_bat;
 };

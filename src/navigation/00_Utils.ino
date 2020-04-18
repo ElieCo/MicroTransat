@@ -87,6 +87,9 @@ void from180to180(float *angle){
 template <class T>
 class Average{
   public:
+  Average(){
+    m_len = 0;
+  }
   Average(int len){
     m_buffer = new T[len];
     m_len = len;
@@ -99,6 +102,7 @@ class Average{
   }
 
   T average(T value){
+    if (m_len == 0) return value;
     m_buffer[m_index] = value;
     m_index = (m_index + 1) % m_len;
     
@@ -108,6 +112,14 @@ class Average{
     }
 
     return total/m_len;
+  }
+
+  void init(int len){
+    m_buffer = new T[len];
+    m_len = len;
+    m_index = 0;
+
+    for (int i = 0; i < m_len; i++) m_buffer[i] = 0;
   }
 
   private:
