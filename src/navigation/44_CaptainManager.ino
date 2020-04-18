@@ -75,8 +75,8 @@ class Captain : public BaseManager
   }
 
   void state_acquisition(){
-    // Wait that the course average is stable to take a decision.
-    if(m_prev_average_course != 0 && abs(m_prev_average_course - db_course.get()) < 5) {
+    // Wait that the course average or being out is stable to take a decision.
+    if((m_prev_average_course != 0 && abs(m_prev_average_course - db_course.get()) < 5) || !isInCorridor()) {
       m_behaviour = DECIDE;
       m_prev_average_course = 0;
     } else {
