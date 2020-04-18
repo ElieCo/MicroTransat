@@ -13,11 +13,11 @@ class Battery
     m_pin = pin;
   }
 
-  double getValue(){
+  float getValue(){
     int value = analogRead(m_pin);
-    double input_voltage = double(value) * 5.0 / 1023;
-    double battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
-    return battery_voltage * 100;
+    float input_voltage = double(value) * 3.3 / 1023;
+    float battery_voltage = input_voltage * (1.5 + 4.7) / 1.5;
+    return battery_voltage;
   }
 
   private:

@@ -21,14 +21,14 @@ class SensorsManager: public BaseManager
     db_average_course.init(m_db, "Average_course", float(0), true);
     db_hdop.init(m_db, "HDOP", int(0), true);
     db_gps_ready.init(m_db, "Gps_ready", false, true);
-    db_battery.init(m_db, "Battery", double(0), true);
+    db_battery.init(m_db, "Battery", float(0), true);
 
     // Initialize attributs needed to make the course average.
     m_x_course.init(10);
     m_y_course.init(10);
 
     // Initialize the battery.
-    m_bat.init(A16);
+    m_bat.init(A17);
   }
 
   void go(){
@@ -54,7 +54,7 @@ class SensorsManager: public BaseManager
     }
 
     // Manage battery
-    double bat_val = m_bat.getValue();
+    float bat_val = m_bat.getValue();
     db_battery.set(bat_val);
   }
 
