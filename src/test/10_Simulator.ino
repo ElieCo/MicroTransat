@@ -10,7 +10,8 @@ class Simulator{
     , m_wind_origin(0.0)
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
-    , m_average_course(10)
+    , m_x_course(10)
+    , m_y_course(10)
   {
     m_actual_position.lat = 0.0;
     m_actual_position.lng = 0.0;
@@ -74,7 +75,7 @@ class Simulator{
     m_db->setData("Date", unsigned(0));
     m_db->setData("Speed", toKnots(m_actual_speed));
     m_db->setData("Course", course);
-    m_db->setData("Average_course", m_average_course.average(course));
+    m_db->setData("Average_course", averageCourse(course));
     m_db->setData("HDOP", int(42));
     m_db->setData("Gps_ready", true);
   }
@@ -111,7 +112,8 @@ class Simulator{
   float m_actual_speed;
   Coord m_actual_position;
 
-  Average<float> m_average_course;
+  Average<float> m_x_course;
+  Average<float> m_y_course;
 
   void calculateSpeed(float wing_angle){
     
@@ -137,5 +139,16 @@ class Simulator{
     m_actual_position.lat = nlat;
     m_actual_position.lng = nlng;
   }
+  
+  float averageCourse(float new_course){
+    float x_cap = m_x_course.average(float(cos(radians(new_course))));
+    float y_cap = m_y_course.average(float(sin(radians(new_course))));
+    
+    float average_course = degrees(atan2(y_cap, x_cap));
+    from0to360(average_course);
+
+    return average_course;
+  }
+
 };
 
