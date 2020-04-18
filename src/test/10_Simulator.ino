@@ -78,6 +78,7 @@ class Simulator{
     m_db->setData("Average_course", averageCourse(course));
     m_db->setData("HDOP", int(42));
     m_db->setData("Gps_ready", true);
+    m_db->setData("Fix", true);
   }
 
   float getWindDirection(){

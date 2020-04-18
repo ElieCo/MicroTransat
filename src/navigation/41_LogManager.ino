@@ -72,8 +72,7 @@ class LogManager: public BaseManager
 
     if(fix && time != 0 && date != 0){
       String t = String(time);
-      // If there is only one digit for the hour (without or with millisecond).
-      if(t.length() == 5 || t.length() == 8) t = "0" + t;
+      for (unsigned i = 0; i < max(0, 6 - String(time).length()); i++) t = "0" + t;
       String d = String(date);
       String filename = d.substring(d.length()-4) + t.substring(0,4) + ".csv";
 
