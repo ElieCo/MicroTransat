@@ -72,7 +72,7 @@ class LogManager: public BaseManager
 
     if(fix && time != 0 && date != 0){
       String t = String(time);
-      for (unsigned i = 0; i < max(0, 6 - String(time).length()); i++) t = "0" + t;
+      for (unsigned i = 0; i < max(unsigned(0), 6 - String(time).length()); i++) t = "0" + t;
       String d = String(date);
       String filename = d.substring(d.length()-4) + t.substring(0,4) + ".csv";
 
