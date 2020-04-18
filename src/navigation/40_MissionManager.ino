@@ -23,6 +23,8 @@ class MissionManager : public BaseManager
     db_wpt_index.init(m_db, "Wpt_index", int(0), true);
     db_latitude.init(m_db, "Latitude", double(0));
     db_longitude.init(m_db, "Longitude", double(0));
+    db_dist_to_axis.init(m_db, "Dist_to_axis", float(0), true);
+    db_in_corridor.init(m_db, "In_corridor", true, true);
 
     bool *sd_ready = m_db->initData("SD_ready", false);
     *sd_ready = m_mission_file.init("mission.txt", *sd_ready);
@@ -49,6 +51,9 @@ class MissionManager : public BaseManager
     db_lat_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lat);
     db_lng_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lng);
     db_corridor_width.set(m_waypoints.at(db_wpt_index.get()).corridor_width);
+
+    // Check if we are in the corridor
+    isInCorridor();
   }
 
   void stop(){}
@@ -70,6 +75,8 @@ class MissionManager : public BaseManager
   DBData<int> db_wpt_index;
   DBData<double> db_latitude;
   DBData<double> db_longitude;
+  DBData<float> db_dist_to_axis;
+  DBData<bool> db_in_corridor;
 
   Vector<Waypoint> m_waypoints;
   int m_default_validation_distance;
@@ -116,6 +123,16 @@ class MissionManager : public BaseManager
       return true;
     }
     return false;
+  }
+
+  void isInCorridor(){
+    float angle_btw_wpt = get_course(db_lat_prev.get(), db_lng_prev.get(), db_lat_next.get(), db_lng_next.get());
+    float dist_to_axis = sin(radians(angle_btw_wpt - db_angle_to_wpt.get())) * db_dist_to_wpt.get();
+
+    bool in_corridor = abs(dist_to_axis) <= db_corridor_width.get()/2;
+
+    db_dist_to_axis.set(dist_to_axis);
+    db_in_corridor.set(in_corridor);
   }
 
 };
