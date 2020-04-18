@@ -50,7 +50,7 @@ class SensorsManager: public BaseManager
       db_course.set(m_gps.course);
       db_average_course.set(averageCourse(m_gps.course));
       db_hdop.set(int(m_gps.hdop));
-      if (m_gps.fix_quality > 0 && m_gps.hdop > 0 && m_gps.hdop < 500) db_gps_ready.set(true);
+      if (m_gps.fix_quality > 0 && m_gps.hdop > 0 && m_gps.hdop < m_max_valid_hdop) db_gps_ready.set(true);
       else db_gps_ready.set(false);
     }
 
@@ -62,6 +62,10 @@ class SensorsManager: public BaseManager
   void stop(){}
 
   private:
+
+  void config(){
+    m_db.getData("Max_valid_hdop", m_max_valid_hdop);
+  }
 
   DBData<bool> db_gps_recent_data;
   DBData<double> db_latitude;
@@ -96,7 +100,7 @@ class SensorsManager: public BaseManager
 
   Gps m_gps;
   AverageAngle m_course_average;
-  Average<float> m_y_course;
+  double m_max_valid_hdop;
 
   Battery m_bat;
 };

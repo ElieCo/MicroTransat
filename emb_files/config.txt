@@ -46,7 +46,11 @@
   },
   {
     "name": "SensorsManager",
-    "interval": 500
+    "interval": 500,
+    "parameters":
+      [
+        { "key": "Max_valid_hdop", "value": 500 }
+      ]
   },
   {
     "name": "LightManager",
