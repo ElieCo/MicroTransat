@@ -43,3 +43,39 @@ void getPointAtDistAndBearing(double actual_lat, double actual_lon, double dista
 //void getPointAtDistAndBearing(Coord actual_coord, double distance, double bearing, Coord &new_coord) {
 //  getPointAtDistAndBearing(actual_coord.lat, actual_coord.lng, distance, bearing, new_coord.lat, new_coord.lng);
 //}
+
+class AverageAngle{
+  public:
+  AverageAngle(){}
+  AverageAngle(int len){
+    init(len);
+  }
+  ~AverageAngle(){}
+
+  float average(float angle){
+    float x_cap = m_x_average.average(float(cos(radians(angle))));
+    float y_cap = m_y_average.average(float(sin(radians(angle))));
+
+    float average_course = degrees(atan2(y_cap, x_cap));
+
+    return average_course;
+  }
+
+  void init(int len){
+    m_x_average.init(len);
+    m_y_average.init(len);
+  }
+
+  void clear(){
+    m_x_average.clear();
+    m_y_average.clear();
+  }
+
+  bool isFull(){
+    return m_x_average.isFull() && m_y_average.isFull();
+  }
+
+  private:
+  Average<float> m_x_average;
+  Average<float> m_y_average;
+};

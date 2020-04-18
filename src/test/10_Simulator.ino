@@ -10,8 +10,7 @@ class Simulator{
     , m_wind_origin(0.0)
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
-    , m_x_course(3)
-    , m_y_course(3)
+    , m_course_average(3)
   {
     m_actual_position.lat = 0.0;
     m_actual_position.lng = 0.0;
@@ -39,16 +38,16 @@ class Simulator{
     m_db->getData("Cmd_helm", helm);
     m_actual_cap = m_wind_origin + helm;
     from0to360(m_actual_cap);
-
+    
     // Calcul new speed
     float wing_angle = 0.0;
     m_db->getData("Wing_angle", wing_angle);
     calculateSpeed(wing_angle);
-
+    
   }
 
   void simulateGps(){
-
+    
     if (m_gps_time == 0 || (millis() - m_gps_time) >= m_gps_period)
       m_gps_time = millis();
     else
@@ -70,10 +69,10 @@ class Simulator{
     int min = ((time - second)/60) % 60;
     int hour = (time - second - min*60) / 3600;
     time = String(String(hour)+(min<10 ? "0" : "")+String(min)+(second<10 ? "0" : "")+String(second)).toInt();
-
+    
     m_db->setData("Time", time);
     m_db->setData("Date", unsigned(200101));
-    m_db->setData("Speed", msToKnots(m_actual_speed));
+    m_db->setData("Speed", toKnots(m_actual_speed));
     m_db->setData("Course", course);
     m_db->setData("Average_course", averageCourse(course));
     m_db->setData("HDOP", int(42));
@@ -113,20 +112,19 @@ class Simulator{
   float m_actual_speed;
   Coord m_actual_position;
 
-  Average<float> m_x_course;
-  Average<float> m_y_course;
+  AverageAngle m_course_average;
 
   void calculateSpeed(float wing_angle){
-
+    
     float wind_direction = m_wind_origin + 180;
     float sail_angle = wind_direction - (wing_angle - 90);
-
+    
     float lift_angle = (wind_direction - sail_angle) > 0 ? sail_angle+90 : sail_angle-90;
     from0to360(lift_angle);
 
     float diff_angle = abs(m_actual_cap - lift_angle);
     float prop_coeff = cos(radians(diff_angle));
-
+    
     float max_speed = 5;
     float theorical_speed = max_speed * prop_coeff;
 
@@ -140,15 +138,19 @@ class Simulator{
     m_actual_position.lat = nlat;
     m_actual_position.lng = nlng;
   }
-
+  
   float averageCourse(float new_course){
-    float x_cap = m_x_course.average(float(cos(radians(new_course))));
-    float y_cap = m_y_course.average(float(sin(radians(new_course))));
-
-    float average_course = degrees(atan2(y_cap, x_cap));
+    float average_course = m_course_average.average(new_course);
     from0to360(average_course);
+
+    if (db_just_wake_up.hasChanged() && db_just_wake_up.get()) {
+      db_average_course_full.set(false);
+      m_course_average.clear();
+    }
+    if(m_course_average.isFull()) db_average_course_full.set(true);
 
     return average_course;
   }
 
 };
+
