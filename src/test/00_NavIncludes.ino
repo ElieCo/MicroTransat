@@ -62,7 +62,7 @@ class SensorsManager: public BaseManager
     m_db->initData("Fix_quality", int(0));
     m_db->initData("Satellites", int(0));
     m_db->initData("Fix_age", unsigned(0));
-    m_db->initData("Time", unsigned(0));
+    m_db->initData("Time", unsigned(0), true);
     m_db->initData("Date", unsigned(0));
     m_db->initData("Speed", float(0), true);
     m_db->initData("Course", float(0), true);
