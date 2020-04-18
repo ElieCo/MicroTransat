@@ -91,20 +91,39 @@ class DBData {
 
     void init(DataBase* db, String name, T value, bool selected = false){
       data_ptr = db->initData(name, value, selected);
+      m_prev_value = *data_ptr;
     }
 
   T get(){
-    if (data_ptr) return *data_ptr;
+    if (data_ptr) {
+      m_prev_value = *data_ptr;
+      return *data_ptr;
+    }
     else return T();
   }
 
   void set(T value){
-    if (data_ptr) *data_ptr = value;
+    if (data_ptr) {
+      m_prev_value = *data_ptr;
+      *data_ptr = value;
+    }
   }
 
   void add(T value){
-    if (data_ptr) *data_ptr += value;
+    if (data_ptr) {
+      m_prev_value = *data_ptr;
+      *data_ptr += value;
+    }
+  }
+
+  bool hasChanged(){
+    bool hasChanged = m_prev_value != *data_ptr;
+    m_prev_value = *data_ptr;
+    return hasChanged;
   }
 
   T* data_ptr;
+
+  private:
+  T m_prev_value;
 };

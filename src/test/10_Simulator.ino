@@ -10,8 +10,8 @@ class Simulator{
     , m_wind_origin(0.0)
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
-    , m_x_course(10)
-    , m_y_course(10)
+    , m_x_course(3)
+    , m_y_course(3)
   {
     m_actual_position.lat = 0.0;
     m_actual_position.lng = 0.0;

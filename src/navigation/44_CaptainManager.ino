@@ -15,6 +15,8 @@ class Captain : public BaseManager
     db_cmd_helm_applied.init(m_db, "Cmd_helm_applied", true);
     db_course.init(m_db, "Average_course", float(0));
     db_wpt_angle.init(m_db, "Wpt_angle", float(0));
+    db_just_wake_up.init(m_db, "Just_wake_up", false);
+    db_average_course_full.init(m_db, "Average_course_full", false);
   }
 
   void go(){
@@ -48,6 +50,8 @@ class Captain : public BaseManager
   DBData<bool> db_cmd_helm_applied;
   DBData<float> db_course;
   DBData<float> db_wpt_angle;
+  DBData<bool> db_just_wake_up;
+  DBData<bool> db_average_course_full;
 
   BEHAVIOUR m_behaviour;
 
@@ -55,16 +59,20 @@ class Captain : public BaseManager
   float m_prev_average_course;
 
   void state_sleep(){
+    // Sleep
+
+    // Say that we just wake up.
+    db_just_wake_up.set(true);
+    db_average_course_full.set(false);
+
     m_behaviour = ACQUISITION;
   }
 
   void state_acquisition(){
-    // Wait that the course average or being out is stable to take a decision.
-    if((m_prev_average_course != 0 && abs(m_prev_average_course - db_course.get()) < 5) || !db_in_corridor.get()) {
+    // Wait that the course average buffer is full to take a decision.
+    if(db_average_course_full.get()) {
+      db_just_wake_up.set(false);
       m_behaviour = DECIDE;
-      m_prev_average_course = 0;
-    } else {
-      m_prev_average_course = db_course.get();
     }
 
   }

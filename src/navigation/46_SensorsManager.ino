@@ -22,10 +22,12 @@ class SensorsManager: public BaseManager
     db_hdop.init(m_db, "HDOP", int(0), true);
     db_gps_ready.init(m_db, "Gps_ready", false, true);
     db_battery.init(m_db, "Battery", float(0), true);
+    db_just_wake_up.init(m_db, "Just_wake_up", false);
+    db_average_course_full.init(m_db, "Average_course_full", false);
 
     // Initialize attributs needed to make the course average.
-    m_x_course.init(10);
-    m_y_course.init(10);
+    m_x_course.init(3);
+    m_y_course.init(3);
 
     // Initialize the battery.
     m_bat.init(A17);
@@ -77,13 +79,21 @@ class SensorsManager: public BaseManager
   DBData<int> db_hdop;
   DBData<bool> db_gps_ready;
   DBData<double> db_battery;
+  DBData<bool> db_just_wake_up;
+  DBData<bool> db_average_course_full;
 
   float averageCourse(float new_course){
     float x_cap = m_x_course.average(float(cos(radians(new_course))));
     float y_cap = m_y_course.average(float(sin(radians(new_course))));
-    
+
     float average_course = degrees(atan2(y_cap, x_cap));
     from180to180(average_course);
+
+    if (db_just_wake_up.hasChanged() && db_just_wake_up.get()) {
+      db_average_course_full.set(false);
+      m_x_course.clear();
+    }
+    if(m_x_course.isFull()) db_average_course_full.set(true);
 
     return average_course;
   }

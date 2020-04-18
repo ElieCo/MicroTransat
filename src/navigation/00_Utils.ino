@@ -91,11 +91,7 @@ class Average{
     m_len = 0;
   }
   Average(int len){
-    m_buffer = new T[len];
-    m_len = len;
-    m_index = 0;
-
-    for (int i = 0; i < m_len; i++) m_buffer[i] = 0;
+    init(len);
   }
   ~Average(){
     delete m_buffer;
@@ -105,7 +101,7 @@ class Average{
     if (m_len == 0) return value;
     m_buffer[m_index] = value;
     m_index = (m_index + 1) % m_len;
-    
+
     T total = T();
     for(int i = 0; i < m_len; i++){
       total += m_buffer[i];
@@ -119,13 +115,20 @@ class Average{
     m_len = len;
     m_index = 0;
 
+    clear();
+  }
+
+  void clear(){
     for (int i = 0; i < m_len; i++) m_buffer[i] = 0;
+  }
+
+  bool isFull(){
+    return (m_buffer[m_index] != 0);
   }
 
   private:
   T *m_buffer;
   int m_len;
   int m_index;
-  
-};
 
+};
