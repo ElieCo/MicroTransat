@@ -72,7 +72,7 @@ class Simulator{
     time = String(String(hour)+(min<10 ? "0" : "")+String(min)+(second<10 ? "0" : "")+String(second)).toInt();
     
     m_db->setData("Time", time);
-    m_db->setData("Date", unsigned(0));
+    m_db->setData("Date", unsigned(200101));
     m_db->setData("Speed", toKnots(m_actual_speed));
     m_db->setData("Course", course);
     m_db->setData("Average_course", averageCourse(course));

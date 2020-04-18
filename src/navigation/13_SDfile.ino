@@ -55,6 +55,12 @@ class SDfile
     m_file.close();
   }
 
+  bool isOpen(){
+    return m_file_opened;
+  }
+
+  private:
+
   File m_file;
   bool m_file_opened;
 };

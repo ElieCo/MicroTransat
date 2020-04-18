@@ -77,7 +77,7 @@ class Gps
     String h = String(hour < 10 ? "0" : "") + String(hour);
     String m = String(min < 10 ? "0" : "") + String(min);
     String s = String(second < 10 ? "0" : "") + String(second);
-    String ms = String(millis < 100 ? "0" : "") + String(millis < 10 ? "0" : "") + String(millis);
+    String ms = "";//String(millis < 100 ? "0" : "") + String(millis < 10 ? "0" : "") + String(millis);
     String time = h + m + s + ms;
     
     return unsigned(time.toInt());

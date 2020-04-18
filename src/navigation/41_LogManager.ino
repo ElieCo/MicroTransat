@@ -7,15 +7,14 @@ class LogManager: public BaseManager
   ~LogManager(){}
 
   void init(){
-    bool *sd_ready = m_db->initData("SD_ready", false);
-
-    // Initialize the SD card.
-    *sd_ready = m_log_csv_file.init("log.csv", *sd_ready, false);
+    
 
     m_not_initialized = true;
   }
 
   void go(){
+    if (!prepareLogFile()) return;
+    
     // If the first line is not initialized.
     if (m_not_initialized) {
       // Get all the data names.
@@ -60,4 +59,29 @@ class LogManager: public BaseManager
 
   SDfile m_log_csv_file;
   bool m_not_initialized;
+
+  bool prepareLogFile(){
+    if (m_log_csv_file.isOpen()) return true;
+
+    bool fix = false;
+    m_db->getData("Fix", fix);
+    unsigned time = 0;
+    m_db->getData("Time", time);
+    unsigned date = 0;
+    m_db->getData("Date", date);
+
+    if(fix && time != 0 && date != 0){
+      String t = String(time);
+      // If there is only one digit for the hour (without or with millisecond).
+      if(t.length() == 5 || t.length() == 8) t = "0" + t;
+      String d = String(date);
+      String filename = d.substring(d.length()-4) + t.substring(0,4) + ".csv";
+
+      // Initialize the SD card.
+      bool *sd_ready = m_db->initData("SD_ready", false);
+      *sd_ready = m_log_csv_file.init(filename, *sd_ready, false);
+      return m_log_csv_file.isOpen();
+    }
+    return false;
+  }
 };
