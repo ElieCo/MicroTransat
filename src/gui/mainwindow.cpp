@@ -71,8 +71,13 @@ QPolygon MainWindow::createBackground(){
 void MainWindow::updateRawData()
 {
     QList<float> newList = cm.getFullList();
-    for (int i=0; i< raw_values.count(); i++){
-        raw_values[i]->setText(header[i]+" : " + newList.at(i));
+    if (raw_values.size()==header.size()){
+        for (int i=0; i< raw_values.count(); i++){
+            raw_values[i]->setText(header[i]+" : " + newList.at(i));
+        }
+    }
+    else {
+        qDebug() << "raw data error";
     }
 }
 
@@ -135,7 +140,7 @@ void MainWindow::updateBoatPosition()
         if (wind_angle != 404)
         {
             if (wind_angle < 0){
-                wind_angle += 180;
+                wind_angle += 360;
             }
             wind_angle = heading_ - wind_angle;
 
@@ -152,11 +157,48 @@ void MainWindow::updateBoatPosition()
 
 void MainWindow::updateView()
 {
-    cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
+    if (replay_mode)
+    {
+        cm.readLine();
+    }
+    else
+    {
+        cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
+    }
 
     updateRawData();
-    //updateBoatPosition();
-    path->setPath(track);
+    updateBoatPosition();
+
+    if (ui->activeTrack->isChecked()){
+        path->setPath(track);
+    }
+    else {
+        track.clear();
+    }
+}
+
+void MainWindow::clearLayout(QLayout *layout)
+{
+    QLayoutItem *child;
+    while ((child = layout->takeAt(0)) != 0) {
+    if(child->layout() != 0)
+    clearLayout( child->layout() );
+    else if(child->widget() != 0)
+    delete child->widget();
+    delete child;
+    }
+}
+
+void MainWindow::openDialBox()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Open Image"), "/home", tr("Log Files (*.log *.csv)"));
+    header = cm.openFile(fileName);
+    if (header.size() > 0){
+        replay_mode = true;
+        clearLayout(ui->rawDataLayout);
+        setVarDisplay();
+    }
 }
 
 void MainWindow::setVarDisplay()
@@ -183,22 +225,7 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
     connect(test_button, SIGNAL (released()), this, SLOT (handleButton()));
     grid->addWidget(test_button,0,1);
 
-
-    // track display
-    resetTrack = new QPushButton("Reset Track", this);
-    connect(resetTrack, SIGNAL (released()), this, SLOT (resetHit()));
-    grid->addWidget(resetTrack,1,0);
-
     layout->addLayout(grid, 0, 1);
-}
-
-void MainWindow::update_val(int i){
-        qDebug()<< "valeur de la box : "<< i;
-}
-
-void MainWindow::resetHit()
-{
-   track.clear();
 }
 
 void MainWindow::handleButton()
@@ -215,6 +242,7 @@ MainWindow::MainWindow() :
     , lon_next_p(0)
     , lat_prev_p(0)
     , lon_prev_p(0)
+    , replay_mode(false)
     ,ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -251,5 +279,6 @@ MainWindow::MainWindow() :
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateView);
+    connect(ui->file_selection, &QPushButton::clicked, this, &MainWindow::openDialBox);
     timer->start(1500);
 }

@@ -38,39 +38,51 @@
         <item>
          <widget class="QLabel" name="label_8">
           <property name="text">
-           <string>Nouveau waypoint : </string>
+           <string>Modify config</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Lat : </string>
+           <string>Commande : </string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox"/>
+         <widget class="QSpinBox" name="commande">
+          <property name="maximum">
+           <number>30</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_9">
           <property name="text">
-           <string>Lon :</string>
+           <string>Name</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_2"/>
+         <widget class="QLineEdit" name="var_name">
+          <property name="maxLength">
+           <number>200</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_10">
           <property name="text">
-           <string>Index : </string>
+           <string>Value</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_3"/>
+         <widget class="QSpinBox" name="spinBox_3">
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton">
@@ -84,9 +96,41 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QRadioButton" name="radioButton">
+         <widget class="QRadioButton" name="activeTrack">
           <property name="text">
            <string>Display track</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Replay mode : </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="file_selection">
+          <property name="text">
+           <string>Select file</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string> Speed : </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="horizontalSlider">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>

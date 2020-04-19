@@ -17,8 +17,6 @@ class MainWindow : public QMainWindow
 
     private slots:
     void handleButton();
-    void resetHit();
-    void update_val(int);
 
     private:
     Ui::MainWindow *ui;
@@ -27,6 +25,7 @@ class MainWindow : public QMainWindow
     void updateBoatPosition();
     void setVarDisplay();
     void setButtonDisplay(QGridLayout *);
+    void clearLayout(QLayout *);
 
     QGraphicsScene scene;
     QGraphicsView * view;
@@ -49,6 +48,8 @@ class MainWindow : public QMainWindow
     QPushButton * test_button;
     QSpinBox * val_selection;
 
+    bool replay_mode;
+
     QList<QLabel*> raw_values;
 
     CommManager cm;
@@ -65,6 +66,7 @@ class MainWindow : public QMainWindow
 public slots:
 
     void updateView();
+    void openDialBox();
 };
 
 #endif

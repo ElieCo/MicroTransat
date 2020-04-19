@@ -26,8 +26,8 @@ void CommManager::openSerialPort(QString nameport)
      if( m_serial->isOpen()==false)
      {
           m_serial->clearError();
-          qDebug() << "Port error", "Port: "+nameport;
-          qDebug() << "Port error", "Vérifier nom du port \n Fermer tout programme utilisant la lisaison RS232 "+nameport;
+          //qDebug() << "Port error", "Port: "+nameport;
+          //qDebug() << "Port error", "Vérifier nom du port \n Fermer tout programme utilisant la lisaison RS232 "+nameport;
       }
    else
      {
@@ -91,7 +91,7 @@ void CommManager::readData()
         m_cache.remove(QChar('\n'), Qt::CaseInsensitive);
         m_cache.remove(QChar('~'), Qt::CaseInsensitive);
         decryptMsg(m_cache);
-        qDebug() << "msg recu et assemble : " << m_cache;
+        //qDebug() << "msg recu et assemble : " << m_cache;
         m_cache = "";
     }
     else {
@@ -112,4 +112,29 @@ void CommManager::send()
     m_serial->write(request.toStdString().c_str());
 
     request = "";
+}
+
+QStringList CommManager::openFile(QString file_name)
+{
+    file.setFileName(file_name);
+    if (file.open(QFile::ReadOnly)) {
+        // read header
+        char buf[1024];
+        qint64 lineLength = file.readLine(buf, sizeof(buf));
+        if (lineLength != -1) {
+            header = QString(buf).split(";");
+            header.removeLast();
+            return header;
+        }
+    }
+    return QStringList();
+}
+
+void CommManager::readLine()
+{
+    char buf[1024];
+    qint64 lineLength = file.readLine(buf, sizeof(buf));
+    if (lineLength != -1) {
+        decryptMsg(QString(buf));
+    }
 }

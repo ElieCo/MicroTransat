@@ -16,6 +16,5 @@ int main(int argc, char *argv[])
     window.show();
 
     //    cm.closeSerialPort();
-//
     return a.exec();
 }
