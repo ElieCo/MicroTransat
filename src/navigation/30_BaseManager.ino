@@ -18,6 +18,7 @@ class BaseManager{
     double inter = m_runInterval;
     m_db->getData(m_name, inter);
     m_runInterval = inter;
+    print("    interval:", inter);
 
     config();
     
