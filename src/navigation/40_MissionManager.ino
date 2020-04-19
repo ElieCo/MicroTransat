@@ -25,6 +25,7 @@ class MissionManager : public BaseManager
     db_longitude.init(m_db, "Longitude", double(0));
     db_dist_to_axis.init(m_db, "Dist_to_axis", float(0), true);
     db_in_corridor.init(m_db, "In_corridor", true, true);
+    db_corridor_angle.init(m_db, "Corridor_angle", float(0));
 
     bool *sd_ready = m_db->initData("SD_ready", false);
     *sd_ready = m_mission_file.init("mission.txt", *sd_ready);
@@ -77,6 +78,7 @@ class MissionManager : public BaseManager
   DBData<double> db_longitude;
   DBData<float> db_dist_to_axis;
   DBData<bool> db_in_corridor;
+  DBData<float> db_corridor_angle;
 
   Vector<Waypoint> m_waypoints;
   double m_default_validation_distance;
@@ -129,8 +131,9 @@ class MissionManager : public BaseManager
     float angle_btw_wpt = get_course(db_lat_prev.get(), db_lng_prev.get(), db_lat_next.get(), db_lng_next.get());
     float dist_to_axis = sin(radians(angle_btw_wpt - db_angle_to_wpt.get())) * db_dist_to_wpt.get();
 
-    bool in_corridor = abs(dist_to_axis) <= db_corridor_width.get()/2;
+    bool in_corridor = abs(dist_to_axis) <= float(db_corridor_width.get())/2;
 
+    db_corridor_angle.set(angle_btw_wpt);
     db_dist_to_axis.set(dist_to_axis);
     db_in_corridor.set(in_corridor);
   }

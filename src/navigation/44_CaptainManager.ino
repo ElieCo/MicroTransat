@@ -17,6 +17,7 @@ class Captain : public BaseManager
     db_wpt_angle.init(m_db, "Wpt_angle", float(0));
     db_just_wake_up.init(m_db, "Just_wake_up", false);
     db_average_course_full.init(m_db, "Average_course_full", false);
+    db_corridor_angle.init(m_db, "Corridor_angle", float(0));
   }
 
   void go(){
@@ -52,6 +53,7 @@ class Captain : public BaseManager
   DBData<float> db_wpt_angle;
   DBData<bool> db_just_wake_up;
   DBData<bool> db_average_course_full;
+  DBData<float> db_corridor_angle;
 
   BEHAVIOUR m_behaviour;
 
@@ -85,8 +87,20 @@ class Captain : public BaseManager
     float new_reg = db_reg_cmd.get() + diff;
     from180to180(new_reg);
 
-    // if she's on the corridor, she go on the same direction as the previous regul, else as the new one
-    bool isPositive = db_in_corridor.get() ? db_reg_cmd.get() >= 0 : new_reg >= 0;
+    float diff_wpt_corridor = db_wpt_angle.get() - db_corridor_angle.get();
+    from180to180(diff_wpt_corridor);
+
+    // If she's on the corridor, she go on the same direction as the previous regul, else reach the corridor (depend of if we go downwind or upwind).
+    bool isPositive = true;
+    if (db_in_corridor.get()){
+      isPositive = db_reg_cmd.get() >= 0;
+    } else {
+      if (abs(new_reg) < 90) {
+        isPositive = diff_wpt_corridor >= 0;
+      } else {
+        isPositive = diff_wpt_corridor <= 0;
+      }
+    }
     int sign = isPositive ? 1 : -1;
 
     // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
