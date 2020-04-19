@@ -71,9 +71,6 @@ class MainWindow : public QMainWindow
     int lon_ofset;
     int scale;
 
-    int lat_next_p, lon_next_p;
-    int lat_prev_p, lon_prev_p;
-
 public slots:
 
     void updateView();
