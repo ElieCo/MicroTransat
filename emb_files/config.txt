@@ -1,7 +1,7 @@
 [
   {
     "name": "MissionManager",
-    "interval": 1000,
+    "interval": 500,
     "parameters":
       [
         { "key": "Default_corridor_width", "value": 40 },
@@ -10,11 +10,11 @@
   },
   {
     "name": "LogManager",
-    "interval": 250
+    "interval": 500
   },
   {
     "name": "HelmManager",
-    "interval": 250,
+    "interval": 100,
     "parameters":
       [
         { "key": "Helm_ratio", "value": 0.3176470588235294 },
@@ -25,7 +25,7 @@
   },
   {
     "name": "WingManager",
-    "interval": 250,
+    "interval": 100,
     "parameters":
       [
         { "key": "Wing_delta", "value": 10 }
@@ -33,7 +33,7 @@
   },
   {
     "name": "Captain",
-    "interval": 5000,
+    "interval": 2000,
     "parameters":
       [
         { "key": "Max_upwind", "value": 30 },
@@ -42,11 +42,11 @@
   },
   {
     "name": "CommManager",
-    "interval": 0
+    "interval": 100
   },
   {
     "name": "SensorsManager",
-    "interval": 500,
+    "interval": 1000,
     "parameters":
       [
         { "key": "Max_valid_hdop", "value": 500 }
