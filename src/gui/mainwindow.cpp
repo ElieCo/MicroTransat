@@ -71,13 +71,13 @@ QPolygon MainWindow::createBackground(){
 void MainWindow::updateRawData()
 {
     QList<float> newList = cm.getFullList();
-    if (raw_values.size()==header.size()){
+    if (raw_values.count()==header.size()){
         for (int i=0; i< raw_values.count(); i++){
-            raw_values[i]->setText(header[i]+" : " + newList.at(i));
+            raw_values[i]->setText(header[i]+" : " + QString::number(newList.at(i)));
         }
     }
     else {
-        qDebug() << "raw data error";
+        qDebug() << "raw data error : header size " << header.size() << " data size " << raw_values.size();
     }
 }
 
@@ -159,6 +159,7 @@ void MainWindow::updateView()
 {
     if (replay_mode)
     {
+        qDebug() << "mode replay actif";
         cm.readLine();
     }
     else
@@ -196,6 +197,7 @@ void MainWindow::openDialBox()
     header = cm.openFile(fileName);
     if (header.size() > 0){
         replay_mode = true;
+        raw_values.clear();
         clearLayout(ui->rawDataLayout);
         setVarDisplay();
     }

@@ -64,7 +64,12 @@ void CommManager::decryptMsg(QString msg)
 
 QList<float> CommManager::getFullList()
 {
-    return m_serialData.values();
+    QList<float> a;
+    for (int i=0; i<header.count(); i++)
+    {
+        a.append(m_serialData[header.at(i)]);
+    }
+    return a;
 }
 
 int CommManager::getData(QString name)
@@ -122,8 +127,14 @@ QStringList CommManager::openFile(QString file_name)
         char buf[1024];
         qint64 lineLength = file.readLine(buf, sizeof(buf));
         if (lineLength != -1) {
-            header = QString(buf).split(";");
-            header.removeLast();
+            QString line = QString(buf);
+            line.remove(QChar('\r'), Qt::CaseInsensitive);
+            line.remove(QChar('\n'), Qt::CaseInsensitive);
+            header = line.split(";");
+            m_serialData.clear();
+            for (int i=0; i<header.size(); i++){
+                m_serialData.insert(header.at(i), 0);
+            }
             return header;
         }
     }
@@ -135,6 +146,12 @@ void CommManager::readLine()
     char buf[1024];
     qint64 lineLength = file.readLine(buf, sizeof(buf));
     if (lineLength != -1) {
-        decryptMsg(QString(buf));
+        QString line = QString(buf);
+        line.remove(QChar('\r'), Qt::CaseInsensitive);
+        line.remove(QChar('\n'), Qt::CaseInsensitive);
+        decryptMsg(line);
+    }
+    else {
+        file.close();
     }
 }
