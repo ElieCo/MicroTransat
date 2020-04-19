@@ -79,8 +79,8 @@ class MissionManager : public BaseManager
   DBData<bool> db_in_corridor;
 
   Vector<Waypoint> m_waypoints;
-  int m_default_validation_distance;
-  int m_default_corridor_width;
+  double m_default_validation_distance;
+  double m_default_corridor_width;
 
   SDfile m_mission_file;
 

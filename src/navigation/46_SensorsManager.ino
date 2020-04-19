@@ -64,7 +64,7 @@ class SensorsManager: public BaseManager
   private:
 
   void config(){
-    m_db.getData("Max_valid_hdop", m_max_valid_hdop);
+    m_db->getData("Max_valid_hdop", m_max_valid_hdop);
   }
 
   DBData<bool> db_gps_recent_data;
