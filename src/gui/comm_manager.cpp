@@ -72,7 +72,7 @@ QList<float> CommManager::getFullList()
     return a;
 }
 
-int CommManager::getData(QString name)
+float CommManager::getData(QString name)
 {
     if (m_serialData.contains(name)){
         return  m_serialData[name];

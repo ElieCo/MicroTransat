@@ -25,8 +25,8 @@ QPolygon MainWindow::createBackground(){
          int lon_min = 0;
          int lon_max = 0;
          for (int i = 0; i < list.length(); i++){
-            lat.append(list[i].split(";")[0].toInt());
-            lon.append(list[i].split(";")[1].toInt());
+            lat.append(list[i].split(";")[0].toFloat()*10000000);
+            lon.append(list[i].split(";")[1].toFloat()*10000000);
 
             if (i ==0){
                 lat_min = lat.last();
@@ -83,30 +83,36 @@ void MainWindow::updateRawData()
 
 void MainWindow::updateBoatPosition()
 {
-    int lat = cm.getData("Latitude");
-    int lon = cm.getData("Longitude");
+    int lat = cm.getData("Latitude")*10000000;
+    int lon = cm.getData("Longitude")*10000000;
+
+    int lat_prev = cm.getData("Lat_prev_point")*10000000;
+    int lon_prev = cm.getData("Lon_prev_point")*10000000;
+
+    int lat_next = cm.getData("Lat_next_point")*10000000;
+    int lon_next = cm.getData("Lon_next_point")*10000000;
 
 
-    if ((cm.getData("Lat_prev_point") == 404 || cm.getData("Lat_prev_point") == 0) && lat != 404 && lat !=0) {
+    if (( lat_prev == 404 || lat_prev == 0) && lat != 404 && lat !=0) {
         cm.setData("Lat_prev_point", lat);
         lat_prev_p = lat;
     }
-    if ((cm.getData("Lon_prev_point") == 404 || cm.getData("Lon_prev_point") == 0) && lon != 404 && lon !=0) {
+    if ((lon_prev == 404 || lon_prev == 0) && lon != 404 && lon !=0) {
         cm.setData("Lon_prev_point", lon);
         lon_prev_p = lon;
     }
 
-    if (lat_next_p != cm.getData("Lat_next_point") && lat_next_p != 0 && lat_next_p != 404){
+    if (lat_next_p != lat_next && lat_next_p != 0 && lat_next_p != 404){
         lat_prev_p = lat_next_p;
         cm.setData("Lat_prev_point", lat_prev_p);
     }
-    lat_next_p = cm.getData("Lat_next_point");
+    lat_next_p = lat_next;
 
-    if (lon_next_p != cm.getData("Lon_next_point") && lon_next_p != 0 && lon_next_p != 404){
+    if (lon_next_p != lon_next && lon_next_p != 0 && lon_next_p != 404){
         lon_prev_p = lon_next_p;
         cm.setData("Lat_prev_point", lon_prev_p);
     }
-    lon_next_p = cm.getData("Lon_next_point");
+    lon_next_p = lon_next;
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
         if (track.length()>0){
@@ -170,12 +176,10 @@ void MainWindow::updateView()
     updateRawData();
     updateBoatPosition();
 
-    if (ui->activeTrack->isChecked()){
-        path->setPath(track);
-    }
-    else {
+    if (!ui->activeTrack->isChecked()){
         track.clear();
     }
+    path->setPath(track);
 }
 
 void MainWindow::clearLayout(QLayout *layout)

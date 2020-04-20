@@ -20,7 +20,7 @@ public:
     QList<float> getFullList();
     void send();
     void setrequest(QString text);
-    int getData(QString name);
+    float getData(QString name);
     void setData(QString name, int value);
 
     // mode replay
