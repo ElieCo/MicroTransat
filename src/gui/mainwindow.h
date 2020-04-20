@@ -27,6 +27,8 @@ class MainWindow : public QMainWindow
     void setButtonDisplay(QGridLayout *);
     void clearLayout(QLayout *);
 
+    QTimer * timer;
+
     QGraphicsScene scene;
     QGraphicsView * view;
     QGraphicsPathItem * path;
@@ -67,6 +69,7 @@ public slots:
 
     void updateView();
     void openDialBox();
+    void changeSpeed();
 };
 
 #endif

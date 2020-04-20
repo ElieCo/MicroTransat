@@ -194,6 +194,13 @@ void MainWindow::clearLayout(QLayout *layout)
     }
 }
 
+void MainWindow::changeSpeed()
+{
+    if (replay_mode){
+        timer->setInterval(1500/ui->Speed_slider->value());
+    }
+}
+
 void MainWindow::openDialBox()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -268,9 +275,14 @@ MainWindow::MainWindow() :
     ligne2 = scene.addLine(QLine(0,-5,0,5));
 
     label_cap = scene.addText("heading");
+    label_cap->setDefaultTextColor(QColor(0,255,0));
     cap = scene.addLine(QLine(0,0,0,1));
+    cap->setPen(QPen(QColor(0,255,0)));
+
     label_wind = scene.addText("supposed wind direction");
+    label_wind->setDefaultTextColor(QColor(255,0,0));
     wind = scene.addLine(QLine(0,0,0,1));
+    wind->setPen(QPen(QColor(255,0,0)));
 
     // draw the circle for the first wpt
     label_wpt1 = scene.addText("next wpt");
@@ -283,8 +295,9 @@ MainWindow::MainWindow() :
 
     setVarDisplay();
 
-    QTimer *timer = new QTimer(this);
+    timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateView);
     connect(ui->file_selection, &QPushButton::clicked, this, &MainWindow::openDialBox);
+    connect(ui->Speed_slider, &QSlider::valueChanged, this, &MainWindow::changeSpeed);
     timer->start(1500);
 }
