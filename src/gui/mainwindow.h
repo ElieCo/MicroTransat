@@ -12,16 +12,20 @@ class MainWindow : public QMainWindow
 
     private slots:
     void handleButton();
+    void resetHit();
     void update_val(int);
 
     private:
     QPolygon createBackground();
-    void updateView();
+    void updateRawData();
+    void updateBoatPosition();
     void setVarDisplay(QGridLayout *);
     void setButtonDisplay(QGridLayout *);
 
     QGraphicsScene scene;
     QGraphicsView * view;
+    QGraphicsPathItem * path;
+    QPainterPath track;
     QGraphicsLineItem * ligne1;
     QGraphicsLineItem * ligne2;
     QGraphicsLineItem * ligne3;
@@ -35,6 +39,7 @@ class MainWindow : public QMainWindow
     QGraphicsTextItem * label_cap;
     QGraphicsTextItem * label_wind;
 
+    QPushButton * resetTrack;
     QPushButton * test_button;
     QSpinBox * val_selection;
 
@@ -65,6 +70,10 @@ class MainWindow : public QMainWindow
     int lat_ofset;
     int lon_ofset;
     int scale;
+
+public slots:
+
+    void updateView();
 };
 
 #endif

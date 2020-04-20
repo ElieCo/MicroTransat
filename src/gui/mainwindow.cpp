@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "mainwindow.h"
 #include <QFile>
 #include <QGraphicsTextItem>
 
@@ -8,7 +8,7 @@
 QPolygon MainWindow::createBackground(){
     QPolygon fond_carte;
     QString raw_background;
-    QFile fichier("../src/gui/resources/carte_lac.csv");
+    QFile fichier("../../src/gui/resources/carte_lac.csv");
 
     if(fichier.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -67,40 +67,50 @@ QPolygon MainWindow::createBackground(){
     return fond_carte;
 }
 
-void MainWindow::updateView()
+void MainWindow::updateRawData()
 {
-    cm.send("log");
     hdop->setText("HDOP : " + QString::number(cm.getData("HDOP")));
-    latittude->setText("latittude : " + QString::number(cm.getData("Latittude")));
+    latittude->setText("latitude : " + QString::number(cm.getData("Latitude")));
     longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));
     lat_next_point->setText("lat_next_point : " + QString::number(cm.getData("Lat_next_point")));
     lon_next_point->setText("lon_next_point : " + QString::number(cm.getData("Lon_next_point")));
     lat_prev_point->setText("lat_prev_point : " + QString::number(cm.getData("Lat_prev_point")));
     lon_prev_point->setText("lon_prev_point : " + QString::number(cm.getData("Lon_prev_point")));
     wpt_angle->setText("wpt_angle : " + QString::number(cm.getData("Wpt_angle")));
-    wpt_dist->setText("wpt_dist : " + QString::number(cm.getData("Wpt_dst")));
-    Index_wpt->setText("Index_wpt : " + QString::number(cm.getData("Index_wpt")));
+    wpt_dist->setText("wpt_dist : " + QString::number(cm.getData("Wpt_dist")));
+    Index_wpt->setText("Index_wpt : " + QString::number(cm.getData("Wpt_index")));
 
-    speed->setText("speed : " + QString::number(cm.getData("Vitesse")));
-    heading->setText("heading : " + QString::number(cm.getData("Cap")));
+    speed->setText("speed : " + QString::number(cm.getData("Speed")));
+    heading->setText("heading : " + QString::number(cm.getData("Course")));
 
-    reg_angle->setText("reg_angle : " + QString::number(cm.getData("Angle_regulateur")));
-    winglet_pos->setText("winglet_pos : " + QString::number(cm.getData("Pos_aile")));
+    reg_angle->setText("reg_angle : " + QString::number(cm.getData("Regulator_angle")));
+    winglet_pos->setText("winglet_pos : " + QString::number(cm.getData("Wing_angle")));
     battery->setText("battery : " + QString::number(cm.getData("Battery")));
 
     corridor_width->setText("corridor_width : " + QString::number(cm.getData("Corridor_width")));
-    ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("ecart_axe")));
-    Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("Presence_couloir")));
+    ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("Dist_to_axis")));
+    Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("In_corridor")));
+}
 
-
-    int lat = cm.getData("Latittude");
+void MainWindow::updateBoatPosition()
+{
+    int lat = cm.getData("Latitude");
     int lon = cm.getData("Longitude");
+
     int lat_next_p = cm.getData("Lat_next_point");
     int lon_next_p = cm.getData("Lon_next_point");
     int lat_prev_p = cm.getData("Lat_prev_point");
     int lon_prev_p = cm.getData("Lon_prev_point");
 
+
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
+        if (track.length()>0){
+            track.lineTo((lon-lon_ofset)/scale,-(lat-lat_ofset)/scale);
+        }
+        else {
+            track.moveTo((lon-lon_ofset)/scale,1-(lat-lat_ofset)/scale);
+            track.lineTo((lon-lon_ofset)/scale,-(lat-lat_ofset)/scale);
+        }
         ligne1->setLine((lon-lon_ofset)/scale-5, -(lat-lat_ofset)/scale, (lon-lon_ofset)/scale+5, -(lat-lat_ofset)/scale);
         ligne2->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale-5, (lon-lon_ofset)/scale, -(lat-lat_ofset)/scale+5);
     }
@@ -115,19 +125,19 @@ void MainWindow::updateView()
            ligne3->setLine((lon_next_p-lon_ofset)/scale, -(lat_next_p-lat_ofset)/scale, (lon_prev_p-lon_ofset)/scale, -(lat_prev_p-lat_ofset)/scale);
         }
 
-        int heading_ = cm.getData("Cap");
+        int heading_ = cm.getData("Course");
         if (heading_ != 404)
         {
             label_cap->setPos(sin(M_PI*heading_/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*heading_/180)*40-(lat-lat_ofset)/scale);
             cap->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale, sin(M_PI*heading_/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*heading_/180)*40-(lat-lat_ofset)/scale);
         }
-        int wind_angle = cm.getData("Angle_regulateur");
+        int wind_angle = cm.getData("Regulator_angle");
         if (wind_angle != 404)
         {
             if (wind_angle < 0){
                 wind_angle += 180;
             }
-            wind_angle += heading_;
+            wind_angle = heading_ - wind_angle;
 
             if (wind_angle > 360)
             {
@@ -138,6 +148,15 @@ void MainWindow::updateView()
             wind->setLine((lon-lon_ofset)/scale, -(lat-lat_ofset)/scale, sin(M_PI*wind_angle/180)*40+(lon-lon_ofset)/scale, -cos(M_PI*wind_angle/180)*40-(lat-lat_ofset)/scale);
         }
     }
+}
+
+void MainWindow::updateView()
+{
+    cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
+
+    updateRawData();
+    updateBoatPosition();
+    path->setPath(track);
 }
 
 void MainWindow::setVarDisplay(QGridLayout * layout)
@@ -199,28 +218,42 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
     connect(test_button, SIGNAL (released()), this, SLOT (handleButton()));
     grid->addWidget(test_button,0,1);
 
-    layout->addLayout(grid,0,1);
+
+    // track display
+    resetTrack = new QPushButton("Reset Track", this);
+    connect(resetTrack, SIGNAL (released()), this, SLOT (resetHit()));
+    grid->addWidget(resetTrack,1,0);
+
+    layout->addLayout(grid, 0, 1);
 }
 
 void MainWindow::update_val(int i){
         qDebug()<< "valeur de la box : "<< i;
 }
+
+void MainWindow::resetHit()
+{
+   track = QPainterPath();
+}
+
 void MainWindow::handleButton()
 {
    test_button->setText("Example");
-   qDebug()<< "valeur de la box : "<< val_selection->value();
-   cm.send(QString::number(val_selection->value()));
+   //qDebug()<< "valeur de la box : "<< val_selection->value();
+   cm.setrequest("c"+QString::number(val_selection->value()));
 }
 
 MainWindow::MainWindow()
 {
     QWidget *zoneCentrale = new QWidget;
 
-    cm.openSerialPort("//./COM6");
+    cm.openSerialPort("/dev/ttyACM1");
 
     // lecture de fichier
-    QPolygon fond_carte = createBackground();
-    scene.addPolygon(fond_carte);
+    scene.addPolygon(createBackground());
+
+    // add the boat track in the scetch
+    path = scene.addPath(track);
 
     // draw the cross representing the boat
     ligne1 = scene.addLine(QLine(-5,0,5,0));
@@ -251,6 +284,6 @@ MainWindow::MainWindow()
     setCentralWidget(zoneCentrale);
 
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateView));
-    timer->start(1000);
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateView);
+    timer->start(1500);
 }

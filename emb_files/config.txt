@@ -1,0 +1,63 @@
+[
+  {
+    "name": "MissionManager",
+    "interval": 500,
+    "parameters":
+      [
+        { "key": "Default_corridor_width", "value": 40 },
+        { "key": "Default_validation_distance", "value": 25 }
+      ]
+  },
+  {
+    "name": "LogManager",
+    "interval": 500
+  },
+  {
+    "name": "HelmManager",
+    "interval": 100,
+    "parameters":
+      [
+        { "key": "Helm_ratio", "value": 0.3176470588235294 },
+        { "key": "Helm_offset", "value": 180 },
+        { "key": "Helm_normal_speed", "value": 45 },
+        { "key": "Helm_tack_speed", "value": 180 }
+      ]
+  },
+  {
+    "name": "WingManager",
+    "interval": 100,
+    "parameters":
+      [
+        { "key": "Wing_delta", "value": 10 }
+      ]
+  },
+  {
+    "name": "Captain",
+    "interval": 2000,
+    "parameters":
+      [
+        { "key": "Max_upwind", "value": 30 },
+        { "key": "Max_downwind", "value": 130 }
+      ]
+  },
+  {
+    "name": "CommManager",
+    "interval": 100
+  },
+  {
+    "name": "SensorsManager",
+    "interval": 1000,
+    "parameters":
+      [
+        { "key": "Max_valid_hdop", "value": 500 }
+      ]
+  },
+  {
+    "name": "LightManager",
+    "interval": 500
+  },
+  {
+    "name": "ConfigManager",
+    "interval": 10000
+  }
+]

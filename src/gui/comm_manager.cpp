@@ -34,7 +34,9 @@ void CommManager::openSerialPort(QString nameport)
           m_serial->setFlowControl(QSerialPort::NoFlowControl);
 
           // definition de la liste des entrée (oui c'est un peu caca)
-          header = QStringList({"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"});
+//          header = QStringList({"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"});
+//          header = QStringList({"Msg_received", "Lat_next_point", "Lon_next_point", "Wpt_index", "Fix_age", "Time", "Date", "Chars", "HDOP", "Sentences", "Failed_checksum", "Latitude", "Longitude", "Wpt_dist", "Wpt_angle", "Cmd_helm", "Wing_angle", "Speed", "Course", "Average_course", "Max_upwind", "Regulator_angle", "Battery", "SD_ready", "Gps_recent_data", "Gps_ready"});
+          header = QStringList({"Corridor_width", "Wpt_index", "HDOP", "Time", "Wpt_dist", "Wpt_angle", "Dist_to_axis", "Cmd_helm", "Regulator_angle", "Wing_angle", "Speed", "Course", "Average_course", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Latitude", "Longitude", "Battery", "In_corridor", "Fix", "Gps_ready"});
           for (int i=0; i<header.size(); i++){
               m_serialData.insert(header.at(i), 0);
           }
@@ -53,8 +55,14 @@ void CommManager::decryptMsg(QString msg)
     QStringList dataList = msg.split(";");
     if (dataList.length() == header.length()){
         for (int i = 0; i < header.length(); i++){
-            m_serialData[header.at(i)] = dataList[i].toInt();
+            m_serialData[header.at(i)] = dataList[i].toFloat();
         }
+        m_serialData["Latitude"] *= 1000000;
+        m_serialData["Longitude"] *= 1000000;
+        m_serialData["Lat_next_point"] *= 1000000;
+        m_serialData["Lon_next_point"] *= 1000000;
+        m_serialData["Lat_prev_point"] *= 1000000;
+        m_serialData["Lon_prev_point"] *= 1000000;
     }
 }
 
@@ -68,6 +76,11 @@ int CommManager::getData(QString name)
     }
 }
 
+void CommManager::setData(QString name, int value)
+{
+    m_serialData[name] = value;
+}
+
 void CommManager::readData()
 {
     QByteArray data = m_serial->readAll();
@@ -77,16 +90,25 @@ void CommManager::readData()
         m_cache.remove(QChar('\n'), Qt::CaseInsensitive);
         m_cache.remove(QChar('~'), Qt::CaseInsensitive);
         decryptMsg(m_cache);
-        qDebug() << m_cache;
+        qDebug() << "msg recu et assemble : " << m_cache;
         m_cache = "";
     }
     else {
         m_cache += data;
     }
 }
-
-void CommManager::send(QString text)
+void CommManager::setrequest(QString text)
 {
+    request = text;
+}
+
+void CommManager::send()
+{
+    if (request.length() == 0){
+        request = "log";
+    }
     m_serial->flush();
-    m_serial->write(text.toStdString().c_str());
+    m_serial->write(request.toStdString().c_str());
+
+    request = "";
 }
