@@ -59,8 +59,8 @@ void CommManager::decryptMsg(QString msg)
         for (int i = 0; i < header.length(); i++){
             m_serialData[header.at(i)] = dataList[i].toFloat();
         }
-        m_serialData["Latitude"] *= 1000000;
-        m_serialData["Longitude"] *= 1000000;
+        m_serialData["Latitude"] *=       1000000;
+        m_serialData["Longitude"] *=      1000000;
         m_serialData["Lat_next_point"] *= 1000000;
         m_serialData["Lon_next_point"] *= 1000000;
         m_serialData["Lat_prev_point"] *= 1000000;

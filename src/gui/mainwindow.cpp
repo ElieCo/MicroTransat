@@ -9,7 +9,7 @@
 QPolygon MainWindow::createBackground(){
     QPolygon fond_carte;
     QString raw_background;
-    QFile fichier("../../src/gui/resources/carte_lac.csv");
+    QFile fichier("../src/gui/resources/carte_lac.csv");
 
     if(fichier.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -25,8 +25,8 @@ QPolygon MainWindow::createBackground(){
          int lon_min = 0;
          int lon_max = 0;
          for (int i = 0; i < list.length(); i++){
-            lat.append(list[i].split(";")[0].toFloat()*10000000);
-            lon.append(list[i].split(";")[1].toFloat()*10000000);
+            lat.append(list[i].split(";")[0].toFloat()*1000000);
+            lon.append(list[i].split(";")[1].toFloat()*1000000);
 
             if (i ==0){
                 lat_min = lat.last();
@@ -63,7 +63,11 @@ QPolygon MainWindow::createBackground(){
          }
     }
 
-    else raw_background = "Impossible d'ouvrir le fichier !";
+    else
+    {
+        qDebug() << "Impossible d'ouvrir le fichier !";
+    }
+
 
     return fond_carte;
 }
@@ -83,14 +87,16 @@ void MainWindow::updateRawData()
 
 void MainWindow::updateBoatPosition()
 {
-    int lat = cm.getData("Latitude")*10000000;
-    int lon = cm.getData("Longitude")*10000000;
+    int lat = cm.getData("Latitude");
+    int lon = cm.getData("Longitude");
+    qDebug() << lat  <<"   "<< lon ;
+    qDebug() << lat_ofset << "   " << lon_ofset;
 
-    int lat_prev = cm.getData("Lat_prev_point")*10000000;
-    int lon_prev = cm.getData("Lon_prev_point")*10000000;
+    int lat_prev = cm.getData("Lat_prev_point");
+    int lon_prev = cm.getData("Lon_prev_point");
 
-    int lat_next = cm.getData("Lat_next_point")*10000000;
-    int lon_next = cm.getData("Lon_next_point")*10000000;
+    int lat_next = cm.getData("Lat_next_point");
+    int lon_next = cm.getData("Lon_next_point");
 
 
     if (( lat_prev == 404 || lat_prev == 0) && lat != 404 && lat !=0) {
