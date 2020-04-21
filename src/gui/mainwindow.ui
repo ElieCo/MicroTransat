@@ -94,7 +94,10 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
          <widget class="QRadioButton" name="activeTrack">
           <property name="text">
@@ -104,6 +107,19 @@
            <bool>true</bool>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
@@ -136,7 +152,7 @@
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>20</number>
+           <number>40</number>
           </property>
           <property name="pageStep">
            <number>1</number>

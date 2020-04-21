@@ -216,8 +216,12 @@ void MainWindow::openDialBox()
 
 void MainWindow::setVarDisplay()
 {
+    QFont police = QFont();
+    police.setPixelSize(15);
+
     for (int i=0; i<header.size(); i++){
         QLabel *raw = new QLabel(header.at(i)+" : ");
+        raw->setFont(police);
         ui->rawDataLayout->addWidget(raw);
         raw_values << raw;
     }
@@ -240,15 +244,6 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
 
     layout->addLayout(grid, 0, 1);
 }
-
-void MainWindow::handleButton()
-{
-   test_button->setText("Example");
-   //qDebug()<< "valeur de la box : "<< val_selection->value();
-   cm.setrequest("c"+QString::number(val_selection->value()));
-}
-
-
 
 MainWindow::MainWindow() :
     lat_next_p(0)
@@ -274,20 +269,27 @@ MainWindow::MainWindow() :
     ligne1 = scene.addLine(QLine(-5,0,5,0));
     ligne2 = scene.addLine(QLine(0,-5,0,5));
 
+    QFont police_dessin = QFont();
+    police_dessin.setPixelSize(17);
+
     label_cap = scene.addText("heading");
     label_cap->setDefaultTextColor(QColor(0,255,0));
+    label_cap->setFont(police_dessin);
     cap = scene.addLine(QLine(0,0,0,1));
     cap->setPen(QPen(QColor(0,255,0)));
 
     label_wind = scene.addText("supposed wind direction");
     label_wind->setDefaultTextColor(QColor(255,0,0));
+    label_wind->setFont(police_dessin);
     wind = scene.addLine(QLine(0,0,0,1));
     wind->setPen(QPen(QColor(255,0,0)));
 
     // draw the circle for the first wpt
     label_wpt1 = scene.addText("next wpt");
+    label_wpt1->setFont(police_dessin);
     wpt_circle1 = scene.addEllipse(0,0,10,10);
     label_wpt2 = scene.addText("prev wpt");
+    label_wpt2->setFont(police_dessin);
     wpt_circle2 = scene.addEllipse(0,0,10,10);
     ligne3 = scene.addLine(QLine(0,1,0,2));
 

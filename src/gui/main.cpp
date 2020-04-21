@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MainWindow window;
+    window.setStyleSheet("QMainWindow {background: 'grey';}");
     window.show();
 
     //    cm.closeSerialPort();

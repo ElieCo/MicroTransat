@@ -16,7 +16,6 @@ class MainWindow : public QMainWindow
     MainWindow();
 
     private slots:
-    void handleButton();
 
     private:
     Ui::MainWindow *ui;
