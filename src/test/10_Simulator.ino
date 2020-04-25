@@ -35,15 +35,36 @@ class Simulator{
     // Calcul new position with previous speed, cap and position
     calculatePosition(m_movement_period);
 
+    /////////////////////////////////////////////////////////////////////////////////  Perturbation ///////////////////////////////////////
+    // change wind direction
+    float wind_dispersion = 0;
+    if ( m_perturbation_type == 5){
+      wind_dispersion = random(-m_difficulty_level*5, m_difficulty_level*5);
+    }
+    m_wind_origin += wind_dispersion;
+
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
     // Get the new cap
     float helm = 0.0;
     m_db->getData("Cmd_helm", helm);
     m_actual_cap = m_wind_origin + helm;
     from0to360(m_actual_cap);
-    
+     
     // Calcul new speed
     float wing_angle = 0.0;
     m_db->getData("Wing_angle", wing_angle);
+
+    /////////////////////////////////////////////////////////////////////////////////  Perturbation ///////////////////////////////////////
+    if (m_perturbation_type == 3){   // aileron bloqué d'un coté
+      wing_angle = 10;
+    }
+
+    if (m_perturbation_type == 4){   // aileron inversé suite à un empannage
+      wing_angle = -wing_angle;
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     calculateSpeed(wing_angle);
     
   }
@@ -118,7 +139,7 @@ class Simulator{
 
   AverageAngle m_course_average;
 
-  void calculateSpeed(float wing_angle){
+  void  (float wing_angle){
     
     float wind_direction = m_wind_origin + 180;
     float sail_angle = wind_direction - (wing_angle - 90);
@@ -138,13 +159,16 @@ class Simulator{
   void calculatePosition(float dt){
     float dist = m_actual_speed * dt/1000;
     double nlat, nlng;
-    
+
+
+    /////////////////////////////////////////////////////////////////////////////////  Perturbation ///////////////////////////////////////
     // random error on the GPS mesurement (depending of the difficulty level)
     float noise = 0;
     float noise_heading = 0;
+    float flow = 0;
     
     if ( m_perturbation_type == 1 || m_perturbation_type == 2){
-      noise = 0,0.0000001*m_difficulty_level;  // this value is aproximatly 10m for the lat
+      noise = 0,0000001*m_difficulty_level;  // this value is aproximatly 10m for the lat
     }
     double lat_error = random(-noise, noise);
     double lon_error = random(-noise, noise);
@@ -153,10 +177,19 @@ class Simulator{
       noise_heading = 5*m_difficulty_level;
     }
     double heading_error = random(-noise_heading, noise_heading);
+
+    float dir = 0;  // flow direction
+    if ( m_perturbation_type == 6){
+      flow = 0,00000005*m_difficulty_level;
+    }
+    lat_error += flow*cos(radians(dir));
+    lon_error += flow*sin(radians(dir));
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     
     getPointAtDistAndBearing(m_actual_position.lat + lat_error, m_actual_position.lng + lon_error, dist, m_actual_cap + heading_error, nlat, nlng);
 
-    [nlat, nlng] = noiseAndBug(nlat,nlng);
     m_actual_position.lat = nlat;
     m_actual_position.lng = nlng;
   }
