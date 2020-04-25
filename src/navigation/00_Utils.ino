@@ -1,6 +1,6 @@
 #define serialDebug Serial1
 
-#define DEBUGLEVEL 1
+#define DEBUGLEVEL 0
 
 #ifndef SIMU
 #define SIMU false

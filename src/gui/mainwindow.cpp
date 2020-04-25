@@ -9,7 +9,7 @@
 QPolygon MainWindow::createBackground(){
     QPolygon fond_carte;
     QString raw_background;
-    QFile fichier("../src/gui/resources/carte_lac.csv");
+    QFile fichier("../../src/gui/resources/carte_lac.csv");
 
     if(fichier.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -89,8 +89,6 @@ void MainWindow::updateBoatPosition()
 {
     int lat = cm.getData("Latitude");
     int lon = cm.getData("Longitude");
-    qDebug() << lat  <<"   "<< lon ;
-    qDebug() << lat_ofset << "   " << lon_ofset;
 
     int lat_prev = cm.getData("Lat_prev_point");
     int lon_prev = cm.getData("Lon_prev_point");
@@ -183,7 +181,7 @@ void MainWindow::updateView()
     updateBoatPosition();
 
     if (!ui->activeTrack->isChecked()){
-        track.clear();
+        track = QPainterPath();
     }
     path->setPath(track);
 }
@@ -261,7 +259,7 @@ MainWindow::MainWindow() :
 {
     ui->setupUi(this);
 
-    cm.openSerialPort("/dev/ttyACM1");
+    cm.openSerialPort("/dev/ttyACM2");
 
     header = cm.getHeader();
 

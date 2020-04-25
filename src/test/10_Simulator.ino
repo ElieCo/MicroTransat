@@ -10,9 +10,9 @@ class Simulator{
     , m_wind_origin(0.0)
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
+    , m_perturbation_type(6)
+    , m_difficulty_level(100)
     , m_course_average(3)
-    , m_perturbation_type(0)
-    , m_difficulty_level(0)
   {
     m_actual_position.lat = 0.0;
     m_actual_position.lng = 0.0;
@@ -168,7 +168,7 @@ class Simulator{
     float flow = 0;
     
     if ( m_perturbation_type == 1 || m_perturbation_type == 2){
-      noise = 0,0000001*m_difficulty_level;  // this value is aproximatly 10m for the lat
+      noise = 0.0000001*m_difficulty_level;  // this value is aproximatly 10m for the lat
     }
     double lat_error = random(-noise, noise);
     double lon_error = random(-noise, noise);
