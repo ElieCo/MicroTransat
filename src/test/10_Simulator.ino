@@ -11,6 +11,8 @@ class Simulator{
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
     , m_course_average(3)
+    , m_perturbation_type(0)
+    , m_difficulty_level(0)
   {
     m_actual_position.lat = 0.0;
     m_actual_position.lng = 0.0;
@@ -106,6 +108,8 @@ class Simulator{
   unsigned int m_movement_time;
   unsigned int m_gps_period;
   unsigned int m_gps_time;
+  unsigned int m_perturbation_type;
+  unsigned int m_difficulty_level;
 
   float m_wind_origin;
   float m_actual_cap;
@@ -134,7 +138,25 @@ class Simulator{
   void calculatePosition(float dt){
     float dist = m_actual_speed * dt/1000;
     double nlat, nlng;
-    getPointAtDistAndBearing(m_actual_position.lat, m_actual_position.lng, dist, m_actual_cap, nlat, nlng);
+    
+    // random error on the GPS mesurement (depending of the difficulty level)
+    float noise = 0;
+    float noise_heading = 0;
+    
+    if ( m_perturbation_type == 1 || m_perturbation_type == 2){
+      noise = 0,0.0000001*m_difficulty_level;  // this value is aproximatly 10m for the lat
+    }
+    double lat_error = random(-noise, noise);
+    double lon_error = random(-noise, noise);
+
+    if ( m_perturbation_type == 2){
+      noise_heading = 5*m_difficulty_level;
+    }
+    double heading_error = random(-noise_heading, noise_heading);
+    
+    getPointAtDistAndBearing(m_actual_position.lat + lat_error, m_actual_position.lng + lon_error, dist, m_actual_cap + heading_error, nlat, nlng);
+
+    [nlat, nlng] = noiseAndBug(nlat,nlng);
     m_actual_position.lat = nlat;
     m_actual_position.lng = nlng;
   }
