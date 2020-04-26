@@ -63,14 +63,12 @@ class LogManager: public BaseManager
   bool prepareLogFile(){
     if (m_log_csv_file.isOpen()) return true;
 
-    bool fix = false;
-    m_db->getData("Fix", fix);
     unsigned time = 0;
     m_db->getData("Time", time);
     unsigned date = 0;
     m_db->getData("Date", date);
 
-    if(fix && time != 0 && date != 0){
+    if(time != 0 && date != 0){
       String t = String(time);
       for (unsigned i = 0; i < max(unsigned(0), 6 - String(time).length()); i++) t = "0" + t;
       String d = String(date);

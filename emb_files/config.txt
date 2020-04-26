@@ -5,7 +5,7 @@
     "parameters":
       [
         { "key": "Default_corridor_width", "value": 40 },
-        { "key": "Default_validation_distance", "value": 25 }
+        { "key": "Default_validation_distance", "value": 15 }
       ]
   },
   {
@@ -36,17 +36,17 @@
     "interval": 2000,
     "parameters":
       [
-        { "key": "Max_upwind", "value": 30 },
-        { "key": "Max_downwind", "value": 130 }
+        { "key": "Max_upwind", "value": 45 },
+        { "key": "Max_downwind", "value": 150 }
       ]
   },
   {
     "name": "CommManager",
-    "interval": 100
+    "interval": 0
   },
   {
     "name": "SensorsManager",
-    "interval": 1000,
+    "interval": 0,
     "parameters":
       [
         { "key": "Max_valid_hdop", "value": 500 }
