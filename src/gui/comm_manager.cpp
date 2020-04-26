@@ -13,7 +13,10 @@ CommManager::CommManager(QObject *parent)
 
 CommManager::~CommManager()
 {
-    if (m_serial) delete m_serial;
+    if (m_serial) {
+        m_serial->close();
+        delete m_serial;
+    }
 }
 
 void CommManager::openSerialPort(QString nameport)
