@@ -10,8 +10,8 @@ class Simulator{
     , m_wind_origin(0.0)
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
-    , m_perturbation_type(6)
-    , m_difficulty_level(100)
+    , m_perturbation_type(1)
+    , m_difficulty_level(500)
     , m_course_average(3)
   {
     m_actual_position.lat = 0.0;
@@ -39,7 +39,7 @@ class Simulator{
     // change wind direction
     float wind_dispersion = 0;
     if ( m_perturbation_type == 5){
-      wind_dispersion = random(-m_difficulty_level*5, m_difficulty_level*5);
+      wind_dispersion = random(-m_difficulty_level, m_difficulty_level);
     }
     m_wind_origin += wind_dispersion;
 
@@ -139,7 +139,7 @@ class Simulator{
 
   AverageAngle m_course_average;
 
-  void  (float wing_angle){
+  void  calculateSpeed(float wing_angle){
     
     float wind_direction = m_wind_origin + 180;
     float sail_angle = wind_direction - (wing_angle - 90);
@@ -165,7 +165,7 @@ class Simulator{
     // random error on the GPS mesurement (depending of the difficulty level)
     float noise = 0;
     float noise_heading = 0;
-    float flow = 0;
+    double flow = 0;
     
     if ( m_perturbation_type == 1 || m_perturbation_type == 2){
       noise = 0.0000001*m_difficulty_level;  // this value is aproximatly 10m for the lat
@@ -180,7 +180,7 @@ class Simulator{
 
     float dir = 0;  // flow direction
     if ( m_perturbation_type == 6){
-      flow = 0,00000005*m_difficulty_level;
+      flow = 0.00000005*m_difficulty_level;
     }
     lat_error += flow*cos(radians(dir));
     lon_error += flow*sin(radians(dir));
@@ -188,10 +188,10 @@ class Simulator{
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     
-    getPointAtDistAndBearing(m_actual_position.lat + lat_error, m_actual_position.lng + lon_error, dist, m_actual_cap + heading_error, nlat, nlng);
+    getPointAtDistAndBearing(m_actual_position.lat, m_actual_position.lng, dist, m_actual_cap + heading_error, nlat, nlng);
 
-    m_actual_position.lat = nlat;
-    m_actual_position.lng = nlng;
+    m_actual_position.lat = nlat + lat_error;
+    m_actual_position.lng = nlng + lon_error;
   }
   
   float averageCourse(float new_course){
