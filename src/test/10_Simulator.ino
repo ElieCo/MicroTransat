@@ -163,8 +163,8 @@ class Simulator{
 
     /////////////////////////////////////////////////////////////////////////////////  Perturbation ///////////////////////////////////////
     // random error on the GPS mesurement (depending of the difficulty level)
-    float noise = 0;
-    float noise_heading = 0;
+    double noise = 0;
+    double noise_heading = 0;
     double flow = 0;
     
     if ( m_perturbation_type == 1 || m_perturbation_type == 2){
