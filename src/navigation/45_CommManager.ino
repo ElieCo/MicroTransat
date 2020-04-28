@@ -7,34 +7,21 @@ class CommManager : public BaseManager
   ~CommManager(){}
 
   void init(){
-    db_msg_received.init(m_db, "Msg_received", String(""));
+    db_msg_received.init(m_db, "Msg_received", false);
 
     m_lora.init();
-
-    m_index_log = 0;
   }
 
   void go(){
     // check received messages
-    db_msg_received.set(m_lora.receive());
+    db_msg_received.set(m_lora.update());
     // Return if there is no message.
-    if (db_msg_received.get().length() <= 0) return;
+    if (!db_msg_received.get()) return;
 
     // send message
-    bool send_log = db_msg_received.get().indexOf("log")>= 0;
+    bool send_log = m_lora.getLastMessage().indexOf("log")>= 0;
     if (send_log) {
-      if (m_index_log == 0){
-        // Send the first part of the message.
-        m_actual_line = getLine();
-        m_index_log++;
-        sendLog(m_actual_line.substring(0,50), false);
-      }
-      else {
-        // Send the second pat of the message.
-        m_index_log = 0;
-        send_log = false;
-        sendLog(m_actual_line.substring(50), true);
-      }
+      m_lora.sendMessage(getLine());
     }
   }
 
@@ -60,17 +47,5 @@ class CommManager : public BaseManager
     return line;
   }
 
-  void sendLog(String msg, boolean end_communication)
-  {
-    if (end_communication){
-      msg = msg + '~';
-    }
-
-    m_lora.send(msg);
-  }
-
-
   LoRa m_lora;
-  int m_index_log;
-  String m_actual_line;
 };
