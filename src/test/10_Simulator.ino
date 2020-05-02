@@ -32,6 +32,20 @@ class Simulator{
     else
       return;
 
+    /////////////////////////////////////////////////////////////////////////////////  Perturbation ///////////////////////////////////////
+    float dir = 0;  // flow direction
+    
+    if ( m_perturbation_type == 6){
+      float x = cos(radians(m_actual_cap))*m_actual_speed;
+      float y = sin(radians(m_actual_cap))*m_actual_speed;
+      float flow_x = cos(radians(dir))*m_difficulty_level;
+      float flow_y = sin(radians(dir))*m_difficulty_level;
+      float vectorial_course_x = x + flow_x;
+      float vectorial_course_y = y + flow_y;
+      m_actual_cap = (atan(vectorial_course_y/vectorial_course_x))* 57296 / 1000;
+      m_actual_speed = sqrt(vectorial_course_x*vectorial_course_x + vectorial_course_y*vectorial_course_y);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Calcul new position with previous speed, cap and position
     calculatePosition(m_movement_period);
 
@@ -165,7 +179,6 @@ class Simulator{
     // random error on the GPS mesurement (depending of the difficulty level)
     double noise = 0;
     double noise_heading = 0;
-    double flow = 0;
     
     if ( m_perturbation_type == 1 || m_perturbation_type == 2){
       noise = 0.0000001*m_difficulty_level;  // this value is aproximatly 10m for the lat
@@ -177,13 +190,6 @@ class Simulator{
       noise_heading = 5*m_difficulty_level;
     }
     double heading_error = random(-noise_heading, noise_heading);
-
-    float dir = 0;  // flow direction
-    if ( m_perturbation_type == 6){
-      flow = 0.00000005*m_difficulty_level;
-    }
-    lat_error += flow*cos(radians(dir));
-    lon_error += flow*sin(radians(dir));
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
