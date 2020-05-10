@@ -261,7 +261,7 @@ MainWindow::MainWindow() :
 {
     ui->setupUi(this);
 
-    cm.openSerialPort("/dev/ttyACM1");
+    cm.openSerialPort("//./COM6");
 
     header = cm.getHeader();
 
@@ -270,6 +270,7 @@ MainWindow::MainWindow() :
 
     // add the boat track in the scetch
     path = scene.addPath(track);
+    path->setPen(QPen(QColor(255,0,0)));
 
     // draw the cross representing the boat
     ligne1 = scene.addLine(QLine(-5,0,5,0));

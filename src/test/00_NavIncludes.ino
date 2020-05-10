@@ -8,7 +8,7 @@
 #define CONCAT(x,y) IDENT(x)IDENT(y)
 #define PATH(x,y) STR(IDENT(x)IDENT(y))
 
-#define REPO /home/elie/Projets/Bateau/MicroTransat/
+#define REPO D:/micro_transat/coque3/MicroTransat/
 #define NAVREPO CONCAT(REPO,src/navigation/)
 
 #define SIMU true
