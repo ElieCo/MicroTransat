@@ -14,7 +14,7 @@ class SensorsManager: public BaseManager
     db_fix_quality.init(m_db, "Fix_quality", int(0));
     db_satellites.init(m_db, "Satellites", int(0));
     db_fix_age.init(m_db, "Fix_age", unsigned(0));
-    db_time.init(m_db, "Time", unsigned(0));
+    db_time.init(m_db, "Time", unsigned(0), true);
     db_date.init(m_db, "Date", unsigned(0));
     db_speed.init(m_db, "Speed", float(0), true);
     db_course.init(m_db, "Course", float(0), true);

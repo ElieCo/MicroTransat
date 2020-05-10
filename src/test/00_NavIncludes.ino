@@ -23,7 +23,8 @@
 #include PATH(NAVREPO,02_Map.ino)
 #include PATH(NAVREPO,03_Vector.ino)
 
-//#include PATH(NAVREPO,10_ServoMotor.ino)
+#include PATH(NAVREPO,10_ServoMotor.ino)
+/*
 class ServoMotor
 {
  public:
@@ -31,7 +32,7 @@ class ServoMotor
   ~ServoMotor(){}
   void init(int pin, int ratio = 1, int offset = 0){}
   void write(int angle){}
-};
+};*/
 
 #include PATH(NAVREPO,11_Gps.ino)
 #include PATH(NAVREPO,12_LoRa.ino)
