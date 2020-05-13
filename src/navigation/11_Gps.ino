@@ -33,30 +33,29 @@ class Gps
     bool has_new_data = false;
     
     char c = GPS.read();
-    while(c){
-      if (GPSECHO) print(c);
-      if (GPS.newNMEAreceived()) {
-        if (GPS.parse(GPS.lastNMEA())) {
+    
+    if(c && GPSECHO) print(c);
+    
+    if (GPS.newNMEAreceived()) {
+      if (GPS.parse(GPS.lastNMEA())) {
 
-          lat = GPS.latitudeDegrees;
-          lng = GPS.longitudeDegrees;
-          altitude = GPS.altitude;
-          fix = GPS.fix;
-          fix_quality = GPS.fixquality_3d;
-          satellites = GPS.satellites;
-          time = getTime(GPS.hour, GPS.minute, GPS.seconds, GPS.milliseconds);
-          date = getDate(GPS.year, GPS.month, GPS.day);
-          if (fix_age == 0 && fix) fix_age = time;
-          if (!fix) fix_age = 0;
-          speed = GPS.speed;
-          course = GPS.angle;
-          hdop = GPS.HDOP;
-          
-          has_new_data = true;
-          
-        }
+        lat = GPS.latitudeDegrees;
+        lng = GPS.longitudeDegrees;
+        altitude = GPS.altitude;
+        fix = GPS.fix;
+        fix_quality = GPS.fixquality_3d;
+        satellites = GPS.satellites;
+        time = getTime(GPS.hour, GPS.minute, GPS.seconds, GPS.milliseconds);
+        date = getDate(GPS.year, GPS.month, GPS.day);
+        if (fix_age == 0 && fix) fix_age = time;
+        if (!fix) fix_age = 0;
+        speed = GPS.speed;
+        course = GPS.angle;
+        hdop = GPS.HDOP;
+        
+        has_new_data = true;
+        
       }
-      c = GPS.read();
     }
     return has_new_data;
   }
