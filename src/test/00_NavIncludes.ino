@@ -8,6 +8,7 @@
 #define CONCAT(x,y) IDENT(x)IDENT(y)
 #define PATH(x,y) STR(IDENT(x)IDENT(y))
 
+//#define REPO D:/micro_transat/coque3/MicroTransat/
 #define REPO /home/elie/Projets/Bateau/MicroTransat/
 #define NAVREPO CONCAT(REPO,src/navigation/)
 
@@ -23,16 +24,7 @@
 #include PATH(NAVREPO,02_Map.ino)
 #include PATH(NAVREPO,03_Vector.ino)
 
-//#include PATH(NAVREPO,10_ServoMotor.ino)
-class ServoMotor
-{
- public:
-  ServoMotor(){}
-  ~ServoMotor(){}
-  void init(int pin, int ratio = 1, int offset = 0){}
-  void write(int angle){}
-};
-
+#include PATH(NAVREPO,10_ServoMotor.ino)
 #include PATH(NAVREPO,11_Gps.ino)
 #include PATH(NAVREPO,12_LoRa.ino)
 #include PATH(NAVREPO,13_SDfile.ino)

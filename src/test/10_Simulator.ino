@@ -10,8 +10,8 @@ class Simulator{
     , m_wind_origin(0.0)
     , m_actual_cap(0.0)
     , m_actual_speed(0.0)
-    , m_perturbation_type(1)
-    , m_difficulty_level(500)
+    , m_perturbation_type(0)
+    , m_difficulty_level(0)
     , m_course_average(3)
   {
     m_actual_position.lat = 0.0;

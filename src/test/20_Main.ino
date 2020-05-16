@@ -12,8 +12,8 @@ void setup(){
 
   simulator.setMovementPeriod(100);
   
-  double sensor_interval = 500;
-  globalManager.getDB()->getData("SensorsManager", sensor_interval);
+  double sensor_interval = 1000;
+  //globalManager.getDB()->getData("SensorsManager", sensor_interval);
   simulator.setGpsPeriod(sensor_interval);
 }
 
