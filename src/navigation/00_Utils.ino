@@ -1,4 +1,4 @@
-#define serialDebug Serial1
+#define serialDebug Serial
 
 #define DEBUGLEVEL 1
 
