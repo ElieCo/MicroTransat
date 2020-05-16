@@ -62,12 +62,21 @@ class Captain : public BaseManager
 
   void state_sleep(){
     // Sleep
+    
+    static int timer = -1;
+    if (timer == -1) timer = millis();
+    else {
+      if (millis() - timer > 10){
+        timer = -1;
+        
+        // Say that we just wake up.
+        db_just_wake_up.set(true);
+        db_average_course_full.set(false);
+    
+        m_behaviour = ACQUISITION;
+      }
+    }
 
-    // Say that we just wake up.
-    db_just_wake_up.set(true);
-    db_average_course_full.set(false);
-
-    m_behaviour = ACQUISITION;
   }
 
   void state_acquisition(){
