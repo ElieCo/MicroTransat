@@ -9,7 +9,7 @@ class ServoMotor
     m_servo.detach();
   }
 
-  void init(int pin, float ratio = 1, int offset = 0){
+  void init(int pin, double ratio = 1.0, double offset = 0){
     m_pin = pin;
     m_ratio = ratio;
     m_offset = offset;
@@ -24,6 +24,6 @@ class ServoMotor
 
   Servo m_servo;
   int m_pin;
-  float m_ratio;
-  int m_offset;
+  double m_ratio;
+  double m_offset;
 };
