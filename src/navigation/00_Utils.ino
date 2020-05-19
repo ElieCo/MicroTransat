@@ -7,7 +7,7 @@
 #endif
 
 void initSerialDebug(){
-  serialDebug.begin(9600);
+  serialDebug.begin(115200);
 }
 
 void print(String s){
