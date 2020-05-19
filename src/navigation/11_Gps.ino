@@ -67,7 +67,7 @@ class Gps
   int satellites;
   unsigned fix_age, time, date;
   float speed, course;
-  unsigned hdop;
+  double hdop;
 
   private:
 

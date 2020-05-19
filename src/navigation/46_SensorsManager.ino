@@ -19,7 +19,7 @@ class SensorsManager: public BaseManager
     db_speed.init(m_db, "Speed", float(0), true);
     db_course.init(m_db, "Course", float(0), true);
     db_average_course.init(m_db, "Average_course", float(0), true);
-    db_hdop.init(m_db, "HDOP", int(0), true);
+    db_hdop.init(m_db, "HDOP", double(0), true);
     db_gps_ready.init(m_db, "Gps_ready", false, true);
     db_battery.init(m_db, "Battery", float(0), true);
     db_just_wake_up.init(m_db, "Just_wake_up", false);
@@ -49,8 +49,8 @@ class SensorsManager: public BaseManager
       db_speed.set(m_gps.speed);
       db_course.set(m_gps.course);
       db_average_course.set(averageCourse(m_gps.course));
-      db_hdop.set(int(m_gps.hdop));
-      if (m_gps.fix_quality > 1 && m_gps.hdop > 0 && m_gps.hdop < m_max_valid_hdop) db_gps_ready.set(true);
+      db_hdop.set(m_gps.hdop);
+      if (m_gps.fix_quality > 0 && m_gps.hdop > 0 && m_gps.hdop < m_max_valid_hdop) db_gps_ready.set(true);
       else db_gps_ready.set(false);
     }
 
@@ -79,7 +79,7 @@ class SensorsManager: public BaseManager
   DBData<float> db_speed;
   DBData<float> db_course;
   DBData<float> db_average_course;
-  DBData<int> db_hdop;
+  DBData<double> db_hdop;
   DBData<bool> db_gps_ready;
   DBData<double> db_battery;
   DBData<bool> db_just_wake_up;
