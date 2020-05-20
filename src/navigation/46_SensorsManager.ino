@@ -30,6 +30,9 @@ class SensorsManager: public BaseManager
 
     // Initialize the battery.
     m_bat.init(A17);
+
+    // Initialize the pwm reader.
+    m_pwm_reader.init(A22);
   }
 
   void go(){
@@ -57,6 +60,10 @@ class SensorsManager: public BaseManager
     // Manage battery
     float bat_val = m_bat.getValue();
     db_battery.set(bat_val);
+
+    // Manage pwm reader
+    float val = m_pwm_reader.updateValue();
+    print(val);
   }
 
   void stop(){}
@@ -103,4 +110,7 @@ class SensorsManager: public BaseManager
   double m_max_valid_hdop;
 
   Battery m_bat;
+
+  Average<float> m_pwm_average;
+  PwmReader m_pwm_reader;
 };
