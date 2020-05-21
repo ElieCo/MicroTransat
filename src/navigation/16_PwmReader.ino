@@ -5,7 +5,7 @@ public:
   PwmReader(){}
   ~PwmReader(){}
   
-  void init(int pin, int min_val = 55, int max_val = 95){
+  void init(int pin, int min_val = 65, int max_val = 95){
     pinMode(pin, INPUT);
     m_pin = pin;
     m_min_val = min_val;
