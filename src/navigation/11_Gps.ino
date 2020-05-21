@@ -51,7 +51,7 @@ class Gps
         if (!fix) fix_age = 0;
         speed = GPS.speed;
         course = GPS.angle;
-        hdop = GPS.HDOP;
+        hdop = GPS.HDOP * 100;
         
         has_new_data = true;
         
