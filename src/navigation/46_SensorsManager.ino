@@ -24,6 +24,7 @@ class SensorsManager: public BaseManager
     db_battery.init(m_db, "Battery", float(0), true);
     db_just_wake_up.init(m_db, "Just_wake_up", false);
     db_average_course_full.init(m_db, "Average_course_full", false);
+    db_radio_controlled.init(m_db, "Radio_controlled", true);
 
     // Initialize the course average.
     m_course_average.init(3);
@@ -63,7 +64,8 @@ class SensorsManager: public BaseManager
 
     // Manage pwm reader
     float val = m_pwm_reader.updateValue();
-    print(val);
+    if (val < 40) db_radio_controlled.set(true);
+    else if (val > 60) db_radio_controlled.set(false);
   }
 
   void stop(){}
@@ -91,6 +93,7 @@ class SensorsManager: public BaseManager
   DBData<double> db_battery;
   DBData<bool> db_just_wake_up;
   DBData<bool> db_average_course_full;
+  DBData<bool> db_radio_controlled;
 
   float averageCourse(float new_course){
     float average_course = m_course_average.average(new_course);
