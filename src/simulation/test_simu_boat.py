@@ -159,7 +159,7 @@ def moveWing(s, FP, dt):
 	Ma = M_1 + M_2
 	I_1 = getI(m_1, P_1-O) # matrice d'inertie de l'aileron dans repere du bateau
 	I_2 = getI(m_2, P_2-O) # matrice d'inertie de l'aile dans repere du bateau
-	I_3 = getI(m_3, P_3-O) # matrice d'inertie du poids dans repere du bateau
+	I_3 = getI(m_11, P_3-O) # matrice d'inertie du poids dans repere du bateau
 
 	I = I_1 + I_2 + I_3
 
@@ -174,10 +174,68 @@ def moveWing(s, FP, dt):
 
 	return s
 
+def getHelmForces(c, s):
+	phi_0 = c[0]
+	v = -s[7].dot(s[3])
+
+	# repere de la barre dans celui du bateau
+	x0 = s[8][0]
+	y0 = s[8][1]
+	z0 = s[8][2]
+
+	P_0 = np.array([0.49+np.cos(phi_0)*0.025, -np.sin(phi_0)*0.025, 0.185])
+
+	Vva0 = (np.vdot(v,x0)/np.vdot(x0,x0))*x0 + (np.vdot(v,z0)/np.vdot(z0,z0))*z0
+	if np.linalg.norm(Vva0) != 0:
+		theta_v0 = np.arccos(np.vdot(v,Vva0)/(np.linalg.norm(v)*np.linalg.norm(Vva0)))
+	else :
+		theta_v0 = np.pi/2
+	theta_v0 *=  sign(np.vdot(v,z0)/np.vdot(z0,z0))
+	if np.linalg.norm(v) != 0:
+		F_0t = (v/np.linalg.norm(v)) * (tr0_0 + theta_v0**2 * S_0 * Ct_0) * np.vdot(v,v)
+	else:
+		F_0t = np.array([0,0,0])
+	F_0p = (y0/np.linalg.norm(y0)) * theta_v0 * S_0 * Cp_0 * np.vdot(v,v)
+	F_0 = F_0t + F_0p
+
+	return [[F_0, P_0]]
+
+def getKeelSailForces(c, s):
+	v = -s[7].dot(s[3])
+
+	# repere du bateau
+	x = s[7][0]
+	y = s[7][1]
+	z = s[7][2]
+
+	P_4 = np.array([-0.025, 0, -0.45/2])
+
+	Vva4 = (np.vdot(v,x)/np.vdot(x,x))*x + (np.vdot(v,z)/np.vdot(z,z))*z
+	if np.linalg.norm(Vva4) != 0:
+		theta_v4 = np.arccos(np.vdot(v,Vva4)/(np.linalg.norm(v)*np.linalg.norm(Vva4)))
+	else :
+		theta_v4 = np.pi/2
+	theta_v4 *=  sign(np.vdot(v,z)/np.vdot(z,z))
+	if np.linalg.norm(v) != 0:
+		F_4t = (v/np.linalg.norm(v)) * (tr0_4 + theta_v4**2 * S_4 * Ct_4) * np.vdot(v,v)
+	else:
+		F_4t = np.array([0,0,0])
+	F_4p = (z/np.linalg.norm(z)) * theta_v4 * S_4 * Cp_4 * np.vdot(v,v)
+	F_4 = F_4t + F_4p
+
+	return [[F_4, P_4]]
+
+def getKeelBulbForces(c, s):
+
+	P_5 = np.array([-0.02, 0, -0.46])
+
+	F_5 = np.array([0, 0, -m_5*g]).dot(s[7])
+
+	return [[F_5, P_5]]
 
 ###
 
-draw = True
+draw = False
 
 if draw :
 	delta = 1
@@ -199,41 +257,48 @@ if draw :
 
 
 # data
+if True:
+	wind_speed = 10 #nds
+	wind_speed = 0.514444 * wind_speed # m.s-1
 
-wind_speed = 10 #nds
-wind_speed = 0.514444 * wind_speed # m.s-1
+	tr0_0 = 0.01
+	S_0 = 0.0198
+	Ct_0 = 10
+	Cp_0 = 10
 
-tr0_0 = 0.01
-S_0 = 0.0198
-Ct_0 = 10
-Cp_0 = 10
+	tr0_1 = 0.01
+	S_1 = 0.072
+	Ct_1 = 1
+	Cp_1 = 1
 
-tr0_1 = 0.01
-S_1 = 0.072
-Ct_1 = 1
-Cp_1 = 1
+	tr0_2 = 0.01
+	S_2 = 0.39525
+	Ct_2 = 1
+	Cp_2 = 1
 
-tr0_2 = 0.01
-S_2 = 0.39525
-Ct_2 = 1
-Cp_2 = 1
+	tr0_4 = 0.01
+	S_4 = 0.05625
+	Ct_4 = 1
+	Cp_4 = 1
 
-m_1 = 0.194
-m_2 = 0.904
-m_3 = 0.280
-O = np.array([0.06, 0, 0.16])
+	g = 9.81
+	m_1 = 0.194
+	m_2 = 0.904
+	m_11 = 0.280
+	m_5 = 3.710
+	O = np.array([0.06, 0, 0.16])
 
 # cmd
 
-_phi_0 = np.radians(0) # angle de la barre dans (x,y,z)
-_phi_1 = np.radians(0) # angle de l'aileron dans (x2,y2,z2)
+_phi_0 = np.radians(10) # angle de la barre dans (x,y,z)
+_phi_1 = np.radians(45) # angle de l'aileron dans (x2,y2,z2)
 
 # state
 
 _phi_2 = np.radians(0) # angle de l'aile dans (x,y,z)
 _Vaz = 0 # vitesse de rotation de l'aile autour de l'axe z dans (x,y,z)
-_Vv = np.array([-wind_speed, 0, 0]) # vitesse du vent dans (u,v,w)
-_V = np.array([0, 0, 0]) # vitesse du bateau dans (u,v,w)
+_Vv = np.array([0, -wind_speed, 0]) # vitesse du vent dans (u,v,w)
+_V = np.array([1, 0, 0]) # vitesse du bateau dans (u,v,w)
 _C = np.array([0, 0, 0]) # position du bateau dans (u,v,w)
 _alpha = np.radians(0) # cap dans (u,v,w)
 _beta = np.radians(0) # roulis dans (u,v,w)
@@ -280,6 +345,20 @@ while i>=0:
 		fig.canvas.flush_events()
 
 	s = moveWing(s, FP_wing, dt)
+	FP_helm = getHelmForces(c, s)
+	FP_keelSail = getKeelSailForces(c,s)
+	FP_keelBulb = getKeelBulbForces(c,s)
+
+	SF = np.array([0.0, 0.0, 0.0])
+	for FP in FP_wing:
+		SF += FP[0]
+	for FP in FP_helm:
+		SF += FP[0]
+	for FP in FP_keelSail:
+		SF += FP[0]
+	for FP in FP_keelBulb:
+		SF += FP[0]
+	print(SF)
 
 	if time.time() - t_1 > 10:
 		t_1 = time.time()
