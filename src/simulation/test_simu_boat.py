@@ -53,8 +53,8 @@ def updateLandmark(c, s):
 	R = np.array([x,y,z])
 
 	# repere de la barre dans celui du bateau
-	x0 = np.array([1, 0, 0])
-	y0 = np.array([0, 1, 0])
+	x0 = np.array([np.cos(phi_0), np.sin(phi_0), 0])
+	y0 = np.array([-np.sin(phi_0), np.cos(phi_0), 0])
 	z0 = np.array([0, 0, 1])
 	R0 = np.array([x0,y0,z0])
 
@@ -103,8 +103,11 @@ def getWingForces(c, s):
 	else :
 		theta_v1 = np.pi/2
 	theta_v1 *=  sign(np.vdot(v,z1)/np.vdot(z1,z1))
-	F_1t = (v/np.linalg.norm(v)) * (tr0_1 + theta_v1**2 * S_1 * Cx_1) * np.vdot(v,v)
-	F_1p = (z1/np.linalg.norm(z1)) * theta_v1 * S_1 * Cz_1 * np.vdot(v,v)
+	if np.linalg.norm(v) != 0:
+		F_1t = (v/np.linalg.norm(v)) * (tr0_1 + theta_v1**2 * S_1 * Ct_1) * np.vdot(v,v)
+	else:
+		F_1t = np.array([0,0,0])
+	F_1p = (z1/np.linalg.norm(z1)) * theta_v1 * S_1 * Cp_1 * np.vdot(v,v)
 	F_1 = F_1t + F_1p
 
 	Vva2 = (np.vdot(v,x2)/np.vdot(x2,x2))*x2 + (np.vdot(v,y2)/np.vdot(y2,y2))*y2
@@ -113,11 +116,33 @@ def getWingForces(c, s):
 	else:
 		theta_v2 = np.pi/2
 	theta_v2 *=  sign(np.vdot(v,z2)/np.vdot(z2,z2))
-	F_2t = (v/np.linalg.norm(v)) * (tr0_2 + theta_v2**2 * S_2 * Cx_2) * np.vdot(v,v)
-	F_2p = (z2/np.linalg.norm(z2)) * theta_v2 * S_2 * Cz_2 * np.vdot(v,v)
+	if np.linalg.norm(v) != 0:
+		F_2t = (v/np.linalg.norm(v)) * (tr0_2 + theta_v2**2 * S_2 * Ct_2) * np.vdot(v,v)
+	else:
+		F_2t = np.array([0,0,0])
+	F_2p = (z2/np.linalg.norm(z2)) * theta_v2 * S_2 * Cp_2 * np.vdot(v,v)
 	F_2 = F_2t + F_2p
 
 	return [[F_1, P_1], [F_2, P_2], [0, P_3]]
+
+def getI(m, P):
+	x = P[0]
+	y = P[1]
+	z = P[2]
+
+	I11 = (y**2 + z**2)*m
+	I12 = 0#-y*x*m
+	I13 = 0#-z*x*m
+	I21 = 0#-x*y*m
+	I22 = (x**2 + z**2)*m
+	I23 = 0#-z*y*m
+	I31 = 0#-x*z*m
+	I32 = 0#-y*z*m
+	I33 = (y**2 + x**2)*m
+
+	I = np.array([[I11, I12, I13], [I21, I22, I23], [I31, I32, I33]])
+
+	return I
 
 def moveWing(s, FP, dt):
 
@@ -128,18 +153,17 @@ def moveWing(s, FP, dt):
 	F_3 = FP[2][0]
 	P_3 = FP[2][1]
 
-	M_1 = np.cross(O-P_1, F_1)
-	M_2 = np.cross(O-P_2, F_2)
+	M_1 = np.cross(P_1-O, F_1)
+	M_2 = np.cross(P_2-O, F_2)
 
 	Ma = M_1 + M_2
-
-	I_1 = m_1*P_1 # matrice d'inertie de l'aileron dans repere du bateau
-	I_2 = m_2*P_2 # matrice d'inertie de l'aile dans repere du bateau
-	I_3 = m_3*P_3 # matrice d'inertie du poids dans repere du bateau
+	I_1 = getI(m_1, P_1-O) # matrice d'inertie de l'aileron dans repere du bateau
+	I_2 = getI(m_2, P_2-O) # matrice d'inertie de l'aile dans repere du bateau
+	I_3 = getI(m_3, P_3-O) # matrice d'inertie du poids dans repere du bateau
 
 	I = I_1 + I_2 + I_3
 
-	Aa = -Ma/I
+	Aa = Ma.dot(np.linalg.inv(I))
 	Aaz = Aa[2]
 
 	Raz = 1*s[1]
@@ -179,15 +203,20 @@ if draw :
 wind_speed = 10 #nds
 wind_speed = 0.514444 * wind_speed # m.s-1
 
+tr0_0 = 0.01
+S_0 = 0.0198
+Ct_0 = 10
+Cp_0 = 10
+
 tr0_1 = 0.01
 S_1 = 0.072
-Cx_1 = 1
-Cz_1 = 1
+Ct_1 = 1
+Cp_1 = 1
 
 tr0_2 = 0.01
 S_2 = 0.39525
-Cx_2 = 1
-Cz_2 = 1
+Ct_2 = 1
+Cp_2 = 1
 
 m_1 = 0.194
 m_2 = 0.904
@@ -230,7 +259,6 @@ while i>=0:
 
 	s = updateLandmark(c, s)
 	FP_wing = getWingForces(c, s)
-	s = moveWing(s, FP_wing, dt)
 
 	if draw and i%1 == 0:
 		# d_F_1p = update2DVector(d_F_1p, P_1, F_1p, c='g')
@@ -251,7 +279,9 @@ while i>=0:
 		fig.canvas.draw()
 		fig.canvas.flush_events()
 
-	if time.time() - t_1 > 5:
+	s = moveWing(s, FP_wing, dt)
+
+	if time.time() - t_1 > 10:
 		t_1 = time.time()
 		step = np.radians(25)
 		limit = np.radians(90)
