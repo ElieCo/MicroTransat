@@ -81,7 +81,7 @@ def getWingForces(c, s):
 
 	phi_1 = c[1]
 	phi_2 = s[0]
-	v = s[7]*s[2]
+	v = s[7].dot(s[2])
 
 	# repere de l'aileron dans celui du bateau
 	x1 = s[9][0]
@@ -117,7 +117,7 @@ def getWingForces(c, s):
 	F_2p = (z2/np.linalg.norm(z2)) * theta_v2 * S_2 * Cz_2 * np.vdot(v,v)
 	F_2 = F_2t + F_2p
 
-	return [[F_1, P_1], [F_2, P_2]]
+	return [[F_1, P_1], [F_2, P_2], [0, P_3]]
 
 def moveWing(s, FP, dt):
 
@@ -125,6 +125,8 @@ def moveWing(s, FP, dt):
 	P_1 = FP[0][1]
 	F_2 = FP[1][0]
 	P_2 = FP[1][1]
+	F_3 = FP[2][0]
+	P_3 = FP[2][1]
 
 	M_1 = np.cross(O-P_1, F_1)
 	M_2 = np.cross(O-P_2, F_2)
@@ -140,16 +142,16 @@ def moveWing(s, FP, dt):
 	Aa = -Ma/I
 	Aaz = Aa[2]
 
-	Raz = 1*Vaz
+	Raz = 1*s[1]
 	Aaz -= Raz
 
 	s[1] += Aaz*dt
-	s[0] += Vaz*dt
+	s[0] += s[1]*dt
 
 	return s
 
 
-f = open("graph.csv", "w")
+###
 
 draw = True
 
@@ -238,12 +240,12 @@ while i>=0:
 		# d_F_2t = update2DVector(d_F_2t, P_2, F_2t, c='r')
 		d_F_2 = update2DVector(d_F_2, FP_wing[1][1], FP_wing[1][0], c='b')
 
-		aile_pts_1 = getLinePt(P_2, np.pi+s[0], 0.33-0.09)
-		aile_pts_2 = getLinePt(P_2, s[0], 0.09)
+		aile_pts_1 = getLinePt(FP_wing[1][1], np.pi+s[0], 0.33-0.09)
+		aile_pts_2 = getLinePt(FP_wing[1][1], s[0], 0.09)
 		d_aile = update2DLine(d_aile, aile_pts_1, aile_pts_2)
 
-		aileron_pts_1 = getLinePt(P_1, np.pi+c[1]+s[0], 0.18-0.05)
-		aileron_pts_2 = getLinePt(P_1, c[1]+s[0], 0.05)
+		aileron_pts_1 = getLinePt(FP_wing[0][1], np.pi+c[1]+s[0], 0.18-0.05)
+		aileron_pts_2 = getLinePt(FP_wing[0][1], c[1]+s[0], 0.05)
 		d_aileron = update2DLine(d_aileron, aileron_pts_1, aileron_pts_2)
 
 		fig.canvas.draw()
