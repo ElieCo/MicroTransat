@@ -458,7 +458,7 @@ if True:
 
 # cmd
 
-_phi_0 = np.radians(45/2) # angle de la barre dans (x,y,z)
+_phi_0 = np.radians(90/2) # angle de la barre dans (x,y,z)
 _phi_1 = np.radians(10*sign(_phi_0)) # angle de l'aileron dans (x2,y2,z2)
 
 # state
@@ -552,16 +552,17 @@ while i>=0:
 	s = moveWing(s, FP_wing, dt*2)
 	s = moveBoat(s, FP, dt*2)
 
-	if time.time() - t_0 > 5 and False:
+	if time.time() - t_0 > 5 or True:
 		t_0 = time.time()
 		step = np.radians(10)
-		mi = np.radians(10)
-		ma = np.radians(90)
-		if c["phi_0"]+sens_0*step > ma:
+		mi = np.radians(5)
+		ma = np.radians(45)
+		if c["phi_0"] > ma:
 			sens_0 = -1
-		elif c["phi_0"]+sens_0*step < mi:
+		elif c["phi_0"] < mi:
 			sens_0 = 1
-		c["phi_0"] += sens_0*step/2
+		c["phi_0"] += sens_0*dt*np.pi/80
+		print(c["phi_0"]+sens_0*step, mi)
 		print(np.degrees(c["phi_0"]))
 
 	if time.time() - t_1 > 10 and False:
