@@ -43,7 +43,7 @@ def update2DLine(line, pt1, pt2, c='black'):
 
 def updateLandmark(c, s):
 
-	phi_0 = c["phi_0"]
+	phi_0 = c["phi_0"]-s["phi_2"]/2
 	phi_1 = c["phi_1"]
 	phi_2 = s["phi_2"]
 	alpha = s["alpha"]
@@ -154,6 +154,7 @@ def getHelmForces(c, s):
 	Vb = (np.linalg.inv(s["R"].T)).dot(s["V"]) # vitesse du bateau dans (x,y,z)
 	Vbrad = (np.linalg.inv(s["R"].T)).dot(s["Vrad"]) # vitesse angulaire du bateau dans (x,y,z)
 	v = -Vb# + Vbrad*P_0 # vitesse de l'eau dans (x,y,z) au point P_0
+	print(v)
 
 	Vva0 = (np.vdot(v,x0)/np.vdot(x0,x0))*x0 + (np.vdot(v,z0)/np.vdot(z0,z0))*z0
 	if np.linalg.norm(Vva0) != 0:
@@ -161,6 +162,7 @@ def getHelmForces(c, s):
 	else :
 		theta_v0 = np.pi/2
 	theta_v0 *=  sign(np.vdot(v,y0)/np.vdot(y0,y0))
+	print(theta_v0)
 	if np.linalg.norm(v) != 0:
 		F_0t = (v/np.linalg.norm(v)) * (tr0_0 + theta_v0**2 * S_0 * Ct_0) * np.vdot(v,v)
 	else:
@@ -347,6 +349,7 @@ def moveBoat(s, FP, dt):
 	s["Vrad"] = Va
 
 	s["alpha"] += Va[2]*dt
+	s["phi_2"] -= Va[2]*dt
 	# s["alpha"] = 0
 
 	F = F_0 + F_1 + F_2 + F_3 + F_4 + F_5 + F_6 # dans (x,y,z)
@@ -482,10 +485,11 @@ s = {"phi_2":_phi_2, "Vaz":_Vaz, "Vv":_Vv, "V":_V, "Vrad":_Vrad, "C":_C, "alpha"
 dt = 0.1
 
 i = 0
+t_0 = time.time()
 t_1 = time.time()
+sens_0 = 1
 sens_1 = 1
 while i>=0:
-	print("===============")
 
 	i+=1
 
@@ -504,7 +508,7 @@ while i>=0:
 	for fp in FP:
 		SF += fp[0]
 
-	if draw and i%1 == 0:
+	if draw:
 		d_F_0 = update2DVector(d_F_0, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(FP_helm[0][0]), c='r')
 		d_F_0t = update2DVector(d_F_0t, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0t), c='b')
 		d_F_0p = update2DVector(d_F_0p, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0p), c='g')
@@ -517,7 +521,7 @@ while i>=0:
 		d_F_6t = update2DVector(d_F_6t, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6t), c='violet')
 		d_F_6p = update2DVector(d_F_6p, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6p), c='brown')
 		d_F = update2DVector(d_F, s["C"], s["R"].T.dot(SF), c='black')
-		d_V = update2DVector(d_V, s["C"], s["R"].T.dot(s["V"]), c='pink')
+		d_V = update2DVector(d_V, s["C"], s["V"], c='pink')
 
 		aile_pts_1 = getLinePt(s["R"].T.dot(FP_wing[1][1]), np.pi+s["phi_2"]+s["alpha"], 0.33-0.09)
 		aile_pts_2 = getLinePt(s["R"].T.dot(FP_wing[1][1]), s["phi_2"]+s["alpha"], 0.09)
@@ -544,15 +548,26 @@ while i>=0:
 	s = moveWing(s, FP_wing, dt)
 	s = moveBoat(s, FP, dt)
 
+	if time.time() - t_0 > 5:
+		t_0 = time.time()
+		step = np.radians(5)
+		mi = np.radians(15)
+		ma = np.radians(90)
+		if c["phi_0"]+sens_0*step > ma:
+			sens_0 = -1
+		elif c["phi_0"]+sens_0*step < mi:
+			sens_0 = 1
+		c["phi_0"] += sens_0*step
+
 	if time.time() - t_1 > 10 and False:
 		t_1 = time.time()
 		step = np.radians(25)
 		limit = np.radians(90)
-		if c[1]+sens_1*step > limit:
+		if c["phi_1"]+sens_1*step > limit:
 			sens_1 = -1
-		elif c[1]+sens_1*step < -limit:
+		elif c["phi_1"]+sens_1*step < -limit:
 			sens_1 = 1
-		c[1] += sens_1*step
+		c["phi_1"] += sens_1*step
 
 	# exit()
 	time.sleep(max(0, dt - (time.time()-t_time)))
