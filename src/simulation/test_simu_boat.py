@@ -85,7 +85,10 @@ def getWingForces(c, s):
 	phi_1 = c["phi_1"]
 	phi_2 = s["phi_2"]
 
-	v = (np.linalg.inv(s["R"].T)).dot(s["Vv"]) # vitesse du vent dans (x,y,z)
+	# il faut prendre en compte le vent vitesse
+	v_real = (np.linalg.inv(s["R"].T)).dot(s["Vv"]) # vitesse du vent dans (x,y,z)
+	v_speed = -(np.linalg.inv(s["R"].T)).dot(s["V"]) # vitesse du bateau dans (x,y,z)
+	v = v_real + v_speed
 
 	# repere de l'aileron dans (x,y,z)
 	x1 = s["R1"][0]
@@ -150,14 +153,14 @@ def getHelmForces(c, s):
 
 	Vb = (np.linalg.inv(s["R"].T)).dot(s["V"]) # vitesse du bateau dans (x,y,z)
 	Vbrad = (np.linalg.inv(s["R"].T)).dot(s["Vrad"]) # vitesse angulaire du bateau dans (x,y,z)
-	v = -Vb + Vbrad*P_0 # vitesse de l'eau dans (x,y,z) au point P_0
+	v = -Vb# + Vbrad*P_0 # vitesse de l'eau dans (x,y,z) au point P_0
 
 	Vva0 = (np.vdot(v,x0)/np.vdot(x0,x0))*x0 + (np.vdot(v,z0)/np.vdot(z0,z0))*z0
 	if np.linalg.norm(Vva0) != 0:
 		theta_v0 = np.arccos(np.vdot(v,Vva0)/(np.linalg.norm(v)*np.linalg.norm(Vva0)))
 	else :
 		theta_v0 = np.pi/2
-	theta_v0 *=  sign(np.vdot(v,z0)/np.vdot(z0,z0))
+	theta_v0 *=  sign(np.vdot(v,y0)/np.vdot(y0,y0))
 	if np.linalg.norm(v) != 0:
 		F_0t = (v/np.linalg.norm(v)) * (tr0_0 + theta_v0**2 * S_0 * Ct_0) * np.vdot(v,v)
 	else:
@@ -165,35 +168,35 @@ def getHelmForces(c, s):
 	F_0p = (y0/np.linalg.norm(y0)) * theta_v0 * S_0 * Cp_0 * np.vdot(v,v)
 	F_0 = F_0t + F_0p
 
-	return [[F_0, P_0]]
+	return ([[F_0, P_0]], F_0t, F_0p)
 
 def getKeelSailForces(c, s):
 
 	# repere de la quille dans (x,y,z)
 	x4 = np.array([1,0,0])
 	y4 = np.array([0,1,0])
-	z4 = np.array((0,0,1))
+	z4 = np.array([0,0,1])
 
 	P_4 = np.array([-0.025, 0, -0.45/2]) # dans (x,y,z)
 
 	Vb = (np.linalg.inv(s["R"].T)).dot(s["V"]) # vitesse du bateau dans (x,y,z)
 	Vbrad = (np.linalg.inv(s["R"].T)).dot(s["Vrad"]) # vitesse angulaire du bateau dans (x,y,z)
-	v = -Vb + Vbrad*P_4 # vitesse de l'eau dans (x,y,z) au point P_4
+	v = -Vb# + Vbrad*P_4 # vitesse de l'eau dans (x,y,z) au point P_4
 
 	Vva4 = (np.vdot(v,x4)/np.vdot(x4,x4))*x4 + (np.vdot(v,z4)/np.vdot(z4,z4))*z4
 	if np.linalg.norm(Vva4) != 0:
 		theta_v4 = np.arccos(np.vdot(v,Vva4)/(np.linalg.norm(v)*np.linalg.norm(Vva4)))
 	else :
 		theta_v4 = np.pi/2
-	theta_v4 *=  sign(np.vdot(v,z4)/np.vdot(z4,z4))
+	theta_v4 *=  sign(np.vdot(v,y4)/np.vdot(y4,y4))
 	if np.linalg.norm(v) != 0:
 		F_4t = (v/np.linalg.norm(v)) * (tr0_4 + theta_v4**2 * S_4 * Ct_4) * np.vdot(v,v)
 	else:
 		F_4t = np.array([0,0,0])
-	F_4p = (z4/np.linalg.norm(z4)) * theta_v4 * S_4 * Cp_4 * np.vdot(v,v)
+	F_4p = (y4/np.linalg.norm(y4)) * theta_v4 * S_4 * Cp_4 * np.vdot(v,v)
 	F_4 = F_4t + F_4p
 
-	return [[F_4, P_4]]
+	return ([[F_4, P_4]], F_4t, F_4p)
 
 def getKeelBulbForces(c, s):
 
@@ -203,6 +206,35 @@ def getKeelBulbForces(c, s):
 	F_5 = (np.linalg.inv(s["R"].T)).dot(F_5) # dans (x,y,z)
 
 	return [[F_5, P_5]]
+
+def getHullForces(c, s):
+
+	beta = s["beta"]
+
+	# repere de la quille dans (x,y,z)
+	x6 = np.array([1,0,0])
+	y6 = np.array([0,np.cos(beta),np.sin(beta)])
+	z6 = np.array([0,-np.sin(beta), np.cos(beta)])
+
+	P_6 = np.array([0, 0, 0]) # dans (x,y,z)
+
+	Vb = (np.linalg.inv(s["R"].T)).dot(s["V"]) # vitesse du bateau dans (x,y,z)
+	v = -Vb # vitesse de l'eau dans (x,y,z)
+
+	Vva6 = (np.vdot(v,x6)/np.vdot(x6,x6))*x6 + (np.vdot(v,z6)/np.vdot(z6,z6))*z6
+	if np.linalg.norm(Vva6) != 0:
+		theta_v6 = np.arccos(np.vdot(v,Vva6)/(np.linalg.norm(v)*np.linalg.norm(Vva6)))
+	else :
+		theta_v6 = np.pi/2
+	theta_v6 *=  sign(np.vdot(v,y6)/np.vdot(y6,y6))
+	if np.linalg.norm(v) != 0:
+		F_6t = (v/np.linalg.norm(v)) * (tr0_6 + theta_v6**2 * S_6 * Ct_6) * np.vdot(v,v)
+	else:
+		F_6t = np.array([0,0,0])
+	F_6p = (y6/np.linalg.norm(y6)) * theta_v6 * S_6 * Cp_6 * np.vdot(v,v)
+	F_6 = F_6t + F_6p
+
+	return ([[F_6, P_6]], F_6t, F_6p)
 
 def getI(m, P):
 	x = P[0]
@@ -269,6 +301,8 @@ def moveBoat(s, FP, dt):
 	P_4 = FP[4][1]
 	F_5 = FP[5][0]
 	P_5 = FP[5][1]
+	F_6 = FP[6][0]
+	P_6 = FP[6][1]
 
 	M_0 = np.cross(P_0, F_0)
 	M_1 = np.cross(P_1, F_1)
@@ -276,8 +310,9 @@ def moveBoat(s, FP, dt):
 	M_3 = np.cross(P_3, F_3)
 	M_4 = np.cross(P_4, F_4)
 	M_5 = np.cross(P_5, F_5)
+	M_6 = np.cross(P_6, F_6)
 
-	M = M_0 + M_1 + M_2 + M_3 + M_4 + M_5
+	M = M_0 + M_1 + M_2 + M_3 + M_4 + M_5 + M_6
 
 	I_0 = getI(m_0, P_0)
 	I_1 = getI(m_1, P_1)
@@ -312,9 +347,9 @@ def moveBoat(s, FP, dt):
 	s["Vrad"] = Va
 
 	s["alpha"] += Va[2]*dt
-	# s["alpha"] = np.pi/2
+	# s["alpha"] = 0
 
-	F = F_0 + F_1 + F_2 + F_3 + F_4 + F_5 # dans (x,y,z)
+	F = F_0 + F_1 + F_2 + F_3 + F_4 + F_5 + F_6 # dans (x,y,z)
 	Al = F/(m_0 + m_1 + m_2 + m_3 + m_4 + m_5 + m_b) # dans (x,y,z)
 
 	Al = s["R"].T.dot(Al) # dans (u,v,w)
@@ -325,8 +360,8 @@ def moveBoat(s, FP, dt):
 	Vl = s["V"]  # dans (u,v,w)
 	Vl = (np.linalg.inv(s["R"].T)).dot(Vl) # dans (x,y,z)
 
-	Rl = 1/10*Vl # dans (x,y,z)
-	Al -= Rl
+	Rl = np.array([0.1, 0.5, 0])*np.linalg.norm(Vl) # dans (x,y,z)
+	# Al -= Rl
 	Vl += Al*dt # dans (x,y,z)
 
 	Vl = s["R"].T.dot(Vl) # dans (u,v,w)
@@ -350,9 +385,16 @@ if draw :
 	fig.show()
 
 	d_F_0 = None
+	d_F_0p = None
+	d_F_0t = None
 	d_F_1 = None
 	d_F_2 = None
-	d_F_3 = None
+	d_F_4 = None
+	d_F_4p = None
+	d_F_4t = None
+	d_F_6 = None
+	d_F_6p = None
+	d_F_6t = None
 	d_F = None
 	d_V = None
 
@@ -397,6 +439,11 @@ if True:
 	Ct_4 = nu_water/factor
 	Cp_4 = nu_water/factor
 
+	tr0_6 = 0.05
+	S_6 = 0.0585
+	Ct_6 = nu_water/factor
+	Cp_6 = 1*nu_water/factor
+
 	g = 9.81
 	m_0 = 0.06
 	m_1 = 0.194
@@ -410,8 +457,8 @@ if True:
 
 # cmd
 
-_phi_0 = np.radians(45/2) # angle de la barre dans (x,y,z)
-_phi_1 = np.radians(8) # angle de l'aileron dans (x2,y2,z2)
+_phi_0 = np.radians(0/2) # angle de la barre dans (x,y,z)
+_phi_1 = np.radians(40*sign(_phi_0)) # angle de l'aileron dans (x2,y2,z2)
 
 # state
 
@@ -446,22 +493,30 @@ while i>=0:
 
 	s = updateLandmark(c, s)
 
-	FP_helm = getHelmForces(c, s)
+	(FP_helm,F_0t,F_0p) = getHelmForces(c,s)
 	FP_wing = getWingForces(c, s)
-	FP_keelSail = getKeelSailForces(c,s)
+	(FP_keelSail,F_4t,F_4p) = getKeelSailForces(c,s)
 	FP_keelBulb = getKeelBulbForces(c,s)
+	(FP_hull,F_6t,F_6p) = getHullForces(c,s)
 
-	FP = np.concatenate((FP_helm, FP_wing, FP_keelSail, FP_keelBulb))
+	FP = np.concatenate((FP_helm, FP_wing, FP_keelSail, FP_keelBulb, FP_hull))
 	SF = np.array([0.0,0.0,0.0])
 	for fp in FP:
 		SF += fp[0]
 
 	if draw and i%1 == 0:
 		d_F_0 = update2DVector(d_F_0, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(FP_helm[0][0]), c='r')
-		d_F_1 = update2DVector(d_F_1, s["R"].T.dot(FP_wing[0][1]), s["R"].T.dot(FP_wing[0][0]), c='b')
-		d_F_2 = update2DVector(d_F_2, s["R"].T.dot(FP_wing[1][1]), s["R"].T.dot(FP_wing[1][0]), c='b')
-		d_F_3 = update2DVector(d_F_3, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(FP_keelSail[0][0]+FP_keelBulb[0][0]), c='r')
-		d_F = update2DVector(d_F, s["C"], s["R"].T.dot(SF), c='g')
+		d_F_0t = update2DVector(d_F_0t, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0t), c='b')
+		d_F_0p = update2DVector(d_F_0p, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0p), c='g')
+		d_F_1 = update2DVector(d_F_1, s["R"].T.dot(FP_wing[0][1]), s["R"].T.dot(FP_wing[0][0]), c='r')
+		d_F_2 = update2DVector(d_F_2, s["R"].T.dot(FP_wing[1][1]), s["R"].T.dot(FP_wing[1][0]), c='r')
+		d_F_4 = update2DVector(d_F_4, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(FP_keelSail[0][0]+FP_keelBulb[0][0]), c='r')
+		d_F_4t = update2DVector(d_F_4t, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(F_4t), c='b')
+		d_F_4p = update2DVector(d_F_4p, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(F_4p), c='g')
+		d_F_6 = update2DVector(d_F_6, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(FP_hull[0][0]), c='orange')
+		d_F_6t = update2DVector(d_F_6t, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6t), c='violet')
+		d_F_6p = update2DVector(d_F_6p, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6p), c='brown')
+		d_F = update2DVector(d_F, s["C"], s["R"].T.dot(SF), c='black')
 		d_V = update2DVector(d_V, s["C"], s["R"].T.dot(s["V"]), c='pink')
 
 		aile_pts_1 = getLinePt(s["R"].T.dot(FP_wing[1][1]), np.pi+s["phi_2"]+s["alpha"], 0.33-0.09)
