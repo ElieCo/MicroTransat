@@ -154,7 +154,6 @@ def getHelmForces(c, s):
 	Vb = (np.linalg.inv(s["R"].T)).dot(s["V"]) # vitesse du bateau dans (x,y,z)
 	Vbrad = (np.linalg.inv(s["R"].T)).dot(s["Vrad"]) # vitesse angulaire du bateau dans (x,y,z)
 	v = -Vb# + Vbrad*P_0 # vitesse de l'eau dans (x,y,z) au point P_0
-	print(v)
 
 	Vva0 = (np.vdot(v,x0)/np.vdot(x0,x0))*x0 + (np.vdot(v,z0)/np.vdot(z0,z0))*z0
 	if np.linalg.norm(Vva0) != 0:
@@ -162,7 +161,6 @@ def getHelmForces(c, s):
 	else :
 		theta_v0 = np.pi/2
 	theta_v0 *=  sign(np.vdot(v,y0)/np.vdot(y0,y0))
-	print(theta_v0)
 	if np.linalg.norm(v) != 0:
 		F_0t = (v/np.linalg.norm(v)) * (tr0_0 + theta_v0**2 * S_0 * Ct_0) * np.vdot(v,v)
 	else:
@@ -280,7 +278,7 @@ def moveWing(s, FP, dt):
 	Aa = Ma.dot(np.linalg.inv(I)) # dans (x,y,z)
 	Aaz = Aa[2]
 
-	Raz = 3*s["Vaz"]
+	Raz = 2*s["Vaz"]
 	Aaz -= Raz
 
 	s["Vaz"] += Aaz*dt
@@ -400,6 +398,7 @@ if draw :
 	d_F_6t = None
 	d_F = None
 	d_V = None
+	d_Wind = None
 
 	d_aile = None
 	d_aileron = None
@@ -416,36 +415,35 @@ if True:
 	wind_speed = 10 #nds
 	wind_speed = 0.514444 * wind_speed # m.s-1
 
-	rho_air = 1.225
 	nu_air = 0.018
-	rho_water = 997
 	nu_water = 1
-	factor = 1/100
+	factor_air = 50
+	factor_water = 80
 
-	tr0_0 = 0.01
+	tr0_0 = 0.001
 	S_0 = 0.0198
-	Ct_0 = nu_water/factor
-	Cp_0 = nu_water/factor
+	Ct_0 = nu_water*factor_water
+	Cp_0 = 1.5*nu_water*factor_water
 
-	tr0_1 = 0.01
+	tr0_1 = 0.001
 	S_1 = 0.072
-	Ct_1 = nu_air/factor
-	Cp_1 = nu_air/factor
+	Ct_1 = nu_air*factor_air
+	Cp_1 = nu_air*factor_air
 
-	tr0_2 = 0.01
+	tr0_2 = 0.001
 	S_2 = 0.39525
-	Ct_2 = nu_air/factor
-	Cp_2 = nu_air/factor
+	Ct_2 = nu_air*factor_air
+	Cp_2 = nu_air*factor_air
 
-	tr0_4 = 0.01
+	tr0_4 = 0.001
 	S_4 = 0.05625
-	Ct_4 = nu_water/factor
-	Cp_4 = nu_water/factor
+	Ct_4 = nu_water*factor_water
+	Cp_4 = 1.5*nu_water*factor_water
 
-	tr0_6 = 0.05
+	tr0_6 = 0.33
 	S_6 = 0.0585
-	Ct_6 = nu_water/factor
-	Cp_6 = 1*nu_water/factor
+	Ct_6 = nu_water*factor_water
+	Cp_6 = 1.5*nu_water*factor_water
 
 	g = 9.81
 	m_0 = 0.06
@@ -460,8 +458,8 @@ if True:
 
 # cmd
 
-_phi_0 = np.radians(0/2) # angle de la barre dans (x,y,z)
-_phi_1 = np.radians(40*sign(_phi_0)) # angle de l'aileron dans (x2,y2,z2)
+_phi_0 = np.radians(45/2) # angle de la barre dans (x,y,z)
+_phi_1 = np.radians(10*sign(_phi_0)) # angle de l'aileron dans (x2,y2,z2)
 
 # state
 
@@ -509,20 +507,6 @@ while i>=0:
 		SF += fp[0]
 
 	if draw:
-		d_F_0 = update2DVector(d_F_0, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(FP_helm[0][0]), c='r')
-		d_F_0t = update2DVector(d_F_0t, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0t), c='b')
-		d_F_0p = update2DVector(d_F_0p, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0p), c='g')
-		d_F_1 = update2DVector(d_F_1, s["R"].T.dot(FP_wing[0][1]), s["R"].T.dot(FP_wing[0][0]), c='r')
-		d_F_2 = update2DVector(d_F_2, s["R"].T.dot(FP_wing[1][1]), s["R"].T.dot(FP_wing[1][0]), c='r')
-		d_F_4 = update2DVector(d_F_4, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(FP_keelSail[0][0]+FP_keelBulb[0][0]), c='r')
-		d_F_4t = update2DVector(d_F_4t, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(F_4t), c='b')
-		d_F_4p = update2DVector(d_F_4p, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(F_4p), c='g')
-		d_F_6 = update2DVector(d_F_6, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(FP_hull[0][0]), c='orange')
-		d_F_6t = update2DVector(d_F_6t, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6t), c='violet')
-		d_F_6p = update2DVector(d_F_6p, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6p), c='brown')
-		d_F = update2DVector(d_F, s["C"], s["R"].T.dot(SF), c='black')
-		d_V = update2DVector(d_V, s["C"], s["V"], c='pink')
-
 		aile_pts_1 = getLinePt(s["R"].T.dot(FP_wing[1][1]), np.pi+s["phi_2"]+s["alpha"], 0.33-0.09)
 		aile_pts_2 = getLinePt(s["R"].T.dot(FP_wing[1][1]), s["phi_2"]+s["alpha"], 0.09)
 		d_aile = update2DLine(d_aile, aile_pts_1, aile_pts_2)
@@ -542,22 +526,43 @@ while i>=0:
 		helm_pt1 = getLinePt(s["R"].T.dot(FP_helm[0][1]), np.pi+s["alpha"]+c["phi_0"]-s["phi_2"]/2, 0.09-0.02)
 		d_helm = update2DLine(d_helm, helm_pt0, helm_pt1)
 
+		vec_factor = 10
+
+		d_F_0 = update2DVector(d_F_0, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(FP_helm[0][0])*vec_factor, c='r')
+		d_F_0t = update2DVector(d_F_0t, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0t)*vec_factor, c='b')
+		d_F_0p = update2DVector(d_F_0p, s["R"].T.dot(FP_helm[0][1]), s["R"].T.dot(F_0p)*vec_factor, c='g')
+		d_F_1 = update2DVector(d_F_1, s["R"].T.dot(FP_wing[0][1]), s["R"].T.dot(FP_wing[0][0])*vec_factor, c='r')
+		d_F_2 = update2DVector(d_F_2, s["R"].T.dot(FP_wing[1][1]), s["R"].T.dot(FP_wing[1][0])*vec_factor, c='r')
+		d_F_4 = update2DVector(d_F_4, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(FP_keelSail[0][0]+FP_keelBulb[0][0])*vec_factor, c='r')
+		d_F_4t = update2DVector(d_F_4t, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(F_4t)*vec_factor, c='b')
+		d_F_4p = update2DVector(d_F_4p, s["R"].T.dot(FP_keelSail[0][1]), s["R"].T.dot(F_4p)*vec_factor, c='g')
+		d_F_6 = update2DVector(d_F_6, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(FP_hull[0][0])*vec_factor, c='orange')
+		d_F_6t = update2DVector(d_F_6t, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6t)*vec_factor, c='violet')
+		d_F_6p = update2DVector(d_F_6p, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6p)*vec_factor, c='brown')
+		d_F = update2DVector(d_F, s["C"], s["R"].T.dot(SF)*vec_factor, c='black')
+		d_V = update2DVector(d_V, s["C"], s["V"]*vec_factor, c='pink')
+
+		d_Wind = update2DVector(d_Wind, [0.75, 0.75], s["Vv"]-s["V"], c='g')
+
+		print("Speed: ", np.linalg.norm(s["V"]))
+
 		fig.canvas.draw()
 		fig.canvas.flush_events()
 
-	s = moveWing(s, FP_wing, dt)
-	s = moveBoat(s, FP, dt)
+	s = moveWing(s, FP_wing, dt*2)
+	s = moveBoat(s, FP, dt*2)
 
-	if time.time() - t_0 > 5:
+	if time.time() - t_0 > 5 and False:
 		t_0 = time.time()
-		step = np.radians(5)
-		mi = np.radians(15)
+		step = np.radians(10)
+		mi = np.radians(10)
 		ma = np.radians(90)
 		if c["phi_0"]+sens_0*step > ma:
 			sens_0 = -1
 		elif c["phi_0"]+sens_0*step < mi:
 			sens_0 = 1
-		c["phi_0"] += sens_0*step
+		c["phi_0"] += sens_0*step/2
+		print(np.degrees(c["phi_0"]))
 
 	if time.time() - t_1 > 10 and False:
 		t_1 = time.time()
