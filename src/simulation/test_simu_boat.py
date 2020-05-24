@@ -22,7 +22,7 @@ def getLinePt(pt, direction, length, scale = 1):
 
 def update2DVector(arrow, pt, vec, c='black', scale = 1):
 	if arrow == None:
-		arrow = ax.quiver(*(pt*scale)[:2], *vec[:2], color=c, scale=50)
+		arrow = ax1.quiver(*(pt*scale)[:2], *vec[:2], color=c, scale=50)
 	else:
 		arrow.set_UVC(*vec[:2])
 		arrow.set_offsets((pt*scale)[:2])
@@ -30,7 +30,7 @@ def update2DVector(arrow, pt, vec, c='black', scale = 1):
 
 def update2DLine(line, pt1, pt2, c='black'):
 	if line == None:
-		line, = ax.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], color=c)
+		line, = ax1.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], color=c)
 	else:
 		line.set_xdata([pt1[0], pt2[0]])
 		line.set_ydata([pt1[1], pt2[1]])
@@ -102,11 +102,6 @@ def getHelmForces(c, s):
 		theta_v0 = np.pi/2
 	theta_v0 *=  sign(np.vdot(v,y0)/np.vdot(y0,y0))
 	if np.linalg.norm(v) != 0:
-		# print(v)
-		# print((v/np.linalg.norm(v)))
-		# print((tr0_0 + theta_v0**2 * S_0 * Ct_0))
-		# print(np.vdot(v,v))
-		# print("-------")
 		F_0t = (v/np.linalg.norm(v)) * (tr0_0 + theta_v0**2 * S_0 * Ct_0) * np.vdot(v,v)
 	else:
 		F_0t = np.array([0,0,0])
@@ -371,8 +366,8 @@ def moveBoat(s, FP, dt):
 	Vl = s["R"].T.dot(Vl) # dans (u,v,w)
 	s["V"] = Vl
 
-	# s["C"][0] += Vl[0]*dt
-	# s["C"][1] += Vl[1]*dt
+	s["C"][0] += Vl[0]*dt
+	s["C"][1] += Vl[1]*dt
 
 	return s
 
@@ -381,11 +376,15 @@ def moveBoat(s, FP, dt):
 draw = True
 
 if draw :
-	delta = 1
+	delta1 = 1
+	delta2 = 200
 	fig = plt.figure(figsize=[10,10])
-	ax = fig.add_subplot(111)
-	ax.set_ylim(bottom=-delta, top=delta)
-	ax.set_xlim(left=-delta, right=delta)
+	ax1 = fig.add_subplot(121)
+	ax1.set_ylim(bottom=-delta1, top=delta1)
+	ax1.set_xlim(left=-delta1, right=delta1)
+	ax2 = fig.add_subplot(122)
+	ax2.set_ylim(bottom=-delta2, top=delta2)
+	ax2.set_xlim(left=-delta2, right=delta2)
 	fig.show()
 
 	d_F_0 = None
@@ -414,10 +413,13 @@ if draw :
 
 	d_keel = None
 
+	pt_prev = [0.0,0.0,0.0]
+	pt_actual = [0.0,0.0,0.0]
+
 
 # data
 if True:
-	wind_speed = 20 #nds
+	wind_speed = 10 #nds
 	wind_speed = 0.514444 * wind_speed # m.s-1
 
 	nu_air = 0.018
@@ -432,12 +434,12 @@ if True:
 
 	tr0_1 = 0.001
 	S_1 = 0.072
-	Ct_1 = nu_air*factor_air
+	Ct_1 = 2*nu_air*factor_air
 	Cp_1 = nu_air*factor_air
 
 	tr0_2 = 0.001
 	S_2 = 0.39525
-	Ct_2 = nu_air*factor_air
+	Ct_2 = 2*nu_air*factor_air
 	Cp_2 = nu_air*factor_air
 
 	tr0_4 = 0.001
@@ -469,11 +471,11 @@ _phi_1 = np.radians(10*sign(_phi_0)) # angle de l'aileron dans (x2,y2,z2)
 # state
 
 _phi_2 = np.radians(0) # angle de l'aile dans (x,y,z)
-_Vaz = 0 # vitesse de rotation de l'aile autour de l'axe z dans (x,y,z)
+_Vaz = 0 # vitesse de rotation de l'aile autour de l'ax1e z dans (x,y,z)
 _Vv = np.array([0.0, 0.0, 0.0]) # vitesse du vent dans (u,v,w)
-_V = np.array([0, 0, 0]) # vitesse du bateau dans (u,v,w)
-_Vrad = np.array([0,0,0]) # vitesse angulaire du bateau dans (u,v,w)
-_C = np.array([0, 0, 0]) # position du bateau dans (u,v,w)
+_V = np.array([0.0, 0.0, 0.0]) # vitesse du bateau dans (u,v,w)
+_Vrad = np.array([00.0, 0.0, 0.0]) # vitesse angulaire du bateau dans (u,v,w)
+_C = np.array([0.0, 0.0, 0.0]) # position du bateau dans (u,v,w)
 _alpha = np.radians(0) # cap dans (u,v,w)
 _beta = np.radians(0) # roulis dans (u,v,w)
 _R = np.array([[1,0,0],[0,1,0],[0,0,1]])  # repere du bateau
@@ -550,8 +552,8 @@ while i>=0:
 		d_F_6 = update2DVector(d_F_6, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(FP_hull[0][0])*vec_factor, c='orange')
 		d_F_6t = update2DVector(d_F_6t, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6t)*vec_factor, c='violet')
 		d_F_6p = update2DVector(d_F_6p, s["R"].T.dot(FP_hull[0][1]), s["R"].T.dot(F_6p)*vec_factor, c='brown')
-		d_F = update2DVector(d_F, s["C"], s["R"].T.dot(SF)*vec_factor, c='black')
-		d_V = update2DVector(d_V, s["C"], s["V"]*vec_factor, c='pink')
+		d_F = update2DVector(d_F, [0,0,0], s["R"].T.dot(SF)*vec_factor, c='black')
+		d_V = update2DVector(d_V, [0,0,0], s["V"]*vec_factor, c='pink')
 
 		d_Wind = update2DVector(d_Wind, [0.75, 0.75], s["Vv"]-s["V"], c='g')
 
@@ -562,6 +564,13 @@ while i>=0:
 		# roll_keel_pt0 = getLinePt(pt, -s["beta"]+np.pi/2, 0.45/2)
 		# roll_keel_pt1 = getLinePt(pt, np.pi-s["beta"]+np.pi/2, 0.45/2)
 		# d_keel = update2DLine(d_keel, roll_keel_pt0, roll_keel_pt1)
+
+		pt_actual = s["C"]
+		print(pt_actual,pt_prev)
+		ax2.plot([pt_prev[0], pt_actual[0]], [pt_prev[1], pt_actual[1]], color='r')
+		pt_prev = []
+		for p in pt_actual:
+			pt_prev.append(p)
 
 		fig.canvas.draw()
 		fig.canvas.flush_events()
