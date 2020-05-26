@@ -27,7 +27,7 @@ class BoatSystem:
 	def getData(self):
 		self.nu_air = 0.018
 		self.nu_water = 1
-		self.factor_air = 50
+		self.factor_air = 20
 		self.factor_water = 80
 
 		self.tr0_0 = 0.001
@@ -37,13 +37,13 @@ class BoatSystem:
 
 		self.tr0_1 = 0.001
 		self.S_1 = 0.072
-		self.Ct_1 = 2*self.nu_air*self.factor_air
-		self.Cp_1 = self.nu_air*self.factor_air
+		self.Ct_1 = self.nu_air*self.factor_air
+		self.Cp_1 = 2*self.nu_air*self.factor_air
 
 		self.tr0_2 = 0.001
 		self.S_2 = 0.39525
-		self.Ct_2 = 2*self.nu_air*self.factor_air
-		self.Cp_2 = self.nu_air*self.factor_air
+		self.Ct_2 = self.nu_air*self.factor_air
+		self.Cp_2 = 2*self.nu_air*self.factor_air
 
 		self.tr0_4 = 0.001
 		self.S_4 = 0.05625
@@ -143,7 +143,7 @@ class BoatSystem:
 		Va = self.s["Vrad"]  # dans (u,v,w)
 		Va = (np.linalg.inv(self.s["R"].T)).dot(Va) # dans (x,y,z)
 
-		Ra = 3*Va # dans (x,y,z)
+		Ra = 1.5*Va # dans (x,y,z)
 		Aa -= Ra
 		Aa[0] = min(np.pi/2, abs(Aa[0]))*sign(Aa[0])
 		Va += Aa*self.dt # dans (x,y,z)
@@ -536,6 +536,7 @@ t_0 = time.time()
 t_1 = time.time()
 sens_0 = 1
 sens_1 = 1
+cmd = np.radians(20)
 while i>=0:
 
 	wind_step = 1
@@ -597,16 +598,24 @@ while i>=0:
 		fig.canvas.draw()
 		fig.canvas.flush_events()
 
-	if time.time() - t_0 > 5 or True:
+	if time.time() - t_0 > 30:
 		t_0 = time.time()
-		step = np.radians(10)
-		mi = np.radians(5)
-		ma = np.radians(45)
-		if c["phi_0"] > ma:
-			sens_0 = -1
-		elif c["phi_0"] < mi:
-			sens_0 = 1
-		c["phi_0"] += sens_0*dt*np.pi/80
+		# mi = np.radians(10)
+		# ma = np.radians(10)
+		# if c["phi_0"] > ma:
+		# 	sens_0 = -1
+		# elif c["phi_0"] < mi:
+		# 	sens_0 = 1
+		# cmd += sens_0*dt*np.pi/80
+		cmd = -cmd
+
+	cmd_speed = np.radians(45)
+	cmd_step = cmd_speed*dt
+	if c["phi_0"]+cmd_step < cmd - c["phi_1"]*2:
+		c["phi_0"] += cmd_step
+	elif c["phi_0"]-cmd_step > cmd - c["phi_1"]*2:
+		c["phi_0"] -= cmd_step
+	c["phi_1"] = abs(c["phi_1"]) * sign(c["phi_0"])
 
 	if time.time() - t_1 > 10 and False:
 		t_1 = time.time()
