@@ -2,10 +2,6 @@
 
 #define DEBUGLEVEL 1
 
-#ifndef SIMU
-#define SIMU false
-#endif
-
 void initSerialDebug(){
   serialDebug.begin(115200);
 }
