@@ -598,16 +598,10 @@ while i>=0:
 		fig.canvas.draw()
 		fig.canvas.flush_events()
 
-	if time.time() - t_0 > 30:
-		t_0 = time.time()
-		# mi = np.radians(10)
-		# ma = np.radians(10)
-		# if c["phi_0"] > ma:
-		# 	sens_0 = -1
-		# elif c["phi_0"] < mi:
-		# 	sens_0 = 1
-		# cmd += sens_0*dt*np.pi/80
-		cmd = -cmd
+	if s["C"][0] > 50:
+		cmd = -abs(cmd)
+	if s["C"][0] < 0:
+		cmd = abs(cmd)
 
 	cmd_speed = np.radians(45)
 	cmd_step = cmd_speed*dt
