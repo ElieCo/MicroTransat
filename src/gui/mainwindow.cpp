@@ -232,7 +232,7 @@ void MainWindow::setVarDisplay()
             ui->rawDataLayout->addWidget(raw, i, 0);
         }
         else {
-            ui->rawDataLayout->addWidget(raw, i-24, 1);
+            ui->rawDataLayout->addWidget(raw, header.size()-1-i, 1);
         }
         raw_values << raw;
     }
