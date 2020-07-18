@@ -72,6 +72,15 @@ class SensorsManager: public BaseManager
 
   private:
 
+  bool isTime(int ms){
+    int margin = m_runInterval*0.9;
+    int r = millis() % ms;
+    if (r <= margin)
+      return true;
+    else
+      return false;
+  }
+
   void config(){
     m_db->getData("Max_valid_hdop", m_max_valid_hdop);
   }
