@@ -33,7 +33,7 @@ class SensorsManager: public BaseManager
     m_bat.init(A17);
 
     // Initialize the pwm reader.
-    m_pwm_reader.init(A22);
+    m_pwm_reader.init(39);
   }
 
   void go(){
@@ -62,10 +62,14 @@ class SensorsManager: public BaseManager
     float bat_val = m_bat.getValue();
     db_battery.set(bat_val);
 
-    // Manage pwm reader
-    float val = m_pwm_reader.updateValue();
-    if (val < 40) db_radio_controlled.set(true);
-    else if (val > 60) db_radio_controlled.set(false);
+    if (isTime(1000)){
+      // Manage pwm reader
+      float val = m_pwm_reader.updateValue();
+      if (val != -1){
+        if (val < 40) db_radio_controlled.set(true);
+        else if (val > 60) db_radio_controlled.set(false);
+      }
+    }
   }
 
   void stop(){}
