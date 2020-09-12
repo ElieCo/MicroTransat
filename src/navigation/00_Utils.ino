@@ -132,3 +132,8 @@ class Average{
   int m_index;
 
 };
+
+class ObjectForDB{
+ public:
+  String toString(){ return ""; };
+};

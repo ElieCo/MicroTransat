@@ -37,7 +37,8 @@
     "parameters":
       [
         { "key": "Max_upwind", "value": 45 },
-        { "key": "Max_downwind", "value": 150 }
+        { "key": "Max_downwind", "value": 150 },
+        { "key": "Sleeping_duration", "value": 10 }
       ]
   },
   {
