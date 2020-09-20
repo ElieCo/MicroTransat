@@ -86,13 +86,14 @@ class SensorsManager: public BaseManager
   DBData<bool> db_average_course_full;
 
   float averageCourse(float new_course){
-    float average_course = m_course_average.average(new_course);
-    from180to180(average_course);
-
     if (db_just_wake_up.hasChanged() && db_just_wake_up.get()) {
       db_average_course_full.set(false);
       m_course_average.clear();
     }
+
+    float average_course = m_course_average.average(new_course);
+    from180to180(average_course);
+
     if(m_course_average.isFull()) db_average_course_full.set(true);
 
     return average_course;

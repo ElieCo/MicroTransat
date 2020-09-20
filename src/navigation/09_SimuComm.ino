@@ -1,4 +1,4 @@
-#define SERIAL_SIMU Serial1
+#define SERIAL_SIMU Serial
 
 #define START 0xF1
 #define STOP 0xF3
@@ -32,9 +32,10 @@ class SimuComm {
 
     void simuServo(int pin, float angle){
       m_simuData.servoData.set(pin, angle);
+      sendData();
     }
     GpsData simuGps(){
-      updateData();
+      readData();
       return m_simuData.gpsData;
     }
 
@@ -49,10 +50,11 @@ class SimuComm {
       SERIAL_SIMU.setTimeout(100);
       SERIAL_SIMU.begin(115200);
     }
+
     bool simuCheck(){
-      sendData();
       int t0 = millis();
       while (millis() - t0 < 10000){
+        sendData();
 
         delay(500);
 
@@ -60,12 +62,6 @@ class SimuComm {
           return true;
       }
       return false;
-    }
-
-    bool updateData(){
-      bool result = readData();
-      sendData();
-      return result;
     }
 
     void sendData(){
@@ -86,9 +82,10 @@ class SimuComm {
 
       SERIAL_SIMU.write(data, sizeof(data));
     }
+
     bool readData(){
       uint8_t recv[51];
-      unsigned int recv_size = SERIAL_SIMU.readBytes(recv, sizeof(recv));
+      unsigned int recv_size = SERIAL_SIMU.readBytes((char*)recv, sizeof(recv));
       for (unsigned int i = 0; i < recv_size; i++){
         m_buffer[m_index] = recv[i];
         m_index = (m_index+1) % sizeof(m_buffer);
@@ -103,46 +100,48 @@ class SimuComm {
       // copy the buffer in a other one to have it in the right order
       uint8_t buffer[sizeof(m_buffer)];
       for (unsigned int i = 0; i < sizeof(m_buffer); i++){
-        buffer[i] = m_buffer[ (m_index+i) % sizeof(m_buffer) ];
+        buffer[i] = m_buffer[ (m_index + i) % sizeof(m_buffer) ];
       }
 
-      // look for the START
-      unsigned int index = 0;
-      bool isStart = false;
-      for (; index < sizeof(buffer); index++){
-        if (buffer[index] == START){
-          isStart = true;
-          break;
-        } else {
-          // write zeros in the buffer while there is no start
-          m_buffer[index] = 0;
-        }
-      }
-
-      // return if there is no START
-      if (!isStart) return result;
-
-      // check if there is also a STOP
-      if (index + 51 >= sizeof(buffer)){
-        if (buffer[index + 50] == STOP){
-          // read data and write zeros (make sure we don't write twice the same message)
-          memcpy(&m_simuData.gpsData, &buffer[index+1], 49);
-          memset(&buffer[index], 0, 51);
+     // check if the last readed byte is a STOP
+      if (buffer[sizeof(buffer)-1] == STOP){
+        // check if 50 before STOP there is a START
+        if (buffer[sizeof(buffer)-1 - 50] == START){
           result = true;
-
-        } else if (buffer[index + 50] != 0){
-          // if there is something but is not the stop,
-          // it have to be that we didn't get the end of this message, so we erase this start
-          m_buffer[index] = 0;
+          uint8_t data[49];
+          m_simuData.gpsData = lastDataToGpsData(buffer);
         }
+        // clear the buffer
+        memset(buffer, 0, sizeof(buffer));
       }
 
       // copy the tmp buffer into the real buffer with the right offset
       for (unsigned int i = 0; i < sizeof(buffer); i++){
-        m_buffer[ (m_index+i) % sizeof(m_buffer) ] = buffer[i];
+        m_buffer[ (m_index + i) % sizeof(m_buffer) ] = buffer[i];
       }
-
+      
       return result;
+    }
+
+    GpsData lastDataToGpsData(uint8_t *buffer){
+      GpsData data;
+
+      int offset = sizeof(m_buffer)-1 - 49;
+      
+      memcpy(&data.lat, &buffer[offset+0], 8);
+      memcpy(&data.lng, &buffer[offset+8], 8);
+      memcpy(&data.altitude, &buffer[offset+16], 4);
+      memcpy(&data.fix, &buffer[offset+20], 1);
+      memcpy(&data.fix_quality, &buffer[offset+21], 2);
+      memcpy(&data.satellites, &buffer[offset+23], 2);
+      memcpy(&data.fix_age, &buffer[offset+25], 4);
+      memcpy(&data.time, &buffer[offset+29], 4);
+      memcpy(&data.date, &buffer[offset+33], 4);
+      memcpy(&data.speed, &buffer[offset+37], 4);
+      memcpy(&data.course, &buffer[offset+41], 4);
+      memcpy(&data.hdop, &buffer[offset+45], 4);
+
+      return data;
     }
 
     bool m_inSimulation;
