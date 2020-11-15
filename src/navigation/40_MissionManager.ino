@@ -45,8 +45,8 @@ class MissionManager : public BaseManager
     db_dist_to_axis.init(m_db, "Dist_to_axis", float(0), true);
     db_in_corridor.init(m_db, "In_corridor", true, true);
     db_corridor_angle.init(m_db, "Corridor_angle", float(0));
-    db_elem_next.init(m_db, "Next_element", MissionElement(), true);
-    db_elem_prev.init(m_db, "Prev_element", MissionElement(), true);
+    db_elem_prev.init(m_db, "Prev_element", ObjectForDBPtr(), true);
+    db_elem_next.init(m_db, "Next_element", ObjectForDBPtr(), true);
 
     bool *sd_ready = m_db->initData("SD_ready", false);
     *sd_ready = m_mission_file.init("mission.txt", *sd_ready);
@@ -69,8 +69,8 @@ class MissionManager : public BaseManager
 
   DBData<float> db_dist_to_wpt;
   DBData<float> db_angle_to_wpt;
-  DBData<MissionElement> db_elem_next;
-  DBData<MissionElement> db_elem_prev;
+  DBData<ObjectForDBPtr> db_elem_prev;
+  DBData<ObjectForDBPtr> db_elem_next;
   DBData<int> db_wpt_index;
   DBData<double> db_latitude;
   DBData<double> db_longitude;
@@ -118,7 +118,8 @@ class MissionManager : public BaseManager
       }
     }
 
-    /*for (int i = 0; i < m_mission_elements.size(); i++){
+    /*
+    for (int i = 0; i < m_mission_elements.size(); i++){
       MissionElement elem = m_mission_elements.at(i);
       if (elem.coord.lat != 0) {
         print("coord:", elem.coord.lat, elem.coord.lng);
@@ -128,11 +129,11 @@ class MissionManager : public BaseManager
         print("angle:", elem.angle);
         print("duration:", elem.duration);
       }
-    }*/
+    }
+    */
 
-
-    db_elem_next.set(m_mission_elements.at(db_wpt_index.get()));
-    db_elem_prev.set(m_mission_elements.at(db_wpt_index.get()));
+    db_elem_next.set(m_mission_elements.ptrAt(db_wpt_index.get()));
+    db_elem_prev.set(m_mission_elements.ptrAt(db_wpt_index.get()-1));
   }
 
   bool checkActualElementFinished(){
@@ -161,19 +162,19 @@ class MissionManager : public BaseManager
     db_wpt_index.set((db_wpt_index.get()+1) % m_mission_elements.size());
 
     // Get the new actual element
-    MissionElement new_elem = m_mission_elements.at(db_wpt_index.get());
+    MissionElement *new_elem = m_mission_elements.ptrAt(db_wpt_index.get());
 
     db_elem_prev.set(db_elem_next.get());
     db_elem_next.set(new_elem);
 
     // Save start time if it's an AWA element
-    if (new_elem.type == AWA) {
+    if (new_elem->type == AWA) {
       m_awa_start_time = millis();
     } else {
       // Get new distance to waypoint
-      float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), new_elem.coord.lat, new_elem.coord.lng);
+      float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), new_elem->coord.lat, new_elem->coord.lng);
       // Calcul the course to the next waypoint.
-      float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), new_elem.coord.lat, new_elem.coord.lng);
+      float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), new_elem->coord.lat, new_elem->coord.lng);
       // Set all this data in the DB.
       db_dist_to_wpt.set(distanceToWaypoint);
       db_angle_to_wpt.set(angleToWaypoint);
@@ -184,10 +185,12 @@ class MissionManager : public BaseManager
   }
 
   void isInCorridor(){
-    float angle_btw_wpt = get_course(db_elem_prev.get().coord.lat, db_elem_prev.get().coord.lng, db_elem_next.get().coord.lat, db_elem_next.get().coord.lng);
+    MissionElement *prev = static_cast<MissionElement*>(db_elem_prev.get());
+    MissionElement *next = static_cast<MissionElement*>(db_elem_next.get());
+    float angle_btw_wpt = get_course(prev->coord.lat, prev->coord.lng, next->coord.lat, next->coord.lng);
     float dist_to_axis = sin(radians(angle_btw_wpt - db_angle_to_wpt.get())) * db_dist_to_wpt.get();
 
-    bool in_corridor = abs(dist_to_axis) <= float(db_elem_next.get().corridor_width)/2;
+    bool in_corridor = abs(dist_to_axis) <= float(next->corridor_width)/2;
 
     db_corridor_angle.set(angle_btw_wpt);
     db_dist_to_axis.set(dist_to_axis);

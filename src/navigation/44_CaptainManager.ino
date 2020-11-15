@@ -14,7 +14,7 @@ class Captain : public BaseManager
     db_in_corridor.init(m_db, "In_corridor", true, true);
     db_cmd_helm_applied.init(m_db, "Cmd_helm_applied", true);
     db_course.init(m_db, "Average_course", float(0));
-    db_next_element.init(m_db, "Next_element", MissionElement());
+    db_next_element.init(m_db, "Next_element", ObjectForDBPtr());
     db_just_wake_up.init(m_db, "Just_wake_up", false);
     db_average_course_full.init(m_db, "Average_course_full", false);
     db_corridor_angle.init(m_db, "Corridor_angle", float(0));
@@ -56,7 +56,7 @@ class Captain : public BaseManager
   DBData<bool> db_in_corridor;
   DBData<bool> db_cmd_helm_applied;
   DBData<float> db_course;
-  DBData<MissionElement> db_next_element;
+  DBData<ObjectForDBPtr> db_next_element;
   DBData<bool> db_just_wake_up;
   DBData<bool> db_average_course_full;
   DBData<float> db_corridor_angle;
@@ -100,7 +100,7 @@ class Captain : public BaseManager
 
   void stateDecide(){
 
-    if (db_next_element.get().type == WPT)
+    if (static_cast<MissionElement*>(db_next_element.get())->type == WPT)
       commandForWPT();
     else
       commandForAWA();
@@ -119,7 +119,7 @@ class Captain : public BaseManager
 
   void commandForWPT(){
     // Get next wpt
-    MissionElement wpt = db_next_element.get();
+    MissionElement wpt = *static_cast<MissionElement*>(db_next_element.get());
 
     // Calculate the angle to the next waypoint
     float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), wpt.coord.lat, wpt.coord.lng);
@@ -157,7 +157,7 @@ class Captain : public BaseManager
 
   void commandForAWA(){
     // Get next awa
-    MissionElement awa = db_next_element.get();
+    MissionElement awa = *static_cast<MissionElement*>(db_next_element.get());
 
     // Get awa cmd
     float new_reg = awa.angle;
