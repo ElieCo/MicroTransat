@@ -100,7 +100,7 @@ class DBData {
   ~DBData(){}
 
     void init(DataBase* db, String name, T value, bool selected = false){
-      data_ptr = db->initData(name, value, selected);
+      data_ptr = static_cast<T*>(static_cast<void*>(db->initData(name, value, selected)));
       m_prev_value = *data_ptr;
     }
 

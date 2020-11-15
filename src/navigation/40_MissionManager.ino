@@ -4,6 +4,8 @@ enum MissionElementType { WPT = 0, AWA = 1 };
 
 class MissionElement : public ObjectForDB {
  public:
+  MissionElement(): ObjectForDB() {}
+ 
   Coord coord;
   double corridor_width = -1;
   double valid_dist = -1;
@@ -17,14 +19,14 @@ class MissionElement : public ObjectForDB {
     String result = "";
     if (type == WPT){
       result += "WPT-";
-      result += String(coord.lat, 7) + "-";
-      result += String(coord.lng, 7) + "-";
-      result += String(corridor_width) + "-";
+      result += String(coord.lat, 7) + "/";
+      result += String(coord.lng, 7) + "/";
+      result += String(corridor_width) + "/";
       result += String(valid_dist);
     } else {
       result += "AWA-";
-      result += String(angle, 7) + "-";
-      result += String(duration, 7) + "-";
+      result += String(angle, 7) + "/";
+      result += String(duration, 7) + "/";
     }
     return result;
   }
@@ -45,8 +47,9 @@ class MissionManager : public BaseManager
     db_dist_to_axis.init(m_db, "Dist_to_axis", float(0), true);
     db_in_corridor.init(m_db, "In_corridor", true, true);
     db_corridor_angle.init(m_db, "Corridor_angle", float(0));
-    db_elem_prev.init(m_db, "Prev_element", ObjectForDBPtr(), true);
-    db_elem_next.init(m_db, "Next_element", ObjectForDBPtr(), true);
+    MissionElement* empty_elem = NULL;
+    db_elem_prev.init(m_db, "Prev_element", empty_elem, true);
+    db_elem_next.init(m_db, "Next_element", empty_elem, true);
 
     bool *sd_ready = m_db->initData("SD_ready", false);
     *sd_ready = m_mission_file.init("mission.txt", *sd_ready);
@@ -69,8 +72,8 @@ class MissionManager : public BaseManager
 
   DBData<float> db_dist_to_wpt;
   DBData<float> db_angle_to_wpt;
-  DBData<ObjectForDBPtr> db_elem_prev;
-  DBData<ObjectForDBPtr> db_elem_next;
+  DBData<MissionElement*> db_elem_prev;
+  DBData<MissionElement*> db_elem_next;
   DBData<int> db_wpt_index;
   DBData<double> db_latitude;
   DBData<double> db_longitude;

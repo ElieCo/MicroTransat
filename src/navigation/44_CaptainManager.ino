@@ -4,173 +4,175 @@ enum BEHAVIOUR { SLEEP = 0, ACQUISITION = 1, DECIDE = 2, PROCESS = 3 };
 class Captain : public BaseManager
 {
   public:
-  BASIC_CONSTRUCTOR(Captain)
-  ~Captain(){}
+    BASIC_CONSTRUCTOR(Captain)
+    ~Captain() {}
 
-  void init(){
-    m_behaviour = ACQUISITION;
+    void init() {
+      m_behaviour = ACQUISITION;
 
-    db_reg_cmd.init(m_db, "Regulator_angle", float(0), true);
-    db_in_corridor.init(m_db, "In_corridor", true, true);
-    db_cmd_helm_applied.init(m_db, "Cmd_helm_applied", true);
-    db_course.init(m_db, "Average_course", float(0));
-    db_next_element.init(m_db, "Next_element", ObjectForDBPtr());
-    db_just_wake_up.init(m_db, "Just_wake_up", false);
-    db_average_course_full.init(m_db, "Average_course_full", false);
-    db_corridor_angle.init(m_db, "Corridor_angle", float(0));
-    db_behaviour.init(m_db, "Behaviour", SLEEP, true);
-    db_latitude.init(m_db, "Latitude", double(0));
-    db_longitude.init(m_db, "Longitude", double(0));
-  }
-
-  void go(){
-    db_behaviour.set(m_behaviour);
-
-    switch(m_behaviour){
-      case SLEEP:
-        stateSleep();
-        break;
-      case ACQUISITION:
-        stateAcquisition();
-        break;
-      case DECIDE:
-        stateDecide();
-        break;
-      case PROCESS:
-        stateProcess();
-        break;
+      db_reg_cmd.init(m_db, "Regulator_angle", float(0), true);
+      db_in_corridor.init(m_db, "In_corridor", true, true);
+      db_cmd_helm_applied.init(m_db, "Cmd_helm_applied", true);
+      db_course.init(m_db, "Average_course", float(0));
+      MissionElement* empty_elem = NULL;
+      db_next_element.init(m_db, "Next_element", empty_elem);
+      db_just_wake_up.init(m_db, "Just_wake_up", false);
+      db_average_course_full.init(m_db, "Average_course_full", false);
+      db_corridor_angle.init(m_db, "Corridor_angle", float(0));
+      db_behaviour.init(m_db, "Behaviour", SLEEP, true);
+      db_latitude.init(m_db, "Latitude", double(0));
+      db_longitude.init(m_db, "Longitude", double(0));
     }
-  }
 
-  void stop(){}
+    void go() {
+      db_behaviour.set(m_behaviour);
+      print("behaviour:", m_behaviour);
+
+      switch (m_behaviour) {
+        case SLEEP:
+          stateSleep();
+          break;
+        case ACQUISITION:
+          stateAcquisition();
+          break;
+        case DECIDE:
+          stateDecide();
+          break;
+        case PROCESS:
+          stateProcess();
+          break;
+      }
+    }
+
+    void stop() {}
 
   private:
 
-  void config(){
-    m_db->getData("Max_upwind", m_max_upwind);
-    m_db->getData("Max_downwind", m_max_downwind);
-    m_db->getData("Sleeping_time", m_sleeping_duration);
-  }
+    void config() {
+      m_db->getData("Max_upwind", m_max_upwind);
+      m_db->getData("Max_downwind", m_max_downwind);
+      m_db->getData("Sleeping_duration", m_sleeping_duration);
+    }
 
-  DBData<float> db_reg_cmd;
-  DBData<bool> db_in_corridor;
-  DBData<bool> db_cmd_helm_applied;
-  DBData<float> db_course;
-  DBData<ObjectForDBPtr> db_next_element;
-  DBData<bool> db_just_wake_up;
-  DBData<bool> db_average_course_full;
-  DBData<float> db_corridor_angle;
-  DBData<int> db_behaviour;
-  DBData<double> db_latitude;
-  DBData<double> db_longitude;
+    DBData<float> db_reg_cmd;
+    DBData<bool> db_in_corridor;
+    DBData<bool> db_cmd_helm_applied;
+    DBData<float> db_course;
+    DBData<MissionElement*> db_next_element;
+    DBData<bool> db_just_wake_up;
+    DBData<bool> db_average_course_full;
+    DBData<float> db_corridor_angle;
+    DBData<int> db_behaviour;
+    DBData<double> db_latitude;
+    DBData<double> db_longitude;
 
-  BEHAVIOUR m_behaviour;
+    BEHAVIOUR m_behaviour;
 
-  double m_max_upwind, m_max_downwind;
-  unsigned int m_sleeping_duration;
-  float m_prev_average_course;
+    double m_max_upwind, m_max_downwind, m_sleeping_duration;
+    float m_prev_average_course;
 
-  void stateSleep(){
-    // Sleep
+    void stateSleep() {
+      // Sleep
 
-    static int timer = -1;
-    if (timer == -1) timer = millis();
-    else {
-      if (millis() - timer > m_sleeping_duration){
-        timer = -1;
+      static int timer = -1;
+      if (timer == -1) timer = millis();
+      else {
+        if (millis() - timer > m_sleeping_duration) {
+          timer = -1;
 
-        // Say that we just wake up.
-        db_just_wake_up.set(true);
-        db_average_course_full.set(false);
+          // Say that we just wake up.
+          db_just_wake_up.set(true);
+          db_average_course_full.set(false);
 
-        m_behaviour = ACQUISITION;
+          m_behaviour = ACQUISITION;
+        }
       }
+
     }
 
-  }
+    void stateAcquisition() {
+      // Wait that the course average buffer is full to take a decision.
+      if (db_average_course_full.get()) {
+        db_just_wake_up.set(false);
+        m_behaviour = DECIDE;
+      }
 
-  void stateAcquisition(){
-    // Wait that the course average buffer is full to take a decision.
-    if(db_average_course_full.get()) {
-      db_just_wake_up.set(false);
-      m_behaviour = DECIDE;
     }
 
-  }
+    void stateDecide() {
+      //print("decide", db_next_element.get().coord.lat);
 
-  void stateDecide(){
+      if (db_next_element.get()->type == WPT)
+        commandForWPT();
+      else
+        commandForAWA();
 
-    if (static_cast<MissionElement*>(db_next_element.get())->type == WPT)
-      commandForWPT();
-    else
-      commandForAWA();
+      // make sure to wait that the helm manager process
+      db_cmd_helm_applied.set(false);
 
-    // make sure to wait that the helm manager process
-    db_cmd_helm_applied.set(false);
+      // Change the behaviour.
+      m_behaviour = PROCESS;
+    }
 
-    // Change the behaviour.
-    m_behaviour = PROCESS;
-  }
+    void stateProcess() {
+      if (db_cmd_helm_applied.get())
+        m_behaviour = SLEEP;
+    }
 
-  void stateProcess(){
-    if (db_cmd_helm_applied.get())
-      m_behaviour = SLEEP;
-  }
+    void commandForWPT() {
+      // Get next wpt
+      MissionElement wpt = *db_next_element.get();
 
-  void commandForWPT(){
-    // Get next wpt
-    MissionElement wpt = *static_cast<MissionElement*>(db_next_element.get());
+      // Calculate the angle to the next waypoint
+      float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), wpt.coord.lat, wpt.coord.lng);
 
-    // Calculate the angle to the next waypoint
-    float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), wpt.coord.lat, wpt.coord.lng);
+      // Calcul the difference between the actual course an the angle to the next waypoint.
+      float diff = angleToWaypoint - db_course.get();
 
-    // Calcul the difference between the actual course an the angle to the next waypoint.
-    float diff = angleToWaypoint - db_course.get();
+      // Calcul the new regulator command to reach the waypoint.
+      float new_reg = db_reg_cmd.get() + diff;
+      from180to180(new_reg);
 
-    // Calcul the new regulator command to reach the waypoint.
-    float new_reg = db_reg_cmd.get() + diff;
-    from180to180(new_reg);
+      float diff_wpt_corridor = angleToWaypoint - db_corridor_angle.get();
+      from180to180(diff_wpt_corridor);
 
-    float diff_wpt_corridor = angleToWaypoint - db_corridor_angle.get();
-    from180to180(diff_wpt_corridor);
-
-    // If she's on the corridor, she go on the same direction as the previous regul, else reach the corridor (depend of if we go downwind or upwind).
-    bool isPositive = true;
-    if (db_in_corridor.get()){
-      isPositive = db_reg_cmd.get() >= 0;
-    } else {
-      if (abs(new_reg) < 90) {
-        isPositive = diff_wpt_corridor >= 0;
+      // If she's on the corridor, she go on the same direction as the previous regul, else reach the corridor (depend of if we go downwind or upwind).
+      bool isPositive = true;
+      if (db_in_corridor.get()) {
+        isPositive = db_reg_cmd.get() >= 0;
       } else {
-        isPositive = diff_wpt_corridor <= 0;
+        if (abs(new_reg) < 90) {
+          isPositive = diff_wpt_corridor >= 0;
+        } else {
+          isPositive = diff_wpt_corridor <= 0;
+        }
       }
+      int sign = isPositive ? 1 : -1;
+
+      // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
+      if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
+      if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
+
+      // Set in the DB the regulator angle.
+      db_reg_cmd.set(new_reg);
     }
-    int sign = isPositive ? 1 : -1;
 
-    // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
-    if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
-    if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
+    void commandForAWA() {
+      // Get next awa
+      MissionElement awa = *db_next_element.get();
 
-    // Set in the DB the regulator angle.
-    db_reg_cmd.set(new_reg);
-  }
+      // Get awa cmd
+      float new_reg = awa.angle;
+      from180to180(new_reg);
 
-  void commandForAWA(){
-    // Get next awa
-    MissionElement awa = *static_cast<MissionElement*>(db_next_element.get());
+      // Check that it doesn't go out of range
+      int sign = new_reg >= 0 ? 1 : -1;
 
-    // Get awa cmd
-    float new_reg = awa.angle;
-    from180to180(new_reg);
+      // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
+      if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
+      if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
 
-    // Check that it doesn't go out of range
-    int sign = new_reg >= 0 ? 1 : -1;
-
-    // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
-    if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
-    if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
-
-    // Set in the DB the regulator angle.
-    db_reg_cmd.set(new_reg);
-  }
+      // Set in the DB the regulator angle.
+      db_reg_cmd.set(new_reg);
+    }
 };

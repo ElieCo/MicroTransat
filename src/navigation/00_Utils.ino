@@ -132,5 +132,5 @@ class Average{
 
 class ObjectForDB{
  public:
-  String toString(){ return ""; };
+  virtual String toString(){ return ""; };
 };
