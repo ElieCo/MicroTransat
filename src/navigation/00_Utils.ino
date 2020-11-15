@@ -1,6 +1,7 @@
 #define serialDebug Serial
 
 #define DEBUGLEVEL 1
+#define LORA_IN_SIMU 0
 
 void initSerialDebug(){
   serialDebug.begin(115200);
