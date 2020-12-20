@@ -15,6 +15,7 @@ class CommManager : public BaseManager
   }
 
   void go(){
+
     // check received messages
     db_msg_received.set(m_lora.receive());
     // Return if there is no message.
@@ -30,10 +31,17 @@ class CommManager : public BaseManager
         sendLog(m_actual_line.substring(0,50), false);
       }
       else {
-        // Send the second pat of the message.
-        m_index_log = 0;
-        send_log = false;
-        sendLog(m_actual_line.substring(50), true);
+        // Send the second pat of the message
+        if (m_actual_line.length() <= 50*m_index_log +50){
+          sendLog(m_actual_line.substring(m_index_log*50)+"~", true);
+          m_index_log = 0;
+          send_log = false;
+        }
+        else {
+          sendLog(m_actual_line.substring(m_index_log*50,m_index_log*50+50), false);
+          m_index_log++;
+        }
+        print("partie ", m_index_log);
       }
     }
   }

@@ -30,7 +30,7 @@ class SensorsManager: public BaseManager
     m_course_average.init(3);
 
     // Initialize the battery.
-    m_bat.init(A17);
+    m_bat.init(A16);
 
     // Initialize the pwm reader.
     m_pwm_reader.init(39);

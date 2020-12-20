@@ -5,7 +5,7 @@ CommManager::CommManager(QObject *parent)
     : QObject(parent)
 {
     // definition de la liste des entrée (oui c'est un peu caca mais je vais revenir dessus !)
-    header = QStringList({"Corridor_width","Wpt_index","HDOP","Time","Wpt_dist","Wpt_angle","Dist_to_axis","Cmd_helm","Regulator_angle","Wing_angle","Speed","Course","Average_course","Lat_next_point","Lon_next_point","Lat_prev_point","Lon_prev_point","Latitude","Longitude","Battery","In_corridor","Fix","Gps_ready"});
+    header = QStringList({"Wpt_index","Behaviour","Time","Wpt_dist","Wpt_angle","Dist_to_axis","Cmd_helm","Regulator_angle","Wing_angle","Speed","Course","Average_course","Latitude","Longitude","HDOP","Battery","In_corridor","Fix","Gps_ready","Prev_element","Next_element"});
     for (int i=0; i<header.size(); i++){
         m_serialData.insert(header.at(i), 0);
     }

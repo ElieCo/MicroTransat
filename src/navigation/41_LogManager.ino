@@ -7,14 +7,12 @@ class LogManager: public BaseManager
   ~LogManager(){}
 
   void init(){
-
-
+    print("init log manager !!!!");
     m_not_initialized = true;
   }
 
   void go(){
     if (!prepareLogFile()) return;
-
     // If the first line is not initialized.
     if (m_not_initialized) {
       // Get all the data names.
@@ -26,6 +24,7 @@ class LogManager: public BaseManager
           line += ";";
         }
       }
+ 
       // Log a first line all the names.
       m_log_csv_file.write(line.replace("\n","").replace("\r",""));
 

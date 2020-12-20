@@ -26,7 +26,6 @@ class Captain : public BaseManager
 
     void go() {
       db_behaviour.set(m_behaviour);
-      print("behaviour:", m_behaviour);
 
       switch (m_behaviour) {
         case SLEEP:
