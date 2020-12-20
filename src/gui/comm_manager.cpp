@@ -55,9 +55,14 @@ void CommManager::decryptMsg(QString msg)
     if(!msg.contains(";"))
             return;
     QStringList dataList = msg.split(";");
-    qDebug()<< dataList.length()<< "   " << header.length();
     if (dataList.length() == header.length()){
         for (int i = 0; i < header.length(); i++){
+            if (dataList[i].contains("AWA")){           // verrue pas belle mais on avait dit "only float by lora" !!
+                dataList[i].remove("AWA-");
+                QStringList a = dataList[i].split("/");
+                dataList[i] = a[0].split(".")[0]+a[1].split(".")[0];
+                qDebug()<<dataList[i];
+            }
             m_serialData[header.at(i)] = dataList[i].toFloat();
         }
         m_serialData["Latitude"] *=       1000000;
