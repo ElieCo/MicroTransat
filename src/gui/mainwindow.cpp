@@ -228,7 +228,12 @@ void MainWindow::setVarDisplay()
     for (int i=0; i<header.size(); i++){
         QLabel *raw = new QLabel(header.at(i)+" : ");
         raw->setFont(police);
-        ui->rawDataLayout->addWidget(raw);
+        if (i < 20){
+            ui->rawDataLayout->addWidget(raw, i, 0);
+        }
+        else {
+            ui->rawDataLayout->addWidget(raw, header.size()-1-i, 1);
+        }
         raw_values << raw;
     }
 }
