@@ -7,7 +7,6 @@ class LogManager: public BaseManager
   ~LogManager(){}
 
   void init(){
-    print("init log manager !!!!");
     m_not_initialized = true;
   }
 
