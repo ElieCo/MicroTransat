@@ -8,8 +8,8 @@ class Mover:
         self.helm_angle = 90
         self.wing_angle = 0
 
-        self.helm_ratio = -0.56
-        self.helm_offset = 180
+        self.helm_ratio = -0.53
+        self.helm_offset = 90
 
         self.speed = 5 # knots
 
@@ -28,7 +28,7 @@ class Mover:
 
     def getYaw(self):
         real_helm_angle = (self.helm_angle - self.helm_offset) / self.helm_ratio
-        return self.wind_direction + self.helm_angle
+        return self.wind_direction + real_helm_angle
 
     def step(self, dt):
         # Calculate distance and azimuth
