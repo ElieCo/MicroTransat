@@ -24,7 +24,7 @@ class SensorsManager: public BaseManager
     db_battery.init(m_db, "Battery", float(0), true);
     db_just_wake_up.init(m_db, "Just_wake_up", false);
     db_average_course_full.init(m_db, "Average_course_full", false);
-    db_radio_controlled.init(m_db, "Radio_controlled", true);
+    db_radio_controlled.init(m_db, "Radio_controlled", true, true);
 
     // Initialize the course average.
     m_course_average.init(3);
