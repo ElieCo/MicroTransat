@@ -79,6 +79,6 @@ class CommManager : public BaseManager
 
 
   LoRa m_lora;
-  int m_index_log;
+  unsigned int m_index_log;
   String m_actual_line;
 };
