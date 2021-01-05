@@ -29,16 +29,20 @@ class Comm:
         data = self.serial.read(250)
         self.buffer += data
         if len(data) and data[0] != START[0]:
-            print(data)
+            msg = str(data).replace("\\r", "").replace("b'", "").replace("'", "").replace("\\n", "\n")
+            print(msg, end="")
+
         return self.decryptBuffer()
 
     def decryptBuffer(self):
         start_i = findInBytes(self.buffer, START)
         stop_i = findInBytes(self.buffer, STOP)
+
         if start_i != -1 and stop_i != -1:
             data = self.buffer[start_i+len(START):stop_i]
             nb_servo = int(len(data) / (4+4))
-            if nb_servo > 0:
+
+            if nb_servo > 0 and nb_servo*(4+4) == len(data):
                 fmt = "<" + "if" * nb_servo
                 s = struct.unpack(fmt, data)
                 # print(s)

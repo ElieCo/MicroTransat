@@ -108,7 +108,6 @@ class SimuComm {
         // check if 50 before STOP there is a START
         if (buffer[sizeof(buffer)-1 - 50] == START){
           result = true;
-          uint8_t data[49];
           m_simuData.gpsData = lastDataToGpsData(buffer);
         }
         // clear the buffer

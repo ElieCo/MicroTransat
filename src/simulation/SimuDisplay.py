@@ -15,10 +15,18 @@ class Display():
         self.ax1.set_xlim(left=-delta1, right=delta1)
         self.fig.show()
 
+        self.prev_x = None
+        self.prev_y = None
+
     def updatePosition(self, pos, course):
         x, y = self.geoToXY(pos)
-        boat_pt = self.getLinePt(np.array([x, y]), course, 1)
+        boat_pt = self.getLinePt(np.array([x, y]), 90-course, 1)
         self.d_boat = self.update2DLine(self.d_boat, np.array([x, y]), boat_pt)
+
+        if self.prev_x != None and self.prev_y != None:
+            self.ax1.plot([self.prev_x, x], [self.prev_y, y], color="red", linewidth=0.2)
+        self.prev_x = x
+        self.prev_y = y
 
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
@@ -27,7 +35,7 @@ class Display():
         pass
 
     def geoToXY(self, pos):
-        azi = np.radians(90 - self.ref_pos.getAzimuthTo(pos))
+        azi = np.radians(self.ref_pos.getAzimuthTo(pos))
         dist = self.ref_pos.getDistanceTo(pos)
         x = np.sin(azi) * dist
         y = np.cos(azi) * dist

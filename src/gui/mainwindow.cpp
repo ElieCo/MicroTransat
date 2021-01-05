@@ -89,8 +89,6 @@ void MainWindow::updateBoatPosition()
 {
     int lat = cm.getData("Latitude");
     int lon = cm.getData("Longitude");
-    qDebug() << lat  <<"   "<< lon ;
-    qDebug() << lat_ofset << "   " << lon_ofset;
 
     int lat_prev = cm.getData("Lat_prev_point");
     int lon_prev = cm.getData("Lon_prev_point");
@@ -228,7 +226,12 @@ void MainWindow::setVarDisplay()
     for (int i=0; i<header.size(); i++){
         QLabel *raw = new QLabel(header.at(i)+" : ");
         raw->setFont(police);
-        ui->rawDataLayout->addWidget(raw);
+        if (i < 20){
+            ui->rawDataLayout->addWidget(raw, i, 0);
+        }
+        else {
+            ui->rawDataLayout->addWidget(raw, header.size()-1-i, 1);
+        }
         raw_values << raw;
     }
 }

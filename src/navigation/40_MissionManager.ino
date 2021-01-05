@@ -1,9 +1,37 @@
 #include <Arduino_JSON.h>
 
-struct Waypoint{
+enum MissionElementType { WPT = 0, AWA = 1 };
+
+class MissionElement : public ObjectForDB {
+ public:
+  MissionElement(): ObjectForDB() {}
+ 
   Coord coord;
-  double corridor_width;
-  double valid_dist;
+  double corridor_width = -1;
+  double valid_dist = -1;
+
+  double angle = 90;
+  double duration = 30;
+
+  String out = "MissionElement";
+
+  MissionElementType type = WPT;
+
+  String toString(){
+    String result = "";
+    if (type == WPT){
+      result += "WPT/";
+      result += String(coord.lat, 7) + "/";
+      result += String(coord.lng, 7) + "/";
+      result += String(corridor_width) + "/";
+      result += String(valid_dist);
+    } else {
+      result += "AWA/";
+      result += String(angle, 7) + "/";
+      result += String(duration, 7) + "/";
+    }
+    return result;
+  }
 };
 
 class MissionManager : public BaseManager
@@ -15,17 +43,15 @@ class MissionManager : public BaseManager
   void init(){
     db_dist_to_wpt.init(m_db, "Wpt_dist", float(0), true);
     db_angle_to_wpt.init(m_db, "Wpt_angle", float(0), true);
-    db_lat_next.init(m_db, "Lat_next_point", double(0), true);
-    db_lng_next.init(m_db, "Lon_next_point", double(0), true);
-    db_lat_prev.init(m_db, "Lat_prev_point", double(0), true);
-    db_lng_prev.init(m_db, "Lon_prev_point", double(0), true);
-    db_corridor_width.init(m_db, "Corridor_width", int(100), true);
     db_wpt_index.init(m_db, "Wpt_index", int(0), true);
     db_latitude.init(m_db, "Latitude", double(0));
     db_longitude.init(m_db, "Longitude", double(0));
     db_dist_to_axis.init(m_db, "Dist_to_axis", float(0), true);
     db_in_corridor.init(m_db, "In_corridor", true, true);
     db_corridor_angle.init(m_db, "Corridor_angle", float(0));
+    MissionElement* empty_elem = NULL;
+    db_elem_prev.init(m_db, "Prev_element", empty_elem, true);
+    db_elem_next.init(m_db, "Next_element", empty_elem, true);
 
     bool *sd_ready = m_db->initData("SD_ready", false);
     *sd_ready = m_mission_file.init("mission.txt", *sd_ready);
@@ -33,28 +59,8 @@ class MissionManager : public BaseManager
   }
 
   void go(){
-    // Calcul the distance to the next waypoint.
-    float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).coord.lat, m_waypoints.at(db_wpt_index.get()).coord.lng);
-
-    // Check if the actual waypoint is validated and select the next one if needed.
-    if (next_point(distanceToWaypoint)) {
-      // Calcul the distance to the new waypoint.
-      distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).coord.lat, m_waypoints.at(db_wpt_index.get()).coord.lng);
-    }
-    // Calcul the course to the next waypoint.
-    float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), m_waypoints.at(db_wpt_index.get()).coord.lat, m_waypoints.at(db_wpt_index.get()).coord.lng);
-
-    // Set all this data in the DB.
-    db_dist_to_wpt.set(distanceToWaypoint);
-    db_angle_to_wpt.set(angleToWaypoint);
-    db_lat_next.set(m_waypoints.at(db_wpt_index.get()).coord.lat);
-    db_lng_next.set(m_waypoints.at(db_wpt_index.get()).coord.lng);
-    db_lat_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lat);
-    db_lng_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lng);
-    db_corridor_width.set(m_waypoints.at(db_wpt_index.get()).corridor_width);
-
-    // Check if we are in the corridor
-    isInCorridor();
+    // Check if the actual element is validated and select the next one if needed.
+    if (checkActualElementFinished()) runNextElement();
   }
 
   void stop(){}
@@ -68,11 +74,8 @@ class MissionManager : public BaseManager
 
   DBData<float> db_dist_to_wpt;
   DBData<float> db_angle_to_wpt;
-  DBData<double> db_lat_next;
-  DBData<double> db_lng_next;
-  DBData<double> db_lat_prev;
-  DBData<double> db_lng_prev;
-  DBData<int> db_corridor_width;
+  DBData<MissionElement*> db_elem_prev;
+  DBData<MissionElement*> db_elem_next;
   DBData<int> db_wpt_index;
   DBData<double> db_latitude;
   DBData<double> db_longitude;
@@ -80,9 +83,10 @@ class MissionManager : public BaseManager
   DBData<bool> db_in_corridor;
   DBData<float> db_corridor_angle;
 
-  Vector<Waypoint> m_waypoints;
+  Vector<MissionElement> m_mission_elements;
   double m_default_validation_distance;
   double m_default_corridor_width;
+  unsigned long m_awa_start_time;
 
   SDfile m_mission_file;
 
@@ -94,7 +98,7 @@ class MissionManager : public BaseManager
     for (int i = 0; i < mission.length(); i++){
 
       if(mission[i].hasOwnProperty("latitude") && mission[i].hasOwnProperty("longitude")){
-        Waypoint wp;
+        MissionElement wp;
         wp.coord.lat = mission[i]["latitude"];
         wp.coord.lng = mission[i]["longitude"];
 
@@ -104,34 +108,94 @@ class MissionManager : public BaseManager
         if (mission[i].hasOwnProperty("validation_distance")) wp.valid_dist = mission[i]["validation_distance"];
         else wp.valid_dist = m_default_validation_distance;
 
-        m_waypoints.push_back(wp);
+        wp.type = WPT;
+
+        m_mission_elements.push_back(wp);
+      }
+      else if(mission[i].hasOwnProperty("angle") && mission[i].hasOwnProperty("duration")){
+        MissionElement awa;
+        awa.angle = mission[i]["angle"];
+        awa.duration = mission[i]["duration"];
+
+        awa.type = AWA;
+
+        m_mission_elements.push_back(awa);
       }
     }
 
+    /*
+    for (int i = 0; i < m_mission_elements.size(); i++){
+      MissionElement elem = m_mission_elements.at(i);
+      if (elem.coord.lat != 0) {
+        print("coord:", elem.coord.lat, elem.coord.lng);
+        print("valid dist:", elem.valid_dist);
+        print("corridor width:", elem.corridor_width);
+      } else {
+        print("angle:", elem.angle);
+        print("duration:", elem.duration);
+      }
+    }
+    */
 
-    db_lat_next.set(m_waypoints.at(db_wpt_index.get()).coord.lat);
-    db_lng_next.set(m_waypoints.at(db_wpt_index.get()).coord.lng);
-    db_lat_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lat);
-    db_lng_prev.set(m_waypoints.at(db_wpt_index.get() - 1).coord.lng);
-    db_corridor_width.set(m_waypoints.at(db_wpt_index.get()).corridor_width);
+    db_elem_next.set(m_mission_elements.ptrAt(db_wpt_index.get()));
+    db_elem_prev.set(m_mission_elements.ptrAt(db_wpt_index.get()-1));
   }
 
-  boolean next_point(float dist) { // unité : mètres
-    // If the distance between the boat and the waypoint is less than *m_valid_wpt* m.
-    // Note : we consider that if dist==0 there should be an error.
-    if (dist <= m_waypoints.at(db_wpt_index.get()).valid_dist && dist != 0) {
-      // Change the index.
-      db_wpt_index.set((db_wpt_index.get()+1) % m_waypoints.size());
-      return true;
+  bool checkActualElementFinished(){
+    MissionElement elem = m_mission_elements.at(db_wpt_index.get());
+
+    if (elem.type == WPT){
+      // Calcul the distance to the next waypoint. // unité : mètres
+      float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), elem.coord.lat, elem.coord.lng);
+
+      // If the distance between the boat and the waypoint is less than *m_valid_wpt* m.
+      // Note : we consider that if dist==0 there should be an error.
+      if (distanceToWaypoint <= elem.valid_dist && distanceToWaypoint != 0) return true;
+      else return false;
+
+    } else {
+      // Get the duration since the awa element is started;
+      unsigned long awa_duration = millis() - m_awa_start_time;
+
+      if (awa_duration >= elem.duration*1000) return true;
+      else return false;
     }
-    return false;
+  }
+
+  void runNextElement() {
+    // Change the index.
+    db_wpt_index.set((db_wpt_index.get()+1) % m_mission_elements.size());
+
+    // Get the new actual element
+    MissionElement *new_elem = m_mission_elements.ptrAt(db_wpt_index.get());
+
+    db_elem_prev.set(db_elem_next.get());
+    db_elem_next.set(new_elem);
+
+    // Save start time if it's an AWA element
+    if (new_elem->type == AWA) {
+      m_awa_start_time = millis();
+    } else {
+      // Get new distance to waypoint
+      float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), new_elem->coord.lat, new_elem->coord.lng);
+      // Calcul the course to the next waypoint.
+      float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), new_elem->coord.lat, new_elem->coord.lng);
+      // Set all this data in the DB.
+      db_dist_to_wpt.set(distanceToWaypoint);
+      db_angle_to_wpt.set(angleToWaypoint);
+
+      // Check if we are in the corridor
+      isInCorridor();
+    }
   }
 
   void isInCorridor(){
-    float angle_btw_wpt = get_course(db_lat_prev.get(), db_lng_prev.get(), db_lat_next.get(), db_lng_next.get());
+    MissionElement *prev = static_cast<MissionElement*>(db_elem_prev.get());
+    MissionElement *next = static_cast<MissionElement*>(db_elem_next.get());
+    float angle_btw_wpt = get_course(prev->coord.lat, prev->coord.lng, next->coord.lat, next->coord.lng);
     float dist_to_axis = sin(radians(angle_btw_wpt - db_angle_to_wpt.get())) * db_dist_to_wpt.get();
 
-    bool in_corridor = abs(dist_to_axis) <= float(db_corridor_width.get())/2;
+    bool in_corridor = abs(dist_to_axis) <= float(next->corridor_width)/2;
 
     db_corridor_angle.set(angle_btw_wpt);
     db_dist_to_axis.set(dist_to_axis);

@@ -12,8 +12,8 @@ class Gps():
         self.fix_quality = 1
         self.satellites = 12
         self.fix_age = 0
-        self.time = 120600
-        self.date = 201209
+        self.time = 0
+        self.date = 0
         self.speed = 0
         self.course = 0
         self.hdop = 1
@@ -47,3 +47,4 @@ class Gps():
 
         # Update time
         self.time = int(datetime.now().strftime("%H%M%S"))
+        self.date = int(datetime.now().strftime("%y%m%d"))
