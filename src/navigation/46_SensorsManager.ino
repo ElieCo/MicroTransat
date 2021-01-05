@@ -38,6 +38,9 @@ class SensorsManager: public BaseManager
 
   void go(){
 
+    int period = millis() - m_last_tick;
+    m_last_tick = millis();
+
     // Manage GPS
     db_gps_recent_data.set(m_gps.updateGpsData());
 
@@ -62,7 +65,7 @@ class SensorsManager: public BaseManager
     float bat_val = m_bat.getValue();
     db_battery.set(bat_val);
 
-    if (isTime(1000)){
+    if (isTime(period, 1000)){
       // Manage pwm reader
       float val = m_pwm_reader.updateValue();
       if (val != -1){
@@ -76,8 +79,8 @@ class SensorsManager: public BaseManager
 
   private:
 
-  bool isTime(int ms){
-    int margin = m_runInterval*0.9;
+  bool isTime(int manager_interval, int ms){
+    int margin = manager_interval*0.9;
     int r = millis() % ms;
     if (r <= margin)
       return true;
@@ -130,4 +133,6 @@ class SensorsManager: public BaseManager
 
   Average<float> m_pwm_average;
   PwmReader m_pwm_reader;
+
+  int m_last_tick = 0;
 };

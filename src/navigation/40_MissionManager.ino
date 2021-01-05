@@ -155,7 +155,7 @@ class MissionManager : public BaseManager
       // Get the duration since the awa element is started;
       unsigned long awa_duration = millis() - m_awa_start_time;
 
-      if (awa_duration >= elem.duration) return true;
+      if (awa_duration >= elem.duration*1000) return true;
       else return false;
     }
   }
