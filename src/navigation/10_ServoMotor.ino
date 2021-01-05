@@ -20,8 +20,7 @@ class ServoMotor
     float real_angle = float(angle) * m_ratio + m_offset;
     if (simuComm.inSimulation())
       simuComm.simuServo(m_pin, real_angle);
-    else
-      m_servo.write(real_angle);
+    m_servo.write(real_angle);
   }
 
  protected:
