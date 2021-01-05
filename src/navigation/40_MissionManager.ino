@@ -13,18 +13,20 @@ class MissionElement : public ObjectForDB {
   double angle = 90;
   double duration = 30;
 
+  String out = "MissionElement";
+
   MissionElementType type = WPT;
 
   String toString(){
     String result = "";
     if (type == WPT){
-      result += "WPT-";
+      result += "WPT/";
       result += String(coord.lat, 7) + "/";
       result += String(coord.lng, 7) + "/";
       result += String(corridor_width) + "/";
       result += String(valid_dist);
     } else {
-      result += "AWA-";
+      result += "AWA/";
       result += String(angle, 7) + "/";
       result += String(duration, 7) + "/";
     }
