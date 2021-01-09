@@ -24,15 +24,22 @@ class SensorsManager: public BaseManager
     db_battery.init(m_db, "Battery", float(0), true);
     db_just_wake_up.init(m_db, "Just_wake_up", false);
     db_average_course_full.init(m_db, "Average_course_full", false);
+    db_radio_controlled.init(m_db, "Radio_controlled", true, true);
 
     // Initialize the course average.
     m_course_average.init(3);
 
     // Initialize the battery.
-    m_bat.init(A17);
+    m_bat.init(A16);
+
+    // Initialize the pwm reader.
+    m_pwm_reader.init(39);
   }
 
   void go(){
+
+    int period = millis() - m_last_tick;
+    m_last_tick = millis();
 
     // Manage GPS
     db_gps_recent_data.set(m_gps.updateGpsData());
@@ -57,11 +64,29 @@ class SensorsManager: public BaseManager
     // Manage battery
     float bat_val = m_bat.getValue();
     db_battery.set(bat_val);
+
+    if (isTime(period, 1000)){
+      // Manage pwm reader
+      float val = m_pwm_reader.updateValue();
+      if (val != -1){
+        if (val < 40) db_radio_controlled.set(true);
+        else if (val > 60) db_radio_controlled.set(false);
+      }
+    }
   }
 
   void stop(){}
 
   private:
+
+  bool isTime(int manager_interval, int ms){
+    int margin = manager_interval*0.9;
+    int r = millis() % ms;
+    if (r <= margin)
+      return true;
+    else
+      return false;
+  }
 
   void config(){
     m_db->getData("Max_valid_hdop", m_max_valid_hdop);
@@ -84,15 +109,17 @@ class SensorsManager: public BaseManager
   DBData<double> db_battery;
   DBData<bool> db_just_wake_up;
   DBData<bool> db_average_course_full;
+  DBData<bool> db_radio_controlled;
 
   float averageCourse(float new_course){
-    float average_course = m_course_average.average(new_course);
-    from180to180(average_course);
-
     if (db_just_wake_up.hasChanged() && db_just_wake_up.get()) {
       db_average_course_full.set(false);
       m_course_average.clear();
     }
+
+    float average_course = m_course_average.average(new_course);
+    from180to180(average_course);
+
     if(m_course_average.isFull()) db_average_course_full.set(true);
 
     return average_course;
@@ -103,4 +130,9 @@ class SensorsManager: public BaseManager
   double m_max_valid_hdop;
 
   Battery m_bat;
+
+  Average<float> m_pwm_average;
+  PwmReader m_pwm_reader;
+
+  int m_last_tick = 0;
 };

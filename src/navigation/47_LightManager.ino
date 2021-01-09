@@ -10,8 +10,8 @@ class LightManager : public BaseManager
     db_gps_ready.init(m_db, "Gps_ready", false);
 
     m_btn_led.init(13);
-    m_nav_led.init(39);
-    m_nav_led.on();
+    //m_nav_led.init(???);
+    //m_nav_led.on();
   }
 
   void go(){

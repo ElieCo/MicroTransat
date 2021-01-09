@@ -1,10 +1,7 @@
 #define serialDebug Serial
 
 #define DEBUGLEVEL 1
-
-#ifndef SIMU
-#define SIMU false
-#endif
+#define LORA_IN_SIMU 0
 
 void initSerialDebug(){
   serialDebug.begin(115200);
@@ -131,4 +128,9 @@ class Average{
   int m_len;
   int m_index;
 
+};
+
+class ObjectForDB{
+ public:
+  virtual String toString(){ return ""; };
 };

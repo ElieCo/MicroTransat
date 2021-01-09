@@ -14,7 +14,10 @@ class LoRa
   void init(){
     m_lora = new RH_RF95<HardwareSerial>(LORA_SERIAL);
 
-    if (!m_lora->init()) {
+    if ((simuComm.inSimulation() && !LORA_IN_SIMU)
+      || (simuComm.inSimulation() && !m_lora->init())
+      || (!simuComm.inSimulation() && !m_lora->init()))
+    {
       print("initialisation Lora : failed");
     }
     else {

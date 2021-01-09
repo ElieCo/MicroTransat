@@ -89,8 +89,6 @@ void MainWindow::updateBoatPosition()
 {
     int lat = cm.getData("Latitude");
     int lon = cm.getData("Longitude");
-    qDebug() << lat  <<"   "<< lon ;
-    qDebug() << lat_ofset << "   " << lon_ofset;
 
     int lat_prev = cm.getData("Lat_prev_point");
     int lon_prev = cm.getData("Lon_prev_point");

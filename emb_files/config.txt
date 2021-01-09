@@ -33,11 +33,12 @@
   },
   {
     "name": "Captain",
-    "interval": 2000,
+    "interval": 100,
     "parameters":
       [
         { "key": "Max_upwind", "value": 45 },
-        { "key": "Max_downwind", "value": 150 }
+        { "key": "Max_downwind", "value": 150 },
+        { "key": "Sleeping_duration", "value": 2000 }
       ]
   },
   {
