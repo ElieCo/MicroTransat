@@ -9,7 +9,8 @@
 QPolygon MainWindow::createBackground(){
     QPolygon fond_carte;
     QString raw_background;
-    QFile fichier("../src/gui/resources/carte_lac.csv");
+    QFile fichier("../../src/gui/resources/carte_lac.csv");  //  ../src/gui/resources/carte_lac.csv
+    qDebug() << QDir::currentPath();
 
     if(fichier.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -117,6 +118,9 @@ void MainWindow::updateBoatPosition()
         cm.setData("Lat_prev_point", lon_prev_p);
     }
     lon_next_p = lon_next;
+
+    qDebug()<<lat;
+    qDebug()<<lon;
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
         if (track.length()>0){
