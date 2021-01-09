@@ -28,7 +28,8 @@
     "interval": 100,
     "parameters":
       [
-        { "key": "Wing_delta", "value": 10 }
+        { "key": "Wing_delta", "value": 10 },
+        { "key": "Wing_calib", "value": 0 }
       ]
   },
   {
