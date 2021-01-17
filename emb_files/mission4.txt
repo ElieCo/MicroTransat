@@ -1,0 +1,14 @@
+[
+	{
+	"latitude": 47.731400,
+	"longitude": -3.393403,
+	"corridor_width": 70,
+	"validation_distance": 20
+	},
+	{
+	"latitude": 47.730439,
+	"longitude": -3.391984,
+	"corridor_width": 70,
+	"validation_distance": 20
+	}
+]

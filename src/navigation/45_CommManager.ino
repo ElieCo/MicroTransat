@@ -33,7 +33,7 @@ class CommManager : public BaseManager
       else {
         // Send the second pat of the message
         if (m_actual_line.length() <= 50*m_index_log + 50){
-          sendLog(m_actual_line.substring(m_index_log*50)+"~", true);
+          sendLog(m_actual_line.substring(m_index_log*50), true);
           m_index_log = 0;
           send_log = false;
         }
@@ -41,7 +41,6 @@ class CommManager : public BaseManager
           sendLog(m_actual_line.substring(m_index_log*50,m_index_log*50+50), false);
           m_index_log++;
         }
-        print("partie ", m_index_log);
       }
     }
   }

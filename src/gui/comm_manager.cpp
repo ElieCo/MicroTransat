@@ -5,7 +5,7 @@ CommManager::CommManager(QObject *parent)
     : QObject(parent)
 {
     // definition de la liste des entrée (oui c'est un peu caca mais je vais revenir dessus !)
-    header = QStringList({"Wpt_index","Behaviour","Time","Wpt_dist","Wpt_angle","Dist_to_axis","Cmd_helm","Regulator_angle","Wing_angle","Speed","Course","Average_course","Latitude","Longitude","HDOP","Battery","In_corridor","Fix","Gps_ready","Prev_element","Next_element"});
+    header = QStringList({"Wpt_index","Behaviour","Time","Wpt_dist","Wpt_angle","Dist_to_axis","Cmd_helm","Regulator_angle","Wing_angle","Speed","Course","Average_course","Latitude","Longitude","HDOP","Battery","In_corridor","Fix","Gps_ready","Radio_controlled","Prev_element","Next_element"});
     for (int i=0; i<header.size(); i++){
         m_serialData.insert(header.at(i), 0);
     }
@@ -61,7 +61,6 @@ void CommManager::decryptMsg(QString msg)
                 dataList[i].remove("AWA-");
                 QStringList a = dataList[i].split("/");
                 dataList[i] = a[0].split(".")[0]+a[1].split(".")[0];
-                qDebug()<<dataList[i];
             }
             m_serialData[header.at(i)] = dataList[i].toFloat();
         }
