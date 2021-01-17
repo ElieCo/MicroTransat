@@ -39,7 +39,7 @@
       [
         { "key": "Max_upwind", "value": 45 },
         { "key": "Max_downwind", "value": 150 },
-        { "key": "Sleeping_duration", "value": 2000 }
+        { "key": "Sleeping_duration", "value": 15000 }
       ]
   },
   {
