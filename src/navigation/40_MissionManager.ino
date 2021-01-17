@@ -45,7 +45,7 @@ class MissionManager : public BaseManager
   void init(){
     db_dist_to_wpt.init(m_db, "Wpt_dist", float(0), true);
     db_angle_to_wpt.init(m_db, "Wpt_angle", float(0), true);
-    db_wpt_index.init(m_db, "Wpt_index", int(0), true);
+    db_elem_index.init(m_db, "Elem_index", int(0), true);
     db_latitude.init(m_db, "Latitude", double(0));
     db_longitude.init(m_db, "Longitude", double(0));
     db_dist_to_axis.init(m_db, "Dist_to_axis", float(0), true);
@@ -55,14 +55,23 @@ class MissionManager : public BaseManager
     db_elem_prev.init(m_db, "Prev_element", empty_elem, true);
     db_elem_next.init(m_db, "Next_element", empty_elem, true);
 
+    db_radio_controlled.init(m_db, "Radio_controlled", true);
+
     bool *sd_ready = m_db->initData("SD_ready", false);
     *sd_ready = m_mission_file.init(MISSION_FILENAME, *sd_ready);
     parseMission();
   }
 
   void go(){
-    // Check if the actual element is validated and select the next one if needed.
-    if (checkActualElementFinished()) runNextElement();
+    // If we are radio controlled reset the index to play the first element
+    if (db_radio_controlled.get()){
+      m_awa_start_time = millis();
+      db_elem_index.set(0);
+    } else {
+        // Check if the actual element is validated and select the next one if needed.
+        if (checkActualElementFinished()) runNextElement();
+    }
+
   }
 
   void stop(){}
@@ -72,27 +81,39 @@ class MissionManager : public BaseManager
   void config(){
     m_db->getData("Default_corridor_width", m_default_corridor_width);
     m_db->getData("Default_validation_distance", m_default_validation_distance);
+    m_db->getData("First_element_angle", m_first_element_angle);
+    m_db->getData("First_element_duration", m_first_element_duration);
   }
 
   DBData<float> db_dist_to_wpt;
   DBData<float> db_angle_to_wpt;
   DBData<MissionElement*> db_elem_prev;
   DBData<MissionElement*> db_elem_next;
-  DBData<int> db_wpt_index;
+  DBData<int> db_elem_index;
   DBData<double> db_latitude;
   DBData<double> db_longitude;
   DBData<float> db_dist_to_axis;
   DBData<bool> db_in_corridor;
   DBData<float> db_corridor_angle;
 
+  DBData<bool> db_radio_controlled;
+
   Vector<MissionElement> m_mission_elements;
-  double m_default_validation_distance;
-  double m_default_corridor_width;
+  double m_default_validation_distance, m_default_corridor_width;
+  double m_first_element_angle, m_first_element_duration;
   unsigned long m_awa_start_time;
 
   SDfile m_mission_file;
 
   void parseMission(){
+    // Add mission element for the transition after radio controlled time
+    MissionElement first_elem;
+    first_elem.angle = m_first_element_angle;
+    first_elem.duration = m_first_element_duration;
+    first_elem.type = AWA;
+    m_mission_elements.push_back(first_elem);
+
+    // Parse the mission file
     String text = m_mission_file.readAll();
 
     JSONVar mission = JSON.parse(text);
@@ -125,26 +146,12 @@ class MissionManager : public BaseManager
       }
     }
 
-    /*
-    for (int i = 0; i < m_mission_elements.size(); i++){
-      MissionElement elem = m_mission_elements.at(i);
-      if (elem.coord.lat != 0) {
-        print("coord:", elem.coord.lat, elem.coord.lng);
-        print("valid dist:", elem.valid_dist);
-        print("corridor width:", elem.corridor_width);
-      } else {
-        print("angle:", elem.angle);
-        print("duration:", elem.duration);
-      }
-    }
-    */
-
-    db_elem_next.set(m_mission_elements.ptrAt(db_wpt_index.get()));
-    db_elem_prev.set(m_mission_elements.ptrAt(db_wpt_index.get()-1));
+    db_elem_next.set(m_mission_elements.ptrAt(db_elem_index.get()));
+    db_elem_prev.set(m_mission_elements.ptrAt(db_elem_index.get()-1));
   }
 
   bool checkActualElementFinished(){
-    MissionElement elem = m_mission_elements.at(db_wpt_index.get());
+    MissionElement elem = m_mission_elements.at(db_elem_index.get());
 
     if (elem.type == WPT){
       // Calcul the distance to the next waypoint. // unité : mètres
@@ -166,10 +173,12 @@ class MissionManager : public BaseManager
 
   void runNextElement() {
     // Change the index.
-    db_wpt_index.set((db_wpt_index.get()+1) % m_mission_elements.size());
+    // First element is for transition with radio controlled, never set the index at 0.
+    int next_index = max(1, (db_elem_index.get()+1) % m_mission_elements.size());
+    db_elem_index.set(next_index);
 
     // Get the new actual element
-    MissionElement *new_elem = m_mission_elements.ptrAt(db_wpt_index.get());
+    MissionElement *new_elem = m_mission_elements.ptrAt(db_elem_index.get());
 
     db_elem_prev.set(db_elem_next.get());
     db_elem_next.set(new_elem);
