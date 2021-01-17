@@ -96,7 +96,7 @@ class MissionManager : public BaseManager
   DBData<bool> db_in_corridor;
   DBData<float> db_corridor_angle;
 
-  DBData<float> db_radio_controlled;
+  DBData<bool> db_radio_controlled;
 
   Vector<MissionElement> m_mission_elements;
   double m_default_validation_distance, m_default_corridor_width;

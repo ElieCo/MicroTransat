@@ -71,6 +71,8 @@ class SensorsManager: public BaseManager
       if (val != -1){
         if (val < 40) db_radio_controlled.set(true);
         else if (val > 60) db_radio_controlled.set(false);
+      } else {
+        db_radio_controlled.set(false);
       }
     }
   }

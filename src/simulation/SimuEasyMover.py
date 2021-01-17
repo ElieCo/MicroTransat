@@ -5,11 +5,11 @@ class Mover:
         self.position = Position()
         self.wind_direction = 0
 
-        self.helm_angle = 90
+        self.helm_angle = 0
         self.wing_angle = 0
 
-        self.helm_ratio = -0.53
-        self.helm_offset = 90
+        self.helm_ratio = -0.56
+        self.helm_offset = 180
 
         self.speed = 5 # knots
 
