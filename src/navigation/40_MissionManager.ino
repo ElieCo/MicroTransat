@@ -1,5 +1,7 @@
 #include <Arduino_JSON.h>
 
+#define MISSION_FILENAME "mission.txt"
+
 enum MissionElementType { WPT = 0, AWA = 1 };
 
 class MissionElement : public ObjectForDB {
@@ -54,7 +56,7 @@ class MissionManager : public BaseManager
     db_elem_next.init(m_db, "Next_element", empty_elem, true);
 
     bool *sd_ready = m_db->initData("SD_ready", false);
-    *sd_ready = m_mission_file.init("mission.txt", *sd_ready);
+    *sd_ready = m_mission_file.init(MISSION_FILENAME, *sd_ready);
     parseMission();
   }
 
