@@ -33,7 +33,7 @@ class SDfile
   }
 
   void write(String line){
-    print(line+"~");
+    if (DEBUGLEVEL>= 1) print(line+"~");
     if (!m_file_opened) return;
 
     m_file.println(line);

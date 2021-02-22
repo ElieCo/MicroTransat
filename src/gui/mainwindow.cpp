@@ -9,7 +9,8 @@
 QPolygon MainWindow::createBackground(){
     QPolygon fond_carte;
     QString raw_background;
-    QFile fichier("../src/gui/resources/carte_lac.csv");
+    QFile fichier("../../src/gui/resources/carte_lac.csv");  //  ../src/gui/resources/carte_lac.csv
+    qDebug() << QDir::currentPath();
 
     if(fichier.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -89,8 +90,6 @@ void MainWindow::updateBoatPosition()
 {
     int lat = cm.getData("Latitude");
     int lon = cm.getData("Longitude");
-    qDebug() << lat  <<"   "<< lon ;
-    qDebug() << lat_ofset << "   " << lon_ofset;
 
     int lat_prev = cm.getData("Lat_prev_point");
     int lon_prev = cm.getData("Lon_prev_point");
@@ -119,6 +118,9 @@ void MainWindow::updateBoatPosition()
         cm.setData("Lat_prev_point", lon_prev_p);
     }
     lon_next_p = lon_next;
+
+    qDebug()<<lat;
+    qDebug()<<lon;
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
         if (track.length()>0){
@@ -228,7 +230,12 @@ void MainWindow::setVarDisplay()
     for (int i=0; i<header.size(); i++){
         QLabel *raw = new QLabel(header.at(i)+" : ");
         raw->setFont(police);
-        ui->rawDataLayout->addWidget(raw);
+        if (i < 20){
+            ui->rawDataLayout->addWidget(raw, i, 0);
+        }
+        else {
+            ui->rawDataLayout->addWidget(raw, header.size()-1-i, 1);
+        }
         raw_values << raw;
     }
 }

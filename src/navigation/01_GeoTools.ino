@@ -72,7 +72,16 @@ class AverageAngle{
   }
 
   bool isFull(){
-    return m_x_average.isFull() && m_y_average.isFull();
+    bool is_full = true;
+    for (int i = 0; i < m_x_average.size(); i++){
+      double x = m_x_average.at(i);
+      double y = m_y_average.at(i);
+      if (x*x + y*y < 0.5){
+        is_full = false;
+        break;
+      }
+    }
+    return is_full;
   }
 
   private:

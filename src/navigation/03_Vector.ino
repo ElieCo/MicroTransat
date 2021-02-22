@@ -62,6 +62,20 @@ class Vector{
   }
 
   /**
+   * Get a pointer on the value at this place in the list.
+   * @param place in the vector
+   * @return value*
+   */
+  T* ptrAt(int place){
+    int s = size();
+    if (s <= 0) return NULL;
+    while(place < 0) place += s;
+    while(place >= s) place -= s;
+    Element* element = recursiveAt(m_first_element, place);
+    return &(element->value);
+  }
+
+  /**
    * Delete all the elements.
    */
   void clear(){

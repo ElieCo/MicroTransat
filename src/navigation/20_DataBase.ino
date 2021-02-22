@@ -1,3 +1,4 @@
+typedef ObjectForDB* ObjectForDBPtr;
 
 #define VAR_NAME(type) DB##type
 
@@ -42,6 +43,12 @@
             map_name.set(VAR_NAME(type).keyAt(i), String(VAR_NAME(type).valueAt(i), decimals));     \
         }
 
+#define ADD_OBJECT_TO_MAP_AS_STRING(map_name, type, only_selected)                                  \
+        for (int i = 0; i < VAR_NAME(type).size(); i++){                                            \
+          if (!only_selected || selected.get(VAR_NAME(type).keyAt(i)))                              \
+            map_name.set(VAR_NAME(type).keyAt(i), VAR_NAME(type).valueAt(i)->toString());           \
+        }
+
 class DataBase {
 
   public:
@@ -53,6 +60,7 @@ class DataBase {
     GET_SET_AND_INIT(float)
     GET_SET_AND_INIT(double)
     GET_SET_AND_INIT(bool)
+    GET_SET_AND_INIT(ObjectForDBPtr)
 
     Map<String, String> getAllData(bool only_selected = false){
         Map<String, String> map_string;
@@ -64,6 +72,7 @@ class DataBase {
         ADD_TO_MAP_AS_STRING_WITH_DECIMAL(map_string, double, only_selected, 7)
         ADD_TO_MAP_AS_STRING(map_string, bool, only_selected)
         ADD_TO_MAP_AS_STRING(map_string, String, only_selected)
+        ADD_OBJECT_TO_MAP_AS_STRING(map_string, ObjectForDBPtr, only_selected)
 
         return map_string;
     }
@@ -77,6 +86,7 @@ class DataBase {
     MAP(float)
     MAP(double)
     MAP(bool)
+    MAP(ObjectForDBPtr)
 
     Map<String, int> selected;
 };
@@ -90,7 +100,7 @@ class DBData {
   ~DBData(){}
 
     void init(DataBase* db, String name, T value, bool selected = false){
-      data_ptr = db->initData(name, value, selected);
+      data_ptr = static_cast<T*>(static_cast<void*>(db->initData(name, value, selected)));
       m_prev_value = *data_ptr;
     }
 
