@@ -101,6 +101,25 @@ void FileManager::rm()
 
 void FileManager::create()
 {
+    if (m_serial.isOpen()){
+        QString filename = QFileDialog::getOpenFileName(this);
+        if (!filename.isEmpty()){
+
+            QFile file(filename);
+            file.open(QFile::ReadOnly);
+
+            if (file.isOpen()){
+                QString data = file.readAll();
+                QFileInfo fileInfo(filename);
+
+                m_serial.write(QString("create %1\r").arg(fileInfo.fileName()).toUtf8());
+                m_serial.write(data.toUtf8());
+                m_serial.write("<<END OF FILE>>");
+
+                ls();
+            }
+        }
+    }
 
 }
 
@@ -108,6 +127,8 @@ void FileManager::ping_react(QByteArray data)
 {
     m_connected = data.contains("pong");
     updateEnable();
+
+    m_last_cmd = NONE;
 }
 
 void FileManager::ls_react(QString data)
@@ -118,6 +139,8 @@ void FileManager::ls_react(QString data)
     foreach (QString str, list)
         if (str.length() > 0)
             ui->files_listWidget->addItem(str);
+
+    m_last_cmd = NONE;
 
 }
 
@@ -133,12 +156,9 @@ void FileManager::cat_react(QByteArray data)
         file.flush();
         file.close();
         m_cat_buffer = "";
+
+        m_last_cmd = NONE;
     }
-}
-
-void FileManager::create_react(QByteArray data)
-{
-
 }
 
 void FileManager::updateEnable()
