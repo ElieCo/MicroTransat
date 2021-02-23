@@ -99,6 +99,9 @@ public:
     if (line_without_space.equals("ls"))
       ls();
       
+    else if (line_without_space.equals("ping"))
+      ping();
+      
     else if (line.indexOf("cat ") >= 0)
       cat(line);
       
@@ -125,6 +128,10 @@ public:
     m_serial.print(output);
   }
 
+  void ping(){
+    m_serial.print("pong");
+  }
+
   void cat(String line){
     line.replace("cat ", "");
     line.replace(" ", "");
@@ -137,7 +144,7 @@ public:
     }
     file.close();
 
-    m_serial.print(output);
+    m_serial.print(output + "<<END OF FILE>>");
   }
 
   void touch(String line){
