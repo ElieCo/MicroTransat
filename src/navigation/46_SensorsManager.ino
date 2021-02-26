@@ -57,8 +57,7 @@ class SensorsManager: public BaseManager
       db_course.set(m_gps.course);
       db_average_course.set(averageCourse(m_gps.course));
       db_hdop.set(m_gps.hdop);
-      if (m_gps.fix && m_gps.hdop > 0 && m_gps.hdop < m_max_valid_hdop) db_gps_ready.set(true);
-      else db_gps_ready.set(false);
+      db_gps_ready.set(m_gps.fix && m_gps.hdop > 0 && m_gps.hdop < m_max_valid_hdop);
     }
 
     // Manage battery

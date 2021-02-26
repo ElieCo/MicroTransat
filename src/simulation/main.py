@@ -1,4 +1,13 @@
 from SimuManager import Manager
+from SimuModelTester import ModelTester
+import sys
 
-manager = Manager()
-manager.runSimulation()
+if "--log" in sys.argv:
+    filename = sys.argv[-1]
+
+    tester = ModelTester()
+    tester.testSimulator(filename)
+
+else:
+    manager = Manager()
+    manager.runSimulation()

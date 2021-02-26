@@ -41,3 +41,6 @@ def findInBytes(sentence, pattern):
 
 def knotToMs(k):
     return k*0.5144
+
+def msToKnot(s):
+    return s/0.5144

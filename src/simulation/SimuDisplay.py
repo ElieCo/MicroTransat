@@ -18,13 +18,13 @@ class Display():
         self.prev_x = None
         self.prev_y = None
 
-    def updatePosition(self, pos, course):
+    def updatePosition(self, pos, course, color="red"):
         x, y = self.geoToXY(pos)
         boat_pt = self.getLinePt(np.array([x, y]), 90-course, 1)
         self.d_boat = self.update2DLine(self.d_boat, np.array([x, y]), boat_pt)
 
         if self.prev_x != None and self.prev_y != None:
-            self.ax1.plot([self.prev_x, x], [self.prev_y, y], color="red", linewidth=0.2)
+            self.ax1.plot([self.prev_x, x], [self.prev_y, y], color=color, linewidth=0.2)
         self.prev_x = x
         self.prev_y = y
 
