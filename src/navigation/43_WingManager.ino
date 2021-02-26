@@ -11,10 +11,10 @@ class WingManager : public BaseManager
 
     db_helm_angle.init(m_db, "Cmd_helm", float(0));
 
-    m_starbord_angle = 90 + m_wing_delta;
-    m_port_angle = 90 - m_wing_delta;
+    m_starbord_angle =  m_wing_calib - m_wing_delta;
+    m_port_angle =      m_wing_calib + m_wing_delta;
 
-    m_servo.init(5);
+    m_servo.init(5, 1, 90);
   }
 
   void go(){
@@ -33,12 +33,13 @@ class WingManager : public BaseManager
 
   void config(){
     m_db->getData("Wing_delta", m_wing_delta);
+    m_db->getData("Wing_calib", m_wing_calib);
   }
 
   DBData<float> db_helm_angle;
   DBData<float> db_wing_angle;
 
   int m_starbord_angle, m_port_angle;
-  double m_wing_delta;
+  double m_wing_delta, m_wing_calib;
   ServoMotor m_servo;
 };

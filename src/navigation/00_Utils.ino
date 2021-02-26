@@ -123,6 +123,17 @@ class Average{
     return (m_buffer[m_index] != 0);
   }
 
+  int size(){
+    return m_len;
+  }
+
+  T at(int index){
+    if (index < m_len && index >= 0)
+      return m_buffer[index];
+    else
+      return T();
+  }
+
   private:
   T *m_buffer;
   int m_len;
