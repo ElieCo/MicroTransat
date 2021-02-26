@@ -6,8 +6,8 @@
       [
         { "key": "Default_corridor_width", "value": 40 },
         { "key": "Default_validation_distance", "value": 15 },
-        { "key": "First_element_angle", "value": 90 },
-        { "key": "First_element_duration", "value": 15 }
+        { "key": "Auto_start_angle", "value": 90 },
+        { "key": "Auto_start_duration", "value": 15 }
       ]
   },
   {

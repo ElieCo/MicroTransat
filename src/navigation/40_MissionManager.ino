@@ -6,8 +6,11 @@ enum MissionElementType { WPT = 0, AWA = 1 };
 
 class MissionElement : public ObjectForDB {
  public:
-  MissionElement(): ObjectForDB() {}
- 
+  MissionElement(bool ephemeral = false)
+    : ObjectForDB()
+    , ephemeral(ephemeral)
+  {}
+
   Coord coord;
   double corridor_width = -1;
   double valid_dist = -1;
@@ -18,6 +21,8 @@ class MissionElement : public ObjectForDB {
   String out = "MissionElement";
 
   MissionElementType type = WPT;
+
+  bool ephemeral;
 
   String toString(){
     String result = "";
@@ -43,6 +48,8 @@ class MissionManager : public BaseManager
   ~MissionManager(){}
 
   void init(){
+    m_awa_start_time = -1;
+
     db_dist_to_wpt.init(m_db, "Wpt_dist", float(0), true);
     db_angle_to_wpt.init(m_db, "Wpt_angle", float(0), true);
     db_elem_index.init(m_db, "Elem_index", int(0), true);
@@ -65,11 +72,19 @@ class MissionManager : public BaseManager
   void go(){
     // If we are radio controlled reset the index to play the first element
     if (db_radio_controlled.get()){
-      m_awa_start_time = millis();
-      db_elem_index.set(0);
+      // Insert an ephemeral element
+      if (!m_mission_elements.at(db_elem_index.get()).ephemeral){
+        MissionElement awa = MissionElement(true);
+        awa.angle = m_auto_start_angle;
+        awa.duration = m_auto_start_duration;
+        awa.type = AWA;
+        m_mission_elements.insert(db_elem_index.get()+1, awa);
+        runNextElement();
+      }
+
     } else {
-        // Check if the actual element is validated and select the next one if needed.
-        if (checkActualElementFinished()) runNextElement();
+      // Check if the actual element is validated and select the next one if needed.
+      if (checkActualElementFinished()) runNextElement();
     }
 
   }
@@ -81,8 +96,8 @@ class MissionManager : public BaseManager
   void config(){
     m_db->getData("Default_corridor_width", m_default_corridor_width);
     m_db->getData("Default_validation_distance", m_default_validation_distance);
-    m_db->getData("First_element_angle", m_first_element_angle);
-    m_db->getData("First_element_duration", m_first_element_duration);
+    m_db->getData("Auto_start_angle", m_auto_start_angle);
+    m_db->getData("Auto_start_duration", m_auto_start_duration);
   }
 
   DBData<float> db_dist_to_wpt;
@@ -100,18 +115,12 @@ class MissionManager : public BaseManager
 
   Vector<MissionElement> m_mission_elements;
   double m_default_validation_distance, m_default_corridor_width;
-  double m_first_element_angle, m_first_element_duration;
+  double m_auto_start_angle, m_auto_start_duration;
   unsigned long m_awa_start_time;
 
   SDfile m_mission_file;
 
   void parseMission(){
-    // Add mission element for the transition after radio controlled time
-    MissionElement first_elem;
-    first_elem.angle = m_first_element_angle;
-    first_elem.duration = m_first_element_duration;
-    first_elem.type = AWA;
-    m_mission_elements.push_back(first_elem);
 
     // Parse the mission file
     String text = m_mission_file.readAll();
@@ -163,6 +172,9 @@ class MissionManager : public BaseManager
       else return false;
 
     } else {
+      // Check awa duration since the first time we check it (for radio purpose)
+      if (m_awa_start_time < 0) m_awa_start_time = millis();
+
       // Get the duration since the awa element is started;
       unsigned long awa_duration = millis() - m_awa_start_time;
 
@@ -172,9 +184,14 @@ class MissionManager : public BaseManager
   }
 
   void runNextElement() {
+    // If the element was an ephemeral element, delete it and change the index
+    if (m_mission_elements.at(db_elem_index.get()).ephemeral){
+      m_mission_elements.removeAt(db_elem_index.get());
+      db_elem_index.set(db_elem_index.get()-1);
+    }
+
     // Change the index.
-    // First element is for transition with radio controlled, never set the index at 0.
-    int next_index = max(1, (db_elem_index.get()+1) % m_mission_elements.size());
+    int next_index = (db_elem_index.get()+1) % m_mission_elements.size();
     db_elem_index.set(next_index);
 
     // Get the new actual element
@@ -183,9 +200,9 @@ class MissionManager : public BaseManager
     db_elem_prev.set(db_elem_next.get());
     db_elem_next.set(new_elem);
 
-    // Save start time if it's an AWA element
+    // Reset start time if it's an AWA element
     if (new_elem->type == AWA) {
-      m_awa_start_time = millis();
+      m_awa_start_time = -1;
     } else {
       // Get new distance to waypoint
       float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), new_elem->coord.lat, new_elem->coord.lng);

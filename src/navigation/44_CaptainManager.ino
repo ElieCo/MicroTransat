@@ -1,5 +1,5 @@
 
-enum BEHAVIOUR { SLEEP = 0, ACQUISITION = 1, DECIDE = 2, PROCESS = 3 };
+enum BEHAVIOUR { SLEEP = 0, ACQUISITION = 1, DECIDE = 2, PROCESS = 3, RADIO_CONTROLLED = 4 };
 
 class Captain : public BaseManager
 {
@@ -22,10 +22,15 @@ class Captain : public BaseManager
       db_behaviour.init(m_db, "Behaviour", SLEEP, true);
       db_latitude.init(m_db, "Latitude", double(0));
       db_longitude.init(m_db, "Longitude", double(0));
+      db_radio_controlled.init(m_db, "Radio_controlled", true);
     }
 
     void go() {
       db_behaviour.set(m_behaviour);
+
+      // Urgent check : if we are radio controlled
+      if (db_radio_controlled.get())
+        m_behaviour = RADIO_CONTROLLED;
 
       switch (m_behaviour) {
         case SLEEP:
@@ -39,6 +44,9 @@ class Captain : public BaseManager
           break;
         case PROCESS:
           stateProcess();
+          break;
+        case RADIO_CONTROLLED:
+          stateRadioControlled();
           break;
       }
     }
@@ -64,6 +72,7 @@ class Captain : public BaseManager
     DBData<int> db_behaviour;
     DBData<double> db_latitude;
     DBData<double> db_longitude;
+    DBData<bool> db_radio_controlled;
 
     BEHAVIOUR m_behaviour;
 
@@ -99,7 +108,6 @@ class Captain : public BaseManager
     }
 
     void stateDecide() {
-      //print("decide", db_next_element.get().coord.lat);
 
       if (db_next_element.get()->type == WPT)
         commandForWPT();
@@ -116,6 +124,12 @@ class Captain : public BaseManager
     void stateProcess() {
       if (db_cmd_helm_applied.get())
         m_behaviour = SLEEP;
+    }
+
+    void stateRadioControlled() {
+      if (!db_radio_controlled.get()){
+        m_behaviour = ACQUISITION;
+      }
     }
 
     void commandForWPT() {
