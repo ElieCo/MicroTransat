@@ -16,6 +16,8 @@ class Comm:
         self.buffer = b''
         self.last_gps_send = 0
 
+        self.wpts = []
+
     def init(self):
         t0 = time.time()
         while time.time() - t0 < 10:
@@ -29,8 +31,22 @@ class Comm:
         data = self.serial.read(250)
         self.buffer += data
         if len(data) and data[0] != START[0]:
-            msg = str(data).replace("\\r", "").replace("b'", "").replace("'", "").replace("\\n", "\n")
+            msg = str(data).replace("\\r", "").replace("b'", "").replace("'", "").replace("\\n", "\n").split("~")[0]
             print(msg, end="")
+
+            try:
+                if "WPT" in msg:
+                    data = msg.split(";")
+                    for d in data:
+                        if "WPT" in d and len(d.split("/")) > 4:
+                            lat = float(d.split("/")[1])
+                            lng = float(d.split("/")[2])
+                            dist = float(d.split("/")[4])
+                            if [lat, lng, dist] not in self.wpts:
+                                self.wpts.append([lat, lng, dist])
+            except:
+                pass
+
 
         return self.decryptBuffer()
 

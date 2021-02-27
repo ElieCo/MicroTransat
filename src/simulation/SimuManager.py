@@ -6,9 +6,8 @@ from utils import *
 
 import time
 
-INIT_LAT = 47.732216
-INIT_LAT = 47.732226
-INIT_LNG = -3.395731
+INIT_LAT = 47.731400
+INIT_LNG = -3.393403
 
 class Manager:
     def __init__(self, dt=0.1):
@@ -51,3 +50,4 @@ class Manager:
             for s in self.comm.servos:
                 self.mover.updateServo(s)
                 self.display.updateServo(s)
+        self.display.updateWpt(self.comm.wpts)
