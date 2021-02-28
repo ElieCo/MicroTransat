@@ -7,7 +7,7 @@
         { "key": "Default_corridor_width", "value": 40 },
         { "key": "Default_validation_distance", "value": 15 },
         { "key": "Auto_start_angle", "value": 90 },
-        { "key": "Auto_start_duration", "value": 15 }
+        { "key": "Auto_start_duration", "value": 10 }
       ]
   },
   {
@@ -21,8 +21,8 @@
       [
         { "key": "Helm_ratio", "value": -0.56 },
         { "key": "Helm_offset", "value": 180 },
-        { "key": "Helm_normal_speed", "value": 45 },
-        { "key": "Helm_tack_speed", "value": 180 }
+        { "key": "Helm_normal_speed", "value": 20 },
+        { "key": "Helm_tack_speed", "value": 90 }
       ]
   },
   {
@@ -40,7 +40,7 @@
     "parameters":
       [
         { "key": "Max_upwind", "value": 45 },
-        { "key": "Max_downwind", "value": 150 },
+        { "key": "Max_downwind", "value": 130 },
         { "key": "Sleeping_duration", "value": 15000 }
       ]
   },
