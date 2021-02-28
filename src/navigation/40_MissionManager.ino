@@ -155,6 +155,7 @@ class MissionManager : public BaseManager
       }
     }
 
+    db_elem_index.set(0);
     db_elem_next.set(m_mission_elements.ptrAt(db_elem_index.get()));
     db_elem_prev.set(m_mission_elements.ptrAt(db_elem_index.get()-1));
   }
@@ -188,6 +189,7 @@ class MissionManager : public BaseManager
     if (m_mission_elements.at(db_elem_index.get()).ephemeral){
       m_mission_elements.removeAt(db_elem_index.get());
       db_elem_index.set(db_elem_index.get()-1);
+      db_elem_next.set(m_mission_elements.ptrAt(db_elem_index.get()));
     }
 
     // Change the index.
