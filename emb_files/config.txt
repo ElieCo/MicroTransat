@@ -20,7 +20,7 @@
     "parameters":
       [
         { "key": "Helm_ratio", "value": -0.56 },
-        { "key": "Helm_offset", "value": 180 },
+        { "key": "Helm_offset", "value": 90 },
         { "key": "Helm_normal_speed", "value": 20 },
         { "key": "Helm_tack_speed", "value": 90 }
       ]
