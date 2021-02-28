@@ -9,7 +9,7 @@ class Mover:
         self.wing_angle = 0
 
         self.helm_ratio = -0.56
-        self.helm_offset = 180
+        self.helm_offset = 90
 
         self.speed = 5 # knots
 

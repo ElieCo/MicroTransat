@@ -1,5 +1,5 @@
 
-enum BEHAVIOUR { SLEEP = 0, ACQUISITION = 1, DECIDE = 2, PROCESS = 3 };
+enum BEHAVIOUR { SLEEP = 0, ACQUISITION = 1, DECIDE = 2, PROCESS = 3, RADIO_CONTROLLED = 4 };
 
 class Captain : public BaseManager
 {
@@ -22,10 +22,16 @@ class Captain : public BaseManager
       db_behaviour.init(m_db, "Behaviour", SLEEP, true);
       db_latitude.init(m_db, "Latitude", double(0));
       db_longitude.init(m_db, "Longitude", double(0));
+      db_radio_controlled.init(m_db, "Radio_controlled", false);
+      db_ask_setpoint_update.init(m_db, "Ask_setpoint_update", true);
     }
 
     void go() {
       db_behaviour.set(m_behaviour);
+
+      // Urgent check : if we are radio controlled
+      if (db_radio_controlled.get())
+        m_behaviour = RADIO_CONTROLLED;
 
       switch (m_behaviour) {
         case SLEEP:
@@ -39,6 +45,9 @@ class Captain : public BaseManager
           break;
         case PROCESS:
           stateProcess();
+          break;
+        case RADIO_CONTROLLED:
+          stateRadioControlled();
           break;
       }
     }
@@ -64,6 +73,8 @@ class Captain : public BaseManager
     DBData<int> db_behaviour;
     DBData<double> db_latitude;
     DBData<double> db_longitude;
+    DBData<bool> db_radio_controlled;
+    DBData<bool> db_ask_setpoint_update;
 
     BEHAVIOUR m_behaviour;
 
@@ -90,16 +101,18 @@ class Captain : public BaseManager
     }
 
     void stateAcquisition() {
-      // Wait that the course average buffer is full to take a decision.
-      if (db_average_course_full.get()) {
-        db_just_wake_up.set(false);
-        m_behaviour = DECIDE;
+      // Wait that the missionManager update the setpoint
+      if (!db_ask_setpoint_update.get()){
+        // Wait that the course average buffer is full to take a decision.
+        if (db_average_course_full.get()) {
+          db_just_wake_up.set(false);
+          m_behaviour = DECIDE;
+        }
       }
 
     }
 
     void stateDecide() {
-      //print("decide", db_next_element.get().coord.lat);
 
       if (db_next_element.get()->type == WPT)
         commandForWPT();
@@ -116,6 +129,14 @@ class Captain : public BaseManager
     void stateProcess() {
       if (db_cmd_helm_applied.get())
         m_behaviour = SLEEP;
+    }
+
+    void stateRadioControlled() {
+      if (!db_radio_controlled.get()){
+        m_behaviour = ACQUISITION;
+        // Ask to update the setpoint.
+        db_ask_setpoint_update.set(true);
+      }
     }
 
     void commandForWPT() {

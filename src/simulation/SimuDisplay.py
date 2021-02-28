@@ -18,6 +18,8 @@ class Display():
         self.prev_x = None
         self.prev_y = None
 
+        self.wpts = []
+
     def updatePosition(self, pos, course):
         x, y = self.geoToXY(pos)
         boat_pt = self.getLinePt(np.array([x, y]), 90-course, 1)
@@ -66,3 +68,12 @@ class Display():
     		line.set_xdata([pt1[0], pt2[0]])
     		line.set_ydata([pt1[1], pt2[1]])
     	return line
+
+    def updateWpt(self, wpts):
+        for wpt in wpts:
+            if wpt not in self.wpts:
+                self.wpts.append(wpt)
+                x, y = self.geoToXY(Position(wpt[0], wpt[1]))
+                circle = plt.Circle((x, y), wpt[2], fill=False)
+                self.ax1.add_patch(circle)
+                self.ax1.plot((x), (y), '.')
