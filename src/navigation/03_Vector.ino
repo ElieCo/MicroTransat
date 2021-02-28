@@ -57,6 +57,9 @@ class Vector{
     next->prev_element = element;
     element->prev_element = prev;
 
+    if (i == 0)
+      m_first_element = element;
+
   }
 
   /**
@@ -67,8 +70,7 @@ class Vector{
     if (size() <= 1)
       return clear();
 
-    if (i == 0)
-      m_first_element = m_first_element->next_element;
+    Element* second_element = m_first_element->next_element;
 
     // Make link between prev and next element and then delete the element
     Element* prev = elementAt(i-1);
@@ -77,6 +79,9 @@ class Vector{
     prev->next_element = next;
     next->prev_element = prev;
     delete element;
+
+    if (i == 0)
+      m_first_element = second_element;
   }
 
   /**
@@ -134,6 +139,9 @@ class Vector{
   };
 
   Element* elementAt(int i){
+    int s = size();
+    while(i < 0) i += s;
+    while(i >= s) i -= s;
     return recursiveAt(m_first_element, i);
   }
 
