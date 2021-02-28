@@ -4,6 +4,11 @@
 CommManager::CommManager(QObject *parent)
     : QObject(parent)
 {
+    // definition de la liste des entrée (oui c'est un peu caca mais je vais revenir dessus !)
+    header = QStringList({"Elem_index","Behaviour","Time","Wpt_dist","Wpt_angle","Dist_to_axis","Cmd_helm","Regulator_angle","Wing_angle","Speed","Course","Average_course","Latitude","Longitude","HDOP","Battery","In_corridor","Fix","Gps_ready","Radio_controlled","Prev_element","Next_element"});
+    for (int i=0; i<header.size(); i++){
+        m_serialData.insert(header.at(i), 0);
+    }
 }
 
 CommManager::~CommManager()
@@ -21,8 +26,8 @@ void CommManager::openSerialPort(QString nameport)
      if( m_serial->isOpen()==false)
      {
           m_serial->clearError();
-          qDebug() << "Port error", "Port: "+nameport;
-          qDebug() << "Port error", "Vérifier nom du port \n Fermer tout programme utilisant la lisaison RS232 "+nameport;
+          //qDebug() << "Port error", "Port: "+nameport;
+          //qDebug() << "Port error", "Vérifier nom du port \n Fermer tout programme utilisant la lisaison RS232 "+nameport;
       }
    else
      {
@@ -32,15 +37,12 @@ void CommManager::openSerialPort(QString nameport)
           m_serial->setParity(QSerialPort::NoParity);
           m_serial->setDataBits(QSerialPort::Data8);
           m_serial->setFlowControl(QSerialPort::NoFlowControl);
-
-          // definition de la liste des entrée (oui c'est un peu caca)
-//          header = QStringList({"Battery", "Time", "HDOP", "Vitesse", "Cap", "Angle_regulateur", "Asserv_regulateur", "Pos_aile", "Cap_moy", "Latittude", "Longitude", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Corridor_width", "Wpt_angle", "Wpt_dst", "ecart_axe", "Presence_couloir", "Index_wpt"});
-//          header = QStringList({"Msg_received", "Lat_next_point", "Lon_next_point", "Wpt_index", "Fix_age", "Time", "Date", "Chars", "HDOP", "Sentences", "Failed_checksum", "Latitude", "Longitude", "Wpt_dist", "Wpt_angle", "Cmd_helm", "Wing_angle", "Speed", "Course", "Average_course", "Max_upwind", "Regulator_angle", "Battery", "SD_ready", "Gps_recent_data", "Gps_ready"});
-          header = QStringList({"Corridor_width", "Wpt_index", "HDOP", "Time", "Wpt_dist", "Wpt_angle", "Dist_to_axis", "Cmd_helm", "Regulator_angle", "Wing_angle", "Speed", "Course", "Average_course", "Lat_next_point", "Lon_next_point", "Lat_prev_point", "Lon_prev_point", "Latitude", "Longitude", "Battery", "In_corridor", "Fix", "Gps_ready"});
-          for (int i=0; i<header.size(); i++){
-              m_serialData.insert(header.at(i), 0);
-          }
      }
+}
+
+QStringList CommManager::getHeader()
+{
+    return header;
 }
 
 void CommManager::closeSerialPort()
@@ -55,10 +57,24 @@ void CommManager::decryptMsg(QString msg)
     QStringList dataList = msg.split(";");
     if (dataList.length() == header.length()){
         for (int i = 0; i < header.length(); i++){
-            m_serialData[header.at(i)] = dataList[i].toFloat();
+            if (dataList[i].contains("WPT")){
+                dataList[i].remove("WPT/");
+                QStringList a = dataList[i].split("/");
+                double lat = a[0].toDouble();
+                double lng = a[1].toDouble();
+
+                if (header.at(i) == "Prev_element"){
+                    m_serialData["Lat_prev_point"] = lat;
+                    m_serialData["Lon_prev_point"] = lng;
+                } else {
+                    m_serialData["Lat_next_point"] = lat;
+                    m_serialData["Lon_next_point"] = lng;
+                }
+            }
+            else m_serialData[header.at(i)] = dataList[i].toFloat();
         }
-        m_serialData["Latitude"] *= 1000000;
-        m_serialData["Longitude"] *= 1000000;
+        m_serialData["Latitude"] *=       1000000;
+        m_serialData["Longitude"] *=      1000000;
         m_serialData["Lat_next_point"] *= 1000000;
         m_serialData["Lon_next_point"] *= 1000000;
         m_serialData["Lat_prev_point"] *= 1000000;
@@ -66,7 +82,17 @@ void CommManager::decryptMsg(QString msg)
     }
 }
 
-int CommManager::getData(QString name)
+QList<float> CommManager::getFullList()
+{
+    QList<float> a;
+    for (int i=0; i<header.count(); i++)
+    {
+        a.append(m_serialData[header.at(i)]);
+    }
+    return a;
+}
+
+float CommManager::getData(QString name)
 {
     if (m_serialData.contains(name)){
         return  m_serialData[name];
@@ -90,7 +116,7 @@ void CommManager::readData()
         m_cache.remove(QChar('\n'), Qt::CaseInsensitive);
         m_cache.remove(QChar('~'), Qt::CaseInsensitive);
         decryptMsg(m_cache);
-        qDebug() << "msg recu et assemble : " << m_cache;
+        //qDebug() << "msg recu et assemble : " << m_cache;
         m_cache = "";
     }
     else {
@@ -111,4 +137,41 @@ void CommManager::send()
     m_serial->write(request.toStdString().c_str());
 
     request = "";
+}
+
+QStringList CommManager::openFile(QString file_name)
+{
+    file.setFileName(file_name);
+    if (file.open(QFile::ReadOnly)) {
+        // read header
+        char buf[1024];
+        qint64 lineLength = file.readLine(buf, sizeof(buf));
+        if (lineLength != -1) {
+            QString line = QString(buf);
+            line.remove(QChar('\r'), Qt::CaseInsensitive);
+            line.remove(QChar('\n'), Qt::CaseInsensitive);
+            header = line.split(";");
+            m_serialData.clear();
+            for (int i=0; i<header.size(); i++){
+                m_serialData.insert(header.at(i), 0);
+            }
+            return header;
+        }
+    }
+    return QStringList();
+}
+
+void CommManager::readLine()
+{
+    char buf[1024];
+    qint64 lineLength = file.readLine(buf, sizeof(buf));
+    if (lineLength != -1) {
+        QString line = QString(buf);
+        line.remove(QChar('\r'), Qt::CaseInsensitive);
+        line.remove(QChar('\n'), Qt::CaseInsensitive);
+        decryptMsg(line);
+    }
+    else {
+        file.close();
+    }
 }

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include <QFile>
 #include <QGraphicsTextItem>
 
@@ -8,7 +9,8 @@
 QPolygon MainWindow::createBackground(){
     QPolygon fond_carte;
     QString raw_background;
-    QFile fichier("../../src/gui/resources/carte_lac.csv");
+    QFile fichier("../../src/gui/resources/carte_lac.csv");  //  ../src/gui/resources/carte_lac.csv
+    qDebug() << QDir::currentPath();
 
     if(fichier.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -24,8 +26,8 @@ QPolygon MainWindow::createBackground(){
          int lon_min = 0;
          int lon_max = 0;
          for (int i = 0; i < list.length(); i++){
-            lat.append(list[i].split(";")[0].toInt());
-            lon.append(list[i].split(";")[1].toInt());
+            lat.append(list[i].split(";")[0].toFloat()*1000000);
+            lon.append(list[i].split(";")[1].toFloat()*1000000);
 
             if (i ==0){
                 lat_min = lat.last();
@@ -62,34 +64,26 @@ QPolygon MainWindow::createBackground(){
          }
     }
 
-    else raw_background = "Impossible d'ouvrir le fichier !";
+    else
+    {
+        qDebug() << "Impossible d'ouvrir le fichier !";
+    }
+
 
     return fond_carte;
 }
 
 void MainWindow::updateRawData()
 {
-    hdop->setText("HDOP : " + QString::number(cm.getData("HDOP")));
-    latittude->setText("latitude : " + QString::number(cm.getData("Latitude")));
-    longitude->setText("longitude : " + QString::number(cm.getData("Longitude")));
-    lat_next_point->setText("lat_next_point : " + QString::number(cm.getData("Lat_next_point")));
-    lon_next_point->setText("lon_next_point : " + QString::number(cm.getData("Lon_next_point")));
-    lat_prev_point->setText("lat_prev_point : " + QString::number(cm.getData("Lat_prev_point")));
-    lon_prev_point->setText("lon_prev_point : " + QString::number(cm.getData("Lon_prev_point")));
-    wpt_angle->setText("wpt_angle : " + QString::number(cm.getData("Wpt_angle")));
-    wpt_dist->setText("wpt_dist : " + QString::number(cm.getData("Wpt_dist")));
-    Index_wpt->setText("Index_wpt : " + QString::number(cm.getData("Wpt_index")));
-
-    speed->setText("speed : " + QString::number(cm.getData("Speed")));
-    heading->setText("heading : " + QString::number(cm.getData("Course")));
-
-    reg_angle->setText("reg_angle : " + QString::number(cm.getData("Regulator_angle")));
-    winglet_pos->setText("winglet_pos : " + QString::number(cm.getData("Wing_angle")));
-    battery->setText("battery : " + QString::number(cm.getData("Battery")));
-
-    corridor_width->setText("corridor_width : " + QString::number(cm.getData("Corridor_width")));
-    ecart_axe->setText("ecart_axe : " + QString::number(cm.getData("Dist_to_axis")));
-    Presence_couloir->setText("Presence_couloir : " + QString::number(cm.getData("In_corridor")));
+    QList<float> newList = cm.getFullList();
+    if (raw_values.count()==header.size()){
+        for (int i=0; i< raw_values.count(); i++){
+            raw_values[i]->setText(header[i]+" : " + QString::number(newList.at(i)));
+        }
+    }
+    else {
+        qDebug() << "raw data error : header size " << header.size() << " data size " << raw_values.size();
+    }
 }
 
 void MainWindow::updateBoatPosition()
@@ -97,11 +91,36 @@ void MainWindow::updateBoatPosition()
     int lat = cm.getData("Latitude");
     int lon = cm.getData("Longitude");
 
-    int lat_next_p = cm.getData("Lat_next_point");
-    int lon_next_p = cm.getData("Lon_next_point");
-    int lat_prev_p = cm.getData("Lat_prev_point");
-    int lon_prev_p = cm.getData("Lon_prev_point");
+    int lat_prev = cm.getData("Lat_prev_point");
+    int lon_prev = cm.getData("Lon_prev_point");
 
+    int lat_next = cm.getData("Lat_next_point");
+    int lon_next = cm.getData("Lon_next_point");
+
+
+    if (( lat_prev == 404 || lat_prev == 0) && lat != 404 && lat !=0) {
+        cm.setData("Lat_prev_point", lat);
+        lat_prev_p = lat;
+    }
+    if ((lon_prev == 404 || lon_prev == 0) && lon != 404 && lon !=0) {
+        cm.setData("Lon_prev_point", lon);
+        lon_prev_p = lon;
+    }
+
+    if (lat_next_p != lat_next && lat_next_p != 0 && lat_next_p != 404){
+        lat_prev_p = lat_next_p;
+        cm.setData("Lat_prev_point", lat_prev_p);
+    }
+    lat_next_p = lat_next;
+
+    if (lon_next_p != lon_next && lon_next_p != 0 && lon_next_p != 404){
+        lon_prev_p = lon_next_p;
+        cm.setData("Lat_prev_point", lon_prev_p);
+    }
+    lon_next_p = lon_next;
+
+    qDebug()<<lat;
+    qDebug()<<lon;
 
     if (lat != 404 && lon != 404 && lat != 0 && lon != 0){
         if (track.length()>0){
@@ -135,7 +154,7 @@ void MainWindow::updateBoatPosition()
         if (wind_angle != 404)
         {
             if (wind_angle < 0){
-                wind_angle += 180;
+                wind_angle += 360;
             }
             wind_angle = heading_ - wind_angle;
 
@@ -152,55 +171,73 @@ void MainWindow::updateBoatPosition()
 
 void MainWindow::updateView()
 {
-    cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
+    if (replay_mode)
+    {
+        qDebug() << "mode replay actif";
+        cm.readLine();
+    }
+    else
+    {
+        cm.send();   // send a command to the boat (the command sent is defined by the last call of setrequest()).
+    }
 
     updateRawData();
     updateBoatPosition();
+
+    if (!ui->activeTrack->isChecked()){
+        track.clear();
+    }
     path->setPath(track);
 }
 
-void MainWindow::setVarDisplay(QGridLayout * layout)
+void MainWindow::clearLayout(QLayout *layout)
 {
-    QGridLayout * grid = new QGridLayout();
+    QLayoutItem *child;
+    while ((child = layout->takeAt(0)) != 0) {
+    if(child->layout() != 0)
+    clearLayout( child->layout() );
+    else if(child->widget() != 0)
+    delete child->widget();
+    delete child;
+    }
+}
 
-    hdop = new QLabel();
-    grid->addWidget(hdop,0,0);
-    latittude = new QLabel();
-    grid->addWidget(latittude,1,0);
-    longitude = new QLabel();
-    grid->addWidget(longitude,2,0);
-    lat_next_point = new QLabel();
-    grid->addWidget(lat_next_point,3,0);
-    lon_next_point= new QLabel();
-    grid->addWidget(lon_next_point,4,0);
-    lat_prev_point= new QLabel();
-    grid->addWidget(lat_prev_point,5,0);
-    lon_prev_point= new QLabel();
-    grid->addWidget(lon_prev_point,6,0);
-    wpt_angle = new QLabel();
-    grid->addWidget(wpt_angle,7,0);
-    wpt_dist = new QLabel();
-    grid->addWidget(wpt_dist,8,0);
-    Index_wpt = new QLabel();
-    grid->addWidget(Index_wpt,9,0);
-    speed = new QLabel();
-    grid->addWidget(speed,10,0);
-    heading = new QLabel();
-    grid->addWidget(heading,11,0);
-    reg_angle = new QLabel();
-    grid->addWidget(reg_angle,12,0);
-    winglet_pos = new QLabel();
-    grid->addWidget(winglet_pos,13,0);
-    battery = new QLabel();
-    grid->addWidget(battery,14,0);
-    corridor_width = new QLabel();
-    grid->addWidget(corridor_width,15,0);
-    ecart_axe = new QLabel();
-    grid->addWidget(ecart_axe,16,0);
-    Presence_couloir = new QLabel();
-    grid->addWidget(Presence_couloir,17,0);
+void MainWindow::changeSpeed()
+{
+    if (replay_mode){
+        timer->setInterval(1500/ui->Speed_slider->value());
+    }
+}
 
-    layout->addLayout(grid,0,0);
+void MainWindow::openDialBox()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Open Image"), "/home", tr("Log Files (*.log *.csv)"));
+    header = cm.openFile(fileName);
+    if (header.size() > 0){
+        replay_mode = true;
+        raw_values.clear();
+        clearLayout(ui->rawDataLayout);
+        setVarDisplay();
+    }
+}
+
+void MainWindow::setVarDisplay()
+{
+    QFont police = QFont();
+    police.setPixelSize(15);
+
+    for (int i=0; i<header.size(); i++){
+        QLabel *raw = new QLabel(header.at(i)+" : ");
+        raw->setFont(police);
+        if (i < 20){
+            ui->rawDataLayout->addWidget(raw, i, 0);
+        }
+        else {
+            ui->rawDataLayout->addWidget(raw, header.size()-1-i, 1);
+        }
+        raw_values << raw;
+    }
 }
 
 void MainWindow::setButtonDisplay(QGridLayout * layout)
@@ -218,72 +255,65 @@ void MainWindow::setButtonDisplay(QGridLayout * layout)
     connect(test_button, SIGNAL (released()), this, SLOT (handleButton()));
     grid->addWidget(test_button,0,1);
 
-
-    // track display
-    resetTrack = new QPushButton("Reset Track", this);
-    connect(resetTrack, SIGNAL (released()), this, SLOT (resetHit()));
-    grid->addWidget(resetTrack,1,0);
-
     layout->addLayout(grid, 0, 1);
 }
 
-void MainWindow::update_val(int i){
-        qDebug()<< "valeur de la box : "<< i;
-}
-
-void MainWindow::resetHit()
+MainWindow::MainWindow() :
+    lat_next_p(0)
+    , lon_next_p(0)
+    , lat_prev_p(0)
+    , lon_prev_p(0)
+    , replay_mode(false)
+    ,ui(new Ui::MainWindow)
 {
-   track = QPainterPath();
-}
+    ui->setupUi(this);
 
-void MainWindow::handleButton()
-{
-   test_button->setText("Example");
-   //qDebug()<< "valeur de la box : "<< val_selection->value();
-   cm.setrequest("c"+QString::number(val_selection->value()));
-}
+    cm.openSerialPort("//./COM6");
 
-MainWindow::MainWindow()
-{
-    QWidget *zoneCentrale = new QWidget;
-
-    cm.openSerialPort("/dev/ttyACM1");
+    header = cm.getHeader();
 
     // lecture de fichier
     scene.addPolygon(createBackground());
 
     // add the boat track in the scetch
     path = scene.addPath(track);
+    path->setPen(QPen(QColor(255,0,0)));
 
     // draw the cross representing the boat
     ligne1 = scene.addLine(QLine(-5,0,5,0));
     ligne2 = scene.addLine(QLine(0,-5,0,5));
 
+    QFont police_dessin = QFont();
+    police_dessin.setPixelSize(17);
+
     label_cap = scene.addText("heading");
+    label_cap->setDefaultTextColor(QColor(0,255,0));
+    label_cap->setFont(police_dessin);
     cap = scene.addLine(QLine(0,0,0,1));
+    cap->setPen(QPen(QColor(0,255,0)));
+
     label_wind = scene.addText("supposed wind direction");
+    label_wind->setDefaultTextColor(QColor(255,0,0));
+    label_wind->setFont(police_dessin);
     wind = scene.addLine(QLine(0,0,0,1));
+    wind->setPen(QPen(QColor(255,0,0)));
 
     // draw the circle for the first wpt
     label_wpt1 = scene.addText("next wpt");
+    label_wpt1->setFont(police_dessin);
     wpt_circle1 = scene.addEllipse(0,0,10,10);
     label_wpt2 = scene.addText("prev wpt");
+    label_wpt2->setFont(police_dessin);
     wpt_circle2 = scene.addEllipse(0,0,10,10);
     ligne3 = scene.addLine(QLine(0,1,0,2));
 
-    view = new QGraphicsView(&scene);
-    view->show();
+    ui->graphicMap->setScene(&scene);
 
-    QGridLayout  *layout = new QGridLayout();
+    setVarDisplay();
 
-    setVarDisplay(layout);
-    setButtonDisplay(layout);
-
-    layout->addWidget(view,1,1);
-    zoneCentrale->setLayout(layout);
-    setCentralWidget(zoneCentrale);
-
-    QTimer *timer = new QTimer(this);
+    timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateView);
+    connect(ui->file_selection, &QPushButton::clicked, this, &MainWindow::openDialBox);
+    connect(ui->Speed_slider, &QSlider::valueChanged, this, &MainWindow::changeSpeed);
     timer->start(1500);
 }

@@ -7,14 +7,11 @@ class LogManager: public BaseManager
   ~LogManager(){}
 
   void init(){
-
-
     m_not_initialized = true;
   }
 
   void go(){
     if (!prepareLogFile()) return;
-
     // If the first line is not initialized.
     if (m_not_initialized) {
       // Get all the data names.
@@ -26,6 +23,7 @@ class LogManager: public BaseManager
           line += ";";
         }
       }
+ 
       // Log a first line all the names.
       m_log_csv_file.write(line.replace("\n","").replace("\r",""));
 
@@ -70,7 +68,7 @@ class LogManager: public BaseManager
     unsigned date = 0;
     m_db->getData("Date", date);
 
-    if(fix && time != 0 && date != 0){
+    if(time != 0 && date != 0 && fix){
       String t = String(time);
       for (unsigned i = 0; i < max(unsigned(0), 6 - String(time).length()); i++) t = "0" + t;
       String d = String(date);

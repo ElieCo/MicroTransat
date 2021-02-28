@@ -9,7 +9,7 @@ public:
     , m_helmMan("HelmManager", 250)
     , m_wingMan("WingManager", 250)
     , m_commMan("CommManager", 0)
-    , m_sensorsMan("SensorsManager", 500)
+    , m_sensorsMan("SensorsManager", 0)
     , m_lightMan("LightManager", 500)
     , m_captain("Captain", 5000)
   {

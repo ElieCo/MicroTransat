@@ -1,0 +1,10 @@
+[
+	{
+	"angle": -40,
+	"duration": 30
+	},
+	{
+	"angle": 40,
+	"duration": 30
+	}
+]

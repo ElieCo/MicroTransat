@@ -22,5 +22,21 @@
 	"longitude": -3.392094,
 	"corridor_width": 20,
 	"validation_distance": 20
+	},
+	{
+	"angle": -45,
+	"duration": 30
+	},
+	{
+	"angle": 45,
+	"duration": 30
+	},
+	{
+	"angle": -45,
+	"duration": 30
+	},
+	{
+	"angle": 45,
+	"duration": 30
 	}
 ]

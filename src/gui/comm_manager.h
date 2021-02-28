@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QMap>
 #include <QSerialPort>
+#include "QFile"
 
 class CommManager : public QObject
 {
@@ -15,10 +16,17 @@ public:
     ~CommManager();
 
     void openSerialPort(QString nameport);
+    QStringList getHeader();
+    QList<float> getFullList();
     void send();
     void setrequest(QString text);
-    int getData(QString name);
+    float getData(QString name);
     void setData(QString name, int value);
+
+    // mode replay
+    QStringList openFile(QString);
+    void readLine();
+
     void closeSerialPort();
 
 private:
@@ -29,6 +37,7 @@ private:
     QString m_cache;
     QStringList header;
     QString request;
+    QFile file;
 
 public slots:
     void readData();

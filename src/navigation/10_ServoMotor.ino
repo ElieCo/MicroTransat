@@ -9,7 +9,7 @@ class ServoMotor
     m_servo.detach();
   }
 
-  void init(int pin, int ratio = 1, int offset = 0){
+  void init(int pin, double ratio = 1.0, double offset = 0){
     m_pin = pin;
     m_ratio = ratio;
     m_offset = offset;
@@ -17,13 +17,16 @@ class ServoMotor
   }
 
   void write(int angle){
-    m_servo.write((angle + m_offset) * m_ratio);
+    float real_angle = float(angle) * m_ratio + m_offset;
+    if (simuComm.inSimulation())
+      simuComm.simuServo(m_pin, real_angle);
+    m_servo.write(real_angle);
   }
 
  protected:
 
   Servo m_servo;
   int m_pin;
-  int m_ratio;
-  int m_offset;
+  double m_ratio;
+  double m_offset;
 };

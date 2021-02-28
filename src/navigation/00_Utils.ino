@@ -1,13 +1,10 @@
-#define serialDebug Serial1
+#define serialDebug Serial
 
 #define DEBUGLEVEL 1
-
-#ifndef SIMU
-#define SIMU false
-#endif
+#define LORA_IN_SIMU 0
 
 void initSerialDebug(){
-  serialDebug.begin(9600);
+  serialDebug.begin(115200);
 }
 
 void print(String s){
@@ -126,9 +123,25 @@ class Average{
     return (m_buffer[m_index] != 0);
   }
 
+  int size(){
+    return m_len;
+  }
+
+  T at(int index){
+    if (index < m_len && index >= 0)
+      return m_buffer[index];
+    else
+      return T();
+  }
+
   private:
   T *m_buffer;
   int m_len;
   int m_index;
 
+};
+
+class ObjectForDB{
+ public:
+  virtual String toString(){ return ""; };
 };
