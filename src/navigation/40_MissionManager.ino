@@ -65,6 +65,7 @@ class MissionManager : public BaseManager
       db_radio_controlled.init(m_db, "Radio_controlled", true);
 
       db_ask_setpoint_update.init(m_db, "Ask_setpoint_update", true);
+      db_ask_add_awa_angle.init(m_db, "Ask_add_awa_angle", double(0));
 
       bool *sd_ready = m_db->initData("SD_ready", false);
       *sd_ready = m_mission_file.init(MISSION_FILENAME, *sd_ready);
@@ -75,19 +76,16 @@ class MissionManager : public BaseManager
       // If we are radio controlled reset the index to play the first element
       if (db_radio_controlled.get()) {
         // Insert an ephemeral element
-        if (!m_mission_elements.at(db_elem_index.get()).ephemeral) {
-          MissionElement awa = MissionElement(true);
-          awa.angle = m_auto_start_angle;
-          awa.duration = m_auto_start_duration;
-          awa.type = AWA;
-          m_mission_elements.insert(db_elem_index.get(), awa);
-
-          // Reload the element at db_elem_index.get() place.
-          db_elem_index.add(-1);
-          runNextElement();
-        }
+        if (!m_mission_elements.at(db_elem_index.get()).ephemeral)
+          addAwa(m_auto_start_angle, m_auto_start_duration);
 
       } else {
+        // If asked by the Captain, add an AWA element
+        if (db_ask_add_awa_angle.get() != 0.0) {
+          addAwa(db_ask_add_awa_angle.get(), m_awa_tack_duration);
+          db_ask_add_awa_angle.set(0.0);
+        }
+
         // Update setpoints
         updateSetpoints();
 
@@ -110,6 +108,7 @@ class MissionManager : public BaseManager
       m_db->getData("Default_validation_distance", m_default_validation_distance);
       m_db->getData("Auto_start_angle", m_auto_start_angle);
       m_db->getData("Auto_start_duration", m_auto_start_duration);
+      m_db->getData("Awa_tack_duration", m_awa_tack_duration);
     }
 
     DBData<float> db_dist_to_wpt;
@@ -126,10 +125,12 @@ class MissionManager : public BaseManager
     DBData<bool> db_radio_controlled;
 
     DBData<bool> db_ask_setpoint_update;
+    DBData<double> db_ask_add_awa_angle;
 
     Vector<MissionElement> m_mission_elements;
     double m_default_validation_distance, m_default_corridor_width;
     double m_auto_start_angle, m_auto_start_duration;
+    double m_awa_tack_duration;
     unsigned long m_awa_start_time;
 
     SDfile m_mission_file;
@@ -250,6 +251,24 @@ class MissionManager : public BaseManager
       db_corridor_angle.set(angle_btw_wpt);
       db_dist_to_axis.set(dist_to_axis);
       db_in_corridor.set(in_corridor);
+    }
+
+    // Create, add and run a ephemeral AWA mission element
+    void addAwa(double angle, double duration){
+      // Create a AWA missin element
+      MissionElement awa = MissionElement(true);
+      awa.type = AWA;
+
+      // Set parameters
+      awa.angle = angle;
+      awa.duration = duration;
+
+      // Add it to the list at the right place
+      m_mission_elements.insert(db_elem_index.get(), awa);
+
+      // Reload the element at db_elem_index.get() place.
+      db_elem_index.add(-1);
+      runNextElement();
     }
 
 };

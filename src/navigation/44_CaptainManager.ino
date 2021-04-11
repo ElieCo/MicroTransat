@@ -24,6 +24,7 @@ class Captain : public BaseManager
       db_longitude.init(m_db, "Longitude", double(0));
       db_radio_controlled.init(m_db, "Radio_controlled", false);
       db_ask_setpoint_update.init(m_db, "Ask_setpoint_update", true);
+      db_ask_add_awa_angle.init(m_db, "Ask_add_awa_angle", double(0));
     }
 
     void go() {
@@ -60,6 +61,7 @@ class Captain : public BaseManager
       m_db->getData("Max_upwind", m_max_upwind);
       m_db->getData("Max_downwind", m_max_downwind);
       m_db->getData("Sleeping_duration", m_sleeping_duration);
+      m_db->getData("Too_far_for_tack", m_too_far_for_tack);
     }
 
     DBData<float> db_reg_cmd;
@@ -75,10 +77,12 @@ class Captain : public BaseManager
     DBData<double> db_longitude;
     DBData<bool> db_radio_controlled;
     DBData<bool> db_ask_setpoint_update;
+    DBData<double> db_ask_add_awa_angle; // 0 don't ask, else ask this angle
 
     BEHAVIOUR m_behaviour;
 
     double m_max_upwind, m_max_downwind, m_sleeping_duration;
+    double m_too_far_for_tack;
     float m_prev_average_course;
 
     void stateSleep() {
@@ -114,16 +118,32 @@ class Captain : public BaseManager
 
     void stateDecide() {
 
+      // Decide of the command
+      double cmd = 0;
       if (db_next_element.get()->type == WPT)
-        commandForWPT();
+        cmd = commandForWPT();
       else
-        commandForAWA();
+        cmd = commandForAWA();
 
-      // make sure to wait that the helm manager process
-      db_cmd_helm_applied.set(false);
+      if (checkViolentTack(cmd)){
+        // Force to update the setpoint
 
-      // Change the behaviour.
-      m_behaviour = PROCESS;
+        // Change the behaviour.
+        m_behaviour = ACQUISITION;
+        // Ask to update the setpoint.
+        db_ask_setpoint_update.set(true);
+
+      } else {
+        // Set in the DB the regulator angle command.
+        db_reg_cmd.set(cmd);
+
+        // Make sure to wait that the helm manager process
+        db_cmd_helm_applied.set(false);
+
+        // Change the behaviour.
+        m_behaviour = PROCESS;
+      }
+
     }
 
     void stateProcess() {
@@ -139,7 +159,7 @@ class Captain : public BaseManager
       }
     }
 
-    void commandForWPT() {
+    double commandForWPT() {
       // Get next wpt
       MissionElement wpt = *db_next_element.get();
 
@@ -173,11 +193,10 @@ class Captain : public BaseManager
       if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
       if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
 
-      // Set in the DB the regulator angle.
-      db_reg_cmd.set(new_reg);
+      return new_reg;
     }
 
-    void commandForAWA() {
+    double commandForAWA() {
       // Get next awa
       MissionElement awa = *db_next_element.get();
 
@@ -185,14 +204,33 @@ class Captain : public BaseManager
       float new_reg = awa.angle;
       from180to180(new_reg);
 
-      // Check that it doesn't go out of range
+      // Get the sign of the cmd
       int sign = new_reg >= 0 ? 1 : -1;
 
       // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
       if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
       if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
 
-      // Set in the DB the regulator angle.
-      db_reg_cmd.set(new_reg);
+      return new_reg;
     }
+
+    bool checkViolentTack(double new_cmd){
+      // Check if we try to do a tack while we are far away from the wind
+
+      // Get actual command
+      double actual_cmd = db_reg_cmd.get();
+
+      // Check if we are far away from the wind and if we have to do a tack.
+      bool is_far_away = abs(actual_cmd) > m_too_far_for_tack;
+      bool have_to_tack = actual_cmd / new_cmd < 0; //if they don't have the same sign
+
+      if (is_far_away && have_to_tack){
+        int sign = actual_cmd < 0 ? -1 : 1;
+        db_ask_add_awa_angle.set(sign * m_max_upwind);
+        return true;
+      }
+
+      return false;
+    }
+
 };

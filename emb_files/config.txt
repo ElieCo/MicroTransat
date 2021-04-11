@@ -7,7 +7,8 @@
         { "key": "Default_corridor_width", "value": 40 },
         { "key": "Default_validation_distance", "value": 15 },
         { "key": "Auto_start_angle", "value": 90 },
-        { "key": "Auto_start_duration", "value": 10 }
+        { "key": "Auto_start_duration", "value": 10 },
+        { "key": "Awa_tack_duration", "value": 10 }
       ]
   },
   {
@@ -41,7 +42,8 @@
       [
         { "key": "Max_upwind", "value": 45 },
         { "key": "Max_downwind", "value": 130 },
-        { "key": "Sleeping_duration", "value": 15000 }
+        { "key": "Sleeping_duration", "value": 15000 },
+        { "key": "Too_far_for_tack", "value": 75 }
       ]
   },
   {
