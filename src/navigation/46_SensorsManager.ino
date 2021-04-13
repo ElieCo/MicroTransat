@@ -14,8 +14,7 @@ class SensorsManager: public BaseManager
     db_fix_quality.init(m_db, "Fix_quality", int(0));
     db_satellites.init(m_db, "Satellites", int(0));
     db_fix_age.init(m_db, "Fix_age", unsigned(0));
-    db_time.init(m_db, "Time", unsigned(0), true);
-    db_date.init(m_db, "Date", unsigned(0));
+    db_datetime.init(m_db, "DateTime", String(""), true);
     db_speed.init(m_db, "Speed", float(0), true);
     db_course.init(m_db, "Course", float(0), true);
     db_average_course.init(m_db, "Average_course", float(0), true);
@@ -51,8 +50,7 @@ class SensorsManager: public BaseManager
       db_fix_quality.set(m_gps.fix_quality);
       db_satellites.set(m_gps.satellites);
       db_fix_age.set(int(m_gps.fix_age));
-      db_time.set(int(m_gps.time));
-      db_date.set(int(m_gps.date));
+      db_datetime.set(String(m_gps.date) + String(m_gps.time));
       db_speed.set(m_gps.speed);
       db_course.set(m_gps.course);
       db_average_course.set(averageCourse(m_gps.course));
@@ -101,8 +99,7 @@ class SensorsManager: public BaseManager
   DBData<int> db_fix_quality;
   DBData<int> db_satellites;
   DBData<unsigned> db_fix_age;
-  DBData<unsigned> db_time;
-  DBData<unsigned> db_date;
+  DBData<String> db_datetime;
   DBData<float> db_speed;
   DBData<float> db_course;
   DBData<float> db_average_course;

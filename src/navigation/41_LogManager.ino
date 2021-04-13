@@ -23,7 +23,7 @@ class LogManager: public BaseManager
           line += ";";
         }
       }
- 
+
       // Log a first line all the names.
       m_log_csv_file.write(line.replace("\n","").replace("\r",""));
 
@@ -63,16 +63,12 @@ class LogManager: public BaseManager
 
     bool fix = false;
     m_db->getData("Fix", fix);
-    unsigned time = 0;
-    m_db->getData("Time", time);
-    unsigned date = 0;
-    m_db->getData("Date", date);
+    String datetime = "";
+    m_db->getData("DateTime", datetime);
 
-    if(time != 0 && date != 0 && fix){
-      String t = String(time);
-      for (unsigned i = 0; i < max(unsigned(0), 6 - String(time).length()); i++) t = "0" + t;
-      String d = String(date);
-      String filename = d.substring(d.length()-4) + t.substring(0,4) + ".csv";
+    if(datetime != "" && fix){
+      String dt = String(datetime);
+      String filename = dt.substring(dt.length()-10, dt.length()-2) + ".csv";
 
       // Initialize the SD card.
       bool *sd_ready = m_db->initData("SD_ready", false);
