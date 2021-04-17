@@ -144,4 +144,5 @@ class Average{
 class ObjectForDB{
  public:
   virtual String toString(){ return ""; };
+  virtual String getLogTitle(String base_name){ return base_name; };
 };

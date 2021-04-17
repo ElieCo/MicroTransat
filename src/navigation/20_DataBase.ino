@@ -46,7 +46,8 @@ typedef ObjectForDB* ObjectForDBPtr;
 #define ADD_OBJECT_TO_MAP_AS_STRING(map_name, type, only_selected)                                  \
         for (int i = 0; i < VAR_NAME(type).size(); i++){                                            \
           if (!only_selected || selected.get(VAR_NAME(type).keyAt(i)))                              \
-            map_name.set(VAR_NAME(type).keyAt(i), VAR_NAME(type).valueAt(i)->toString());           \
+            map_name.set(VAR_NAME(type).valueAt(i)->getLogTitle(VAR_NAME(type).keyAt(i)),           \
+                         VAR_NAME(type).valueAt(i)->toString());                                    \
         }
 
 class DataBase {

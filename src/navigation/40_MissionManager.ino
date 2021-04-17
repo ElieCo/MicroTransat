@@ -18,8 +18,6 @@ class MissionElement : public ObjectForDB {
     double angle = 90;
     double duration = 30;
 
-    String out = "MissionElement";
-
     MissionElementType type = WPT;
 
     bool ephemeral;
@@ -27,17 +25,54 @@ class MissionElement : public ObjectForDB {
     String toString() {
       String result = "";
       if (type == WPT) {
-        result += "WPT/";
-        result += String(coord.lat, 7) + "/";
-        result += String(coord.lng, 7) + "/";
-        result += String(corridor_width) + "/";
+        result += "0";
+        result += ";";
+        result += String(coord.lat, 7);
+        result += ";";
+        result += String(coord.lng, 7);
+        result += ";";
+        result += String(corridor_width);
+        result += ";";
         result += String(valid_dist);
+        result += ";";
+        result += "0";
+        result += ";";
+        result += "0";
+
       } else {
-        result += "AWA/";
-        result += String(angle, 7) + "/";
-        result += String(duration, 7) + "/";
+        result += "1";
+        result += ";";
+        result += "0";
+        result += ";";
+        result += "0";
+        result += ";";
+        result += "0";
+        result += ";";
+        result += "0";
+        result += ";";
+        result += String(angle, 7);
+        result += ";";
+        result += String(duration, 7);
       }
       return result;
+    }
+
+    String getLogTitle(String base_name){
+      String title = "";
+      title += base_name + "_" + "Type";
+      title += ";";
+      title += base_name + "_" + "Latitude";
+      title += ";";
+      title += base_name + "_" + "Longitude";
+      title += ";";
+      title += base_name + "_" + "CorridorWidth";
+      title += ";";
+      title += base_name + "_" + "ValidationDistance";
+      title += ";";
+      title += base_name + "_" + "Angle";
+      title += ";";
+      title += base_name + "_" + "Duration";
+      return title;
     }
 };
 
