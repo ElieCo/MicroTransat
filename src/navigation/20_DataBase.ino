@@ -69,7 +69,7 @@ class DataBase {
         ADD_TO_MAP_AS_STRING(map_string, int, only_selected)
         ADD_TO_MAP_AS_STRING(map_string, unsigned, only_selected)
         ADD_TO_MAP_AS_STRING(map_string, long, only_selected)
-        ADD_TO_MAP_AS_STRING(map_string, float, only_selected)
+        ADD_TO_MAP_AS_STRING_WITH_DECIMAL(map_string, float, only_selected, 6)
         ADD_TO_MAP_AS_STRING_WITH_DECIMAL(map_string, double, only_selected, 7)
         ADD_TO_MAP_AS_STRING(map_string, bool, only_selected)
         ADD_TO_MAP_AS_STRING(map_string, String, only_selected)

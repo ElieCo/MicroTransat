@@ -63,11 +63,11 @@ class LogManager: public BaseManager
 
     bool fix = false;
     m_db->getData("Fix", fix);
-    String datetime = "";
+    float datetime = 0;
     m_db->getData("DateTime", datetime);
 
-    if(datetime != "" && fix){
-      String dt = String(datetime);
+    if(datetime != 0 && datetime > 210000 && fix){
+      String dt = String(datetime, 6).replace(".", "");
       String filename = dt.substring(dt.length()-10, dt.length()-2) + ".csv";
 
       // Initialize the SD card.
