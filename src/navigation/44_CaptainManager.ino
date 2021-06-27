@@ -60,8 +60,9 @@ class Captain : public BaseManager
     void config() {
       m_db->getData("Max_upwind", m_max_upwind);
       m_db->getData("Max_downwind", m_max_downwind);
-      m_db->getData("Sleeping_duration", m_sleeping_duration);
+      m_db->getData("Sleeping_duration", m_default_sleeping_duration);
       m_db->getData("Too_far_for_tack", m_too_far_for_tack);
+      m_sleeping_duration = m_default_sleeping_duration;
     }
 
     DBData<float> db_reg_cmd;
@@ -81,9 +82,9 @@ class Captain : public BaseManager
 
     BEHAVIOUR m_behaviour;
 
-    double m_max_upwind, m_max_downwind, m_sleeping_duration;
+    double m_max_upwind, m_max_downwind, m_default_sleeping_duration;
     double m_too_far_for_tack;
-    float m_prev_average_course;
+    float m_sleeping_duration;
 
     void stateSleep() {
       // Sleep
@@ -93,6 +94,9 @@ class Captain : public BaseManager
       else {
         if (millis() - timer > m_sleeping_duration) {
           timer = -1;
+
+          // Reset the sleeping duration to default
+          m_sleeping_duration = m_default_sleeping_duration;
 
           // Say that we just wake up.
           db_just_wake_up.set(true);
@@ -200,6 +204,9 @@ class Captain : public BaseManager
       // Get next awa
       MissionElement awa = *db_next_element.get();
 
+      // Set the sleeping duration to the AWA duration
+      m_sleeping_duration = 1000 * awa.duration;
+
       // Get awa cmd
       float new_reg = awa.angle;
       from180to180(new_reg);
@@ -222,7 +229,7 @@ class Captain : public BaseManager
 
       // Check if we are far away from the wind and if we have to do a tack.
       bool is_far_away = abs(actual_cmd) > m_too_far_for_tack;
-      bool have_to_tack = actual_cmd / new_cmd < 0; //if they don't have the same sign
+      bool have_to_tack = (actual_cmd / new_cmd) < 0; //if they don't have the same sign
 
       if (is_far_away && have_to_tack){
         int sign = actual_cmd < 0 ? -1 : 1;
