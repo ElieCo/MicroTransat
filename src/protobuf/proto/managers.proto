@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+import "utils.proto";
+
+///////////////////////////////////
+//              Data             //
+///////////////////////////////////
+
+message Data {
+    DataMissionManager mission_manager = 1;
+    DataLogManager log_manager = 2;
+    DataHelmManager helm_manager = 3;
+    DataWingManager wing_manager = 4;
+    DataCaptainManager captain_manager = 5;
+    DataCommManager comm_manager = 6;
+    DataSensorManager sensor_manager = 7;
+}
+
+message DataMissionManager{
+
+    message MissionElement {
+        enum ElementType {WPT = 0; AWA = 1;}
+
+        ElementType type = 1;
+
+        GeoCoordinate coordinates = 2;
+        float corridor_width = 3;
+        float valid_dist = 4;
+
+        float angle = 5;
+        float duration = 6;
+
+        bool ephemeral = 7;
+    }
+
+    float wpt_dist = 1;
+    float wpt_angle = 2;
+    int32 element_index = 3;
+    float dist_to_axis = 4;
+    bool in_corridor = 5;
+    float corridor_angle = 6;
+    MissionElement prev_element = 7;
+    MissionElement next_element = 8;
+    bool setpoint_update_asked = 9;
+}
+
+message DataLogManager {
+    bool sd_ready = 1;
+}
+
+message DataHelmManager {
+    float helm_angle = 1;
+    float helm_order = 2;
+    bool cmd_helm_applied = 3;
+}
+
+message DataWingManager {
+    float wing_angle = 1;
+}
+
+message DataCaptainManager {
+    enum Behaviour { SLEEP = 0; ACQUISITION = 1; DECIDE = 2; PROCESS = 3; RADIO_CONTROLLED = 4; }
+
+    bool just_wake_up = 1;
+    Behaviour behaviour = 2;
+}
+
+message DataCommManager {
+    string msg_received = 1;
+}
+
+message DataSensorManager {
+    message DataGps {
+        // Raw data
+        GeoCoordinate coord = 1;
+        float altitude = 2;
+        bool fix = 3;
+        int32 fix_quality = 4;
+        int32 sattelites = 5;
+        uint32 fix_age = 6;
+        uint32 time = 7;
+        uint32 date = 8;
+        float speed = 9;
+        float course = 10;
+        double hdop = 11;
+
+        // Compute data
+        bool recent_data = 50;
+        float average_course = 51;
+        bool average_course_full = 52;
+        bool gps_ready = 53;
+    }
+
+    message DataBattery {
+        float voltage = 1;
+    }
+
+    message DataRadioControl {
+        bool radio_controlled = 1;
+    }
+
+    DataGps gps = 1;
+    DataBattery battery = 2;
+    DataRadioControl radio = 3;
+}
+
+///////////////////////////////////
+//              Conf             //
+///////////////////////////////////
+
+message Conf{
+    ConfMissionManager mission_manager = 1;
+    ConfLogManager log_manager = 2;
+    ConfHelmManager helm_manager = 3;
+    ConfHelmManager wing_manager = 4;
+    ConfCaptainManager captain_manager = 5;
+    ConfCommManager comm_manager = 6;
+    ConfSensorManager sensor_manager = 7;
+}
+
+message ConfBaseManager {
+    int32 interval = 1; // [ms] wakeup interval
+}
+
+message ConfMissionManager {
+    ConfBaseManager base = 1;
+    
+    float default_corridor_width = 2;
+    float default_validation_distance = 3;
+    float start_auto_angle = 4;
+    float start_auto_duration = 5;
+}
+
+message ConfLogManager {
+    ConfBaseManager base = 1;
+}
+
+message ConfHelmManager {
+    ConfBaseManager base = 1;
+
+    float ratio = 2;
+    float offset = 3;
+    float normal_speed = 4;
+    float tack_speed = 5;
+}
+
+message ConfWingManager {
+    ConfBaseManager base = 1;
+
+    float step = 2;
+    float calib_offset = 3;
+}
+
+message ConfCaptainManager {
+    ConfBaseManager base = 1;
+
+    float max_upwind = 2;
+    float max_downwind = 3;
+    float speeping_duration = 4;
+}
+
+message ConfCommManager {
+    ConfBaseManager base = 1;
+}
+
+message ConfSensorManager {
+    ConfBaseManager base = 1;
+
+    message ConfGps {
+        double max_valid_hdop = 1;
+    }
+
+    ConfGps gps = 2;
+}
