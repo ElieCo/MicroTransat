@@ -50,8 +50,7 @@ class MissionManager : public BaseManager
     void init() {
       m_awa_start_time = 0;
 
-      bool *sd_ready = m_db->initData("SD_ready", false);
-      *sd_ready = m_mission_file.init(MISSION_FILENAME, *sd_ready);
+      GetLogData.sd_ready = m_mission_file.init(MISSION_FILENAME, GetLogData.sd_ready);
       parseMission();
     }
 

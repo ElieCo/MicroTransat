@@ -10,8 +10,7 @@ class ConfigManager: public BaseManager
   void init(){
     if (m_config.length() > 0) return;
 
-    bool *sd_ready = m_db->initData("SD_ready", false);
-    *sd_ready = m_config_file.init("config.txt", *sd_ready);
+    GetLogData.sd_ready = m_config_file.init("config.txt", GetLogData.sd_ready);
     parseConfig();
   }
 

@@ -72,8 +72,7 @@ class LogManager: public BaseManager
       String filename = d.substring(d.length()-4) + t.substring(0,4) + ".csv";
 
       // Initialize the SD card.
-      bool *sd_ready = m_db->initData("SD_ready", false);
-      *sd_ready = m_log_csv_file.init(filename, *sd_ready, false);
+      GetLogData.sd_ready = m_log_csv_file.init(filename, GetLogData.sd_ready, false);
       return m_log_csv_file.isOpen();
     }
     return false;
