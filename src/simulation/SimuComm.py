@@ -30,8 +30,21 @@ class Comm:
     def read(self):
         data = self.serial.read(250)
         self.buffer += data
-        if len(data) and data[0] != START[0]:
-            msg = str(data).replace("\\r", "").replace("b'", "").replace("'", "").replace("\\n", "\n").split("~")[0]
+        in_msg = False
+        debug = bytes()
+        for d in data:
+            d = d.to_bytes(1, byteorder='big')
+            if d == START:
+                in_msg = True
+            
+            if not in_msg:
+                debug += d
+
+            if d == STOP:
+                in_msg = False
+
+        if len(debug):
+            msg = str(debug).replace("\\r", "").replace("b'", "").replace("'", "").replace("\\n", "\n").split("~")[0]
             print(msg, end="")
 
             try:
