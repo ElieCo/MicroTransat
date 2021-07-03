@@ -5,4 +5,7 @@ build/
 *.user
 
 src/simulation/*.pyc
-src/simulation/__pycache__*
+src/simulation/__pycache__/*
+
+src/protobuf/nanopb/generator/__pycache__/*
+src/protobuf/nanopb/generator/proto/__pycache__*
