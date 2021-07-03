@@ -23,12 +23,12 @@ message DataMissionManager{
 
         ElementType type = 1;
 
-        GeoCoordinate coordinates = 2;
-        float corridor_width = 3;
-        float valid_dist = 4;
+        GeoCoordinate coord = 2;
+        double corridor_width = 3;
+        double valid_dist = 4;
 
-        float angle = 5;
-        float duration = 6;
+        double angle = 5;
+        double duration = 6;
 
         bool ephemeral = 7;
     }
@@ -49,13 +49,12 @@ message DataLogManager {
 }
 
 message DataHelmManager {
-    float helm_angle = 1;
-    float helm_order = 2;
-    bool cmd_helm_applied = 3;
+    float angle = 1;
+    bool cmd_applied = 2;
 }
 
 message DataWingManager {
-    float wing_angle = 1;
+    float angle = 1;
 }
 
 message DataCaptainManager {
@@ -63,10 +62,11 @@ message DataCaptainManager {
 
     bool just_wake_up = 1;
     Behaviour behaviour = 2;
+    float helm_order = 3;
 }
 
 message DataCommManager {
-    string msg_received = 1;
+    //string msg_received = 1;
 }
 
 message DataSensorManager {
@@ -76,7 +76,7 @@ message DataSensorManager {
         float altitude = 2;
         bool fix = 3;
         int32 fix_quality = 4;
-        int32 sattelites = 5;
+        int32 satellites = 5;
         uint32 fix_age = 6;
         uint32 time = 7;
         uint32 date = 8;
@@ -88,7 +88,7 @@ message DataSensorManager {
         bool recent_data = 50;
         float average_course = 51;
         bool average_course_full = 52;
-        bool gps_ready = 53;
+        bool ready = 53;
     }
 
     message DataBattery {

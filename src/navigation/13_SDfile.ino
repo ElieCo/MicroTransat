@@ -26,7 +26,7 @@ class SDfile
       return true;
     }
     else {
-      print("initialization carte SD : failed");
+      print("initialization SD card: failed");
       m_file_opened = false;
       return false;
     }

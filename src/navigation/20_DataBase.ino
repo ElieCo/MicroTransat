@@ -77,6 +77,9 @@ class DataBase {
         return map_string;
     }
 
+    Data data;
+    Conf conf;
+
   private:
 
     MAP(String)

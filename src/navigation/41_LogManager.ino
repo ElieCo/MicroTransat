@@ -61,12 +61,9 @@ class LogManager: public BaseManager
   bool prepareLogFile(){
     if (m_log_csv_file.isOpen()) return true;
 
-    bool fix = false;
-    m_db->getData("Fix", fix);
-    unsigned time = 0;
-    m_db->getData("Time", time);
-    unsigned date = 0;
-    m_db->getData("Date", date);
+    bool fix = GetSensorData.gps.fix;
+    unsigned time = GetSensorData.gps.time;
+    unsigned date = GetSensorData.gps.date;
 
     if(time != 0 && date != 0 && fix){
       String t = String(time);

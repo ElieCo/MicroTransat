@@ -1,6 +1,4 @@
 
-enum BEHAVIOUR { SLEEP = 0, ACQUISITION = 1, DECIDE = 2, PROCESS = 3, RADIO_CONTROLLED = 4 };
-
 class Captain : public BaseManager
 {
   public:
@@ -8,45 +6,30 @@ class Captain : public BaseManager
     ~Captain() {}
 
     void init() {
-      m_behaviour = ACQUISITION;
-
-      db_reg_cmd.init(m_db, "Regulator_angle", float(0), true);
-      db_in_corridor.init(m_db, "In_corridor", true, true);
-      db_cmd_helm_applied.init(m_db, "Cmd_helm_applied", true);
-      db_course.init(m_db, "Average_course", float(0));
-      MissionElement* empty_elem = NULL;
-      db_next_element.init(m_db, "Next_element", empty_elem);
-      db_just_wake_up.init(m_db, "Just_wake_up", false);
-      db_average_course_full.init(m_db, "Average_course_full", false);
-      db_corridor_angle.init(m_db, "Corridor_angle", float(0));
-      db_behaviour.init(m_db, "Behaviour", SLEEP, true);
-      db_latitude.init(m_db, "Latitude", double(0));
-      db_longitude.init(m_db, "Longitude", double(0));
-      db_radio_controlled.init(m_db, "Radio_controlled", false);
-      db_ask_setpoint_update.init(m_db, "Ask_setpoint_update", true);
+      m_behaviour = DataCaptainManager_Behaviour_ACQUISITION;
     }
 
     void go() {
-      db_behaviour.set(m_behaviour);
+      GetCaptainData.behaviour = m_behaviour;
 
       // Urgent check : if we are radio controlled
-      if (db_radio_controlled.get())
-        m_behaviour = RADIO_CONTROLLED;
+      if (GetSensorData.radio.radio_controlled)
+        m_behaviour = DataCaptainManager_Behaviour_RADIO_CONTROLLED;
 
       switch (m_behaviour) {
-        case SLEEP:
+        case DataCaptainManager_Behaviour_SLEEP:
           stateSleep();
           break;
-        case ACQUISITION:
+        case DataCaptainManager_Behaviour_ACQUISITION:
           stateAcquisition();
           break;
-        case DECIDE:
+        case DataCaptainManager_Behaviour_DECIDE:
           stateDecide();
           break;
-        case PROCESS:
+        case DataCaptainManager_Behaviour_PROCESS:
           stateProcess();
           break;
-        case RADIO_CONTROLLED:
+        case DataCaptainManager_Behaviour_RADIO_CONTROLLED:
           stateRadioControlled();
           break;
       }
@@ -62,21 +45,7 @@ class Captain : public BaseManager
       m_db->getData("Sleeping_duration", m_sleeping_duration);
     }
 
-    DBData<float> db_reg_cmd;
-    DBData<bool> db_in_corridor;
-    DBData<bool> db_cmd_helm_applied;
-    DBData<float> db_course;
-    DBData<MissionElement*> db_next_element;
-    DBData<bool> db_just_wake_up;
-    DBData<bool> db_average_course_full;
-    DBData<float> db_corridor_angle;
-    DBData<int> db_behaviour;
-    DBData<double> db_latitude;
-    DBData<double> db_longitude;
-    DBData<bool> db_radio_controlled;
-    DBData<bool> db_ask_setpoint_update;
-
-    BEHAVIOUR m_behaviour;
+    DataCaptainManager_Behaviour m_behaviour;
 
     double m_max_upwind, m_max_downwind, m_sleeping_duration;
     float m_prev_average_course;
@@ -91,10 +60,10 @@ class Captain : public BaseManager
           timer = -1;
 
           // Say that we just wake up.
-          db_just_wake_up.set(true);
-          db_average_course_full.set(false);
+          GetCaptainData.just_wake_up = true;
+          GetSensorData.gps.average_course_full = false;
 
-          m_behaviour = ACQUISITION;
+          m_behaviour = DataCaptainManager_Behaviour_ACQUISITION;
         }
       }
 
@@ -102,11 +71,11 @@ class Captain : public BaseManager
 
     void stateAcquisition() {
       // Wait that the missionManager update the setpoint
-      if (!db_ask_setpoint_update.get()){
+      if (!GetMissionData.setpoint_update_asked){
         // Wait that the course average buffer is full to take a decision.
-        if (db_average_course_full.get()) {
-          db_just_wake_up.set(false);
-          m_behaviour = DECIDE;
+        if (GetSensorData.gps.average_course_full) {
+          GetCaptainData.just_wake_up = false;
+          m_behaviour = DataCaptainManager_Behaviour_DECIDE;
         }
       }
 
@@ -114,52 +83,49 @@ class Captain : public BaseManager
 
     void stateDecide() {
 
-      if (db_next_element.get()->type == WPT)
+      if (GetMissionData.next_element.type == DataMissionManager_MissionElement_ElementType_WPT)
         commandForWPT();
       else
         commandForAWA();
 
       // make sure to wait that the helm manager process
-      db_cmd_helm_applied.set(false);
+      GetHelmData.cmd_applied = false;
 
       // Change the behaviour.
-      m_behaviour = PROCESS;
+      m_behaviour = DataCaptainManager_Behaviour_PROCESS;
     }
 
     void stateProcess() {
-      if (db_cmd_helm_applied.get())
-        m_behaviour = SLEEP;
+      if (GetHelmData.cmd_applied)
+        m_behaviour = DataCaptainManager_Behaviour_SLEEP;
     }
 
     void stateRadioControlled() {
-      if (!db_radio_controlled.get()){
-        m_behaviour = ACQUISITION;
+      if (!GetSensorData.radio.radio_controlled){
+        m_behaviour = DataCaptainManager_Behaviour_ACQUISITION;
         // Ask to update the setpoint.
-        db_ask_setpoint_update.set(true);
+        GetMissionData.setpoint_update_asked = true;
       }
     }
 
     void commandForWPT() {
-      // Get next wpt
-      MissionElement wpt = *db_next_element.get();
-
       // Calculate the angle to the next waypoint
-      float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), wpt.coord.lat, wpt.coord.lng);
+      float angleToWaypoint = get_course(GetSensorData.gps.coord.latitude, GetSensorData.gps.coord.longitude, GetMissionData.next_element.coord.latitude, GetMissionData.next_element.coord.longitude);
 
       // Calcul the difference between the actual course an the angle to the next waypoint.
-      float diff = angleToWaypoint - db_course.get();
+      float diff = angleToWaypoint - GetSensorData.gps.average_course;
 
       // Calcul the new regulator command to reach the waypoint.
-      float new_reg = db_reg_cmd.get() + diff;
+      float new_reg = GetCaptainData.helm_order + diff;
       from180to180(new_reg);
 
-      float diff_wpt_corridor = angleToWaypoint - db_corridor_angle.get();
+      float diff_wpt_corridor = angleToWaypoint - GetMissionData.corridor_angle;
       from180to180(diff_wpt_corridor);
 
       // If she's on the corridor, she go on the same direction as the previous regul, else reach the corridor (depend of if we go downwind or upwind).
       bool isPositive = true;
-      if (db_in_corridor.get()) {
-        isPositive = db_reg_cmd.get() >= 0;
+      if (GetMissionData.in_corridor) {
+        isPositive = GetCaptainData.helm_order >= 0;
       } else {
         if (abs(new_reg) < 90) {
           isPositive = diff_wpt_corridor >= 0;
@@ -174,15 +140,12 @@ class Captain : public BaseManager
       if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
 
       // Set in the DB the regulator angle.
-      db_reg_cmd.set(new_reg);
+      GetCaptainData.helm_order = new_reg;
     }
 
     void commandForAWA() {
-      // Get next awa
-      MissionElement awa = *db_next_element.get();
-
       // Get awa cmd
-      float new_reg = awa.angle;
+      float new_reg = GetMissionData.next_element.angle;
       from180to180(new_reg);
 
       // Check that it doesn't go out of range
@@ -193,6 +156,6 @@ class Captain : public BaseManager
       if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
 
       // Set in the DB the regulator angle.
-      db_reg_cmd.set(new_reg);
+      GetCaptainData.helm_order = new_reg;
     }
 };
