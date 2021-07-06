@@ -1,0 +1,58 @@
+{
+  "missionManager": {
+    "base": {
+      "interval": 500
+    },
+    "defaultCorridorWidth": 40.0,
+    "defaultValidationDistance": 15.0,
+    "startAutoAngle": 90.0,
+    "startAutoDuration": 10.0
+  },
+  "logManager": {
+    "base": {
+      "interval": 500
+    }
+  },
+  "helmManager": {
+    "base": {
+      "interval": 100
+    },
+    "ratio": -0.56,
+    "offset": 90.0,
+    "normalSpeed": 20.0,
+    "tackSpeed": 90.0
+  },
+  "wingManager": {
+    "base": {
+      "interval": 100
+    },
+    "step": 10.0
+  },
+  "captainManager": {
+    "base": {
+      "interval": 100
+    },
+    "maxUpwind": 45.0,
+    "maxDownwind": 130.0,
+    "speepingDuration": 15000.0
+  },
+  "commManager": {
+    "base": {}
+  },
+  "sensorManager": {
+    "base": {},
+    "gps": {
+      "maxValidHdop": 500.0
+    }
+  },
+  "lightManager": {
+    "base": {
+      "interval": 500
+    }
+  },
+  "configManager": {
+    "base": {
+      "interval": 10000
+    }
+  }
+}

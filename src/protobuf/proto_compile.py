@@ -3,13 +3,14 @@ import os
 OS_NAME = ""
 INPUT_DIR = "./proto/"
 TMP_DIR = "./.tmp_working_dir/"
-OUTPUT_FILE = "../navigation/00_Protobuf.ino"
+CPP_OUTPUT_FILE = "../navigation/00_Protobuf.ino"
+PYTHON_OUTPUT_DIR = "./python/"
 PROTOC = "./nanopb/generator/protoc"
 
 ADDED_FILES = []
 
 def clearDest():
-    open(OUTPUT_FILE, 'w').close()
+    open(CPP_OUTPUT_FILE, 'w').close()
 
 def removeIncludes(lines):
     result = []
@@ -60,10 +61,10 @@ def addNanopbToFile():
     ]
 
     for h in h_files:
-        copyInto(dir+h, OUTPUT_FILE)
+        copyInto(dir+h, CPP_OUTPUT_FILE)
 
     for c in c_files:
-        copyInto(dir+c, OUTPUT_FILE)
+        copyInto(dir+c, CPP_OUTPUT_FILE)
 
 def addProtoToFile():
     h_files = []
@@ -76,10 +77,10 @@ def addProtoToFile():
             c_files.append(f_name)
 
     for h in h_files:
-        copyInto(TMP_DIR+h, OUTPUT_FILE)
+        copyInto(TMP_DIR+h, CPP_OUTPUT_FILE)
 
     for c in c_files:
-        copyInto(TMP_DIR+c, OUTPUT_FILE)
+        copyInto(TMP_DIR+c, CPP_OUTPUT_FILE)
 
     
 
@@ -100,7 +101,7 @@ if __name__ == "__main__":
         proto_files = os.listdir(INPUT_DIR)
         for f in proto_files:
             if ".proto" in f:
-                cmd = PROTOC + " --nanopb_out=" + TMP_DIR + " --proto_path=" + INPUT_DIR + " " + f
+                cmd = PROTOC + " --nanopb_out=" + TMP_DIR + " --python_out=" + PYTHON_OUTPUT_DIR + " --proto_path=" + INPUT_DIR + " " + f
                 print(cmd)
                 os.system(cmd)
 

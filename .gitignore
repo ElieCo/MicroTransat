@@ -9,3 +9,4 @@ src/simulation/__pycache__/*
 
 src/protobuf/nanopb/generator/__pycache__/*
 src/protobuf/nanopb/generator/proto/__pycache__*
+src/protobuf/python/__pycache__/*
