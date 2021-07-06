@@ -14,6 +14,8 @@ message Data {
     DataCaptainManager captain_manager = 5;
     DataCommManager comm_manager = 6;
     DataSensorManager sensor_manager = 7;
+    DataLightManager light_manager = 8;
+    DataConfManager config_manager = 9;
 }
 
 message DataMissionManager{
@@ -104,6 +106,12 @@ message DataSensorManager {
     DataRadioControl radio = 3;
 }
 
+message DataLightManager {
+}
+
+message DataConfManager {
+}
+
 ///////////////////////////////////
 //              Conf             //
 ///////////////////////////////////
@@ -112,10 +120,12 @@ message Conf{
     ConfMissionManager mission_manager = 1;
     ConfLogManager log_manager = 2;
     ConfHelmManager helm_manager = 3;
-    ConfHelmManager wing_manager = 4;
+    ConfWingManager wing_manager = 4;
     ConfCaptainManager captain_manager = 5;
     ConfCommManager comm_manager = 6;
     ConfSensorManager sensor_manager = 7;
+    ConfLightManager light_manager = 8;
+    ConfConfManager config_manager = 9;
 }
 
 message ConfBaseManager {
@@ -171,4 +181,12 @@ message ConfSensorManager {
     }
 
     ConfGps gps = 2;
+}
+
+message ConfLightManager {
+    ConfBaseManager base = 1;
+}
+
+message ConfConfManager {
+    ConfBaseManager base = 1;
 }
