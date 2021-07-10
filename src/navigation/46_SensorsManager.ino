@@ -1,5 +1,10 @@
 
 
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->sensor_manager
+#define GetConf m_main_conf->sensor_manager
+
 class SensorsManager: public BaseManager
 {
   public:
@@ -38,7 +43,7 @@ class SensorsManager: public BaseManager
       GetSensorData.gps.course = m_gps.course;
       GetSensorData.gps.average_course = averageCourse(m_gps.course);
       GetSensorData.gps.hdop = m_gps.hdop;
-      if (m_gps.fix && m_gps.hdop > 0 && m_gps.hdop < m_max_valid_hdop) GetSensorData.gps.ready = true;
+      if (m_gps.fix && m_gps.hdop > 0 && m_gps.hdop < GetConf.gps.max_valid_hdop) GetSensorData.gps.ready = true;
       else GetSensorData.gps.ready = false;
     }
 
@@ -71,10 +76,6 @@ class SensorsManager: public BaseManager
       return false;
   }
 
-  void config(){
-    m_db->getData("Max_valid_hdop", m_max_valid_hdop);
-  }
-
   float averageCourse(float new_course){
     static bool prev_just_wake_up_value = GetCaptainData.just_wake_up;
     if (prev_just_wake_up_value != GetCaptainData.just_wake_up && GetCaptainData.just_wake_up) {
@@ -93,7 +94,6 @@ class SensorsManager: public BaseManager
 
   Gps m_gps;
   AverageAngle m_course_average;
-  double m_max_valid_hdop;
 
   Battery m_bat;
 

@@ -17,9 +17,9 @@ _sym_db = _symbol_database.Default()
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='utils.proto',
   package='',
-  syntax='proto3',
+  syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\x0butils.proto\"4\n\rGeoCoordinate\x12\x10\n\x08latitude\x18\x01 \x01(\x01\x12\x11\n\tlongitude\x18\x02 \x01(\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0butils.proto\"4\n\rGeoCoordinate\x12\x10\n\x08latitude\x18\x01 \x02(\x01\x12\x11\n\tlongitude\x18\x02 \x02(\x01')
 )
 
 
@@ -34,14 +34,14 @@ _GEOCOORDINATE = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='latitude', full_name='GeoCoordinate.latitude', index=0,
-      number=1, type=1, cpp_type=5, label=1,
+      number=1, type=1, cpp_type=5, label=2,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='longitude', full_name='GeoCoordinate.longitude', index=1,
-      number=2, type=1, cpp_type=5, label=1,
+      number=2, type=1, cpp_type=5, label=2,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -54,7 +54,7 @@ _GEOCOORDINATE = _descriptor.Descriptor(
   ],
   serialized_options=None,
   is_extendable=False,
-  syntax='proto3',
+  syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],

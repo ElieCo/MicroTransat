@@ -1,4 +1,9 @@
 
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->captain_manager
+#define GetConf m_main_conf->captain_manager
+
 class Captain : public BaseManager
 {
   public:
@@ -39,15 +44,8 @@ class Captain : public BaseManager
 
   private:
 
-    void config() {
-      m_db->getData("Max_upwind", m_max_upwind);
-      m_db->getData("Max_downwind", m_max_downwind);
-      m_db->getData("Sleeping_duration", m_sleeping_duration);
-    }
-
     DataCaptainManager_Behaviour m_behaviour;
 
-    double m_max_upwind, m_max_downwind, m_sleeping_duration;
     float m_prev_average_course;
 
     void stateSleep() {
@@ -56,7 +54,7 @@ class Captain : public BaseManager
       static int timer = -1;
       if (timer == -1) timer = millis();
       else {
-        if (millis() - timer > m_sleeping_duration) {
+        if (millis() - timer > GetConf.speeping_duration) {
           timer = -1;
 
           // Say that we just wake up.
@@ -135,9 +133,13 @@ class Captain : public BaseManager
       }
       int sign = isPositive ? 1 : -1;
 
-      // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
-      if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
-      if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
+      // Avoid to go less than *GetConf.max_upwind* deg or more than *GetConf.max_downwind*.
+      if (abs(new_reg) < GetConf.max_upwind) new_reg = sign * GetConf.max_upwind;
+      if (abs(new_reg) > GetConf.max_downwind) new_reg = sign * GetConf.max_downwind;
+
+      
+      //print("Captain:", GetConf.max_downwind, GetConf.max_upwind);
+
 
       // Set in the DB the regulator angle.
       GetCaptainData.helm_order = new_reg;
@@ -151,9 +153,9 @@ class Captain : public BaseManager
       // Check that it doesn't go out of range
       int sign = new_reg >= 0 ? 1 : -1;
 
-      // Avoid to go less than *m_max_upwind* deg or more than *m_max_downwind*.
-      if (abs(new_reg) < m_max_upwind) new_reg = sign * m_max_upwind;
-      if (abs(new_reg) > m_max_downwind) new_reg = sign * m_max_downwind;
+      // Avoid to go less than *GetConf.max_upwind* deg or more than *GetConf.max_downwind*.
+      if (abs(new_reg) < GetConf.max_upwind) new_reg = sign * GetConf.max_upwind;
+      if (abs(new_reg) > GetConf.max_downwind) new_reg = sign * GetConf.max_downwind;
 
       // Set in the DB the regulator angle.
       GetCaptainData.helm_order = new_reg;

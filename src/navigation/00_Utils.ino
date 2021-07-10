@@ -140,8 +140,3 @@ class Average{
   int m_index;
 
 };
-
-class ObjectForDB{
- public:
-  virtual String toString(){ return ""; };
-};

@@ -32,6 +32,11 @@ class SDfile
     }
   }
 
+  void write(unsigned char* d, uint32_t s){
+    m_file.write(d, s);
+    m_file.flush();
+  }
+
   void write(String line){
     if (DEBUGLEVEL>= 1) print(line+"~");
     if (!m_file_opened) return;

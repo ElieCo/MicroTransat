@@ -26,7 +26,8 @@
     "base": {
       "interval": 100
     },
-    "step": 10.0
+    "step": 10.0,
+    "calibOffset": 0.0
   },
   "captainManager": {
     "base": {
@@ -37,10 +38,14 @@
     "speepingDuration": 15000.0
   },
   "commManager": {
-    "base": {}
+    "base": {
+      "interval": 0
+    }
   },
   "sensorManager": {
-    "base": {},
+    "base": {
+      "interval": 0
+    },
     "gps": {
       "maxValidHdop": 500.0
     }

@@ -1,5 +1,10 @@
 
 
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->wing_manager
+#define GetConf m_main_conf->wing_manager
+
 class WingManager : public BaseManager
 {
   public:
@@ -7,8 +12,8 @@ class WingManager : public BaseManager
   ~WingManager(){}
 
   void init(){
-    m_starbord_angle =  m_wing_calib - m_wing_delta;
-    m_port_angle =      m_wing_calib + m_wing_delta;
+    m_starbord_angle =  GetConf.calib_offset - GetConf.step;
+    m_port_angle =      GetConf.calib_offset + GetConf.step;
 
     m_servo.init(5, 1, 90);
   }
@@ -27,12 +32,6 @@ class WingManager : public BaseManager
 
   private:
 
-  void config(){
-    m_db->getData("Wing_delta", m_wing_delta);
-    m_db->getData("Wing_calib", m_wing_calib);
-  }
-
   int m_starbord_angle, m_port_angle;
-  double m_wing_delta, m_wing_calib;
   ServoMotor m_servo;
 };

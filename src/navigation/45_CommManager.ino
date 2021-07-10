@@ -1,4 +1,9 @@
 
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->comm_manager
+#define GetConf m_main_conf->comm_manager
+
 class CommManager : public BaseManager
 {
   public:
@@ -51,7 +56,7 @@ class CommManager : public BaseManager
    * @return line the string with all data in it.
    */
   String getLine(){
-    Map<String, String> data = m_db->getAllData(true);
+    Map<String, String> data; // = m_db->getAllData(true);
     String line = "";
     for (int i = 0; i < data.size(); i++){
       line += data.valueAt(i).c_str();

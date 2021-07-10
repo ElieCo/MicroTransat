@@ -1,5 +1,10 @@
 
 
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->helm_manager
+#define GetConf m_main_conf->helm_manager
+
 class HelmManager : public BaseManager
 {
   public:
@@ -8,18 +13,16 @@ class HelmManager : public BaseManager
 
   void init() {
 
-    db_max_upwind.init(m_db, "Max_upwind", double(0));
-
     m_last_time = -1;
 
-    m_servo.init(7, m_helm_ratio, m_helm_offset);
+    m_servo.init(7, GetConf.ratio, GetConf.offset);
   }
 
   void go(){
 
     float angle_speed;
-    if (abs(GetHelmData.angle) <= db_max_upwind.get()) angle_speed = m_tack_angle_speed;
-    else angle_speed = m_normal_angle_speed;
+    if (abs(GetHelmData.angle) <= GetCaptainConf.max_upwind) angle_speed = GetConf.tack_speed;
+    else angle_speed = GetConf.normal_speed;
 
     // Calcul the time this the last time.
     int time = millis();
@@ -51,17 +54,6 @@ class HelmManager : public BaseManager
 
   private:
 
-  void config(){
-    m_db->getData("Helm_ratio", m_helm_ratio);
-    m_db->getData("Helm_offset", m_helm_offset);
-    m_db->getData("Helm_normal_speed", m_normal_angle_speed);
-    m_db->getData("Helm_tack_speed", m_tack_angle_speed);
-  }
-
-  DBData<double> db_max_upwind;
-
-  double m_normal_angle_speed, m_tack_angle_speed; // deg/s
-  double m_helm_ratio, m_helm_offset;
   int m_last_time;
 
   ServoMotor m_servo;

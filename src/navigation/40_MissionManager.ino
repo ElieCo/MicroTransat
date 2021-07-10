@@ -2,44 +2,10 @@
 
 #define MISSION_FILENAME "mission.txt"
 
-enum MissionElementType { WPT = 0, AWA = 1 };
-
-class MissionElement : public ObjectForDB {
-  public:
-    MissionElement(bool ephemeral = false)
-      : ObjectForDB()
-      , ephemeral(ephemeral)
-    {}
-
-    Coord coord;
-    double corridor_width = -1;
-    double valid_dist = -1;
-
-    double angle = 90;
-    double duration = 30;
-
-    String out = "MissionElement";
-
-    MissionElementType type = WPT;
-
-    bool ephemeral;
-
-    String toString() {
-      String result = "";
-      if (type == WPT) {
-        result += "WPT/";
-        result += String(coord.lat, 7) + "/";
-        result += String(coord.lng, 7) + "/";
-        result += String(corridor_width) + "/";
-        result += String(valid_dist);
-      } else {
-        result += "AWA/";
-        result += String(angle, 7) + "/";
-        result += String(duration, 7) + "/";
-      }
-      return result;
-    }
-};
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->mission_manager
+#define GetConf m_main_conf->mission_manager
 
 class MissionManager : public BaseManager
 {
@@ -61,8 +27,8 @@ class MissionManager : public BaseManager
         if (!m_mission_elements.at(GetMissionData.element_index).ephemeral) {
           DataMissionManager_MissionElement awa;
           awa.ephemeral = true;
-          awa.angle = m_auto_start_angle;
-          awa.duration = m_auto_start_duration;
+          awa.angle = GetConf.start_auto_angle;
+          awa.duration = GetConf.start_auto_duration;
           awa.type = DataMissionManager_MissionElement_ElementType_AWA;
           m_mission_elements.insert(GetMissionData.element_index, awa);
 
@@ -89,16 +55,7 @@ class MissionManager : public BaseManager
 
   private:
 
-    void config() {
-      m_db->getData("Default_corridor_width", m_default_corridor_width);
-      m_db->getData("Default_validation_distance", m_default_validation_distance);
-      m_db->getData("Auto_start_angle", m_auto_start_angle);
-      m_db->getData("Auto_start_duration", m_auto_start_duration);
-    }
-
     Vector<DataMissionManager_MissionElement> m_mission_elements;
-    double m_default_validation_distance, m_default_corridor_width;
-    double m_auto_start_angle, m_auto_start_duration;
     unsigned long m_awa_start_time;
 
     SDfile m_mission_file;
@@ -118,10 +75,10 @@ class MissionManager : public BaseManager
           wp.coord.longitude = mission[i]["longitude"];
 
           if (mission[i].hasOwnProperty("corridor_width")) wp.corridor_width = mission[i]["corridor_width"];
-          else wp.corridor_width = m_default_corridor_width;
+          else wp.corridor_width = GetConf.default_corridor_width;
 
           if (mission[i].hasOwnProperty("validation_distance")) wp.valid_dist = mission[i]["validation_distance"];
-          else wp.valid_dist = m_default_validation_distance;
+          else wp.valid_dist = GetConf.default_validation_distance;
 
           wp.type = DataMissionManager_MissionElement_ElementType_WPT;
 

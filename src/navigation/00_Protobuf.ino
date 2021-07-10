@@ -4419,8 +4419,8 @@ extern "C" {
 
 /* Struct field encoding specification for nanopb */
 #define GeoCoordinate_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, DOUBLE,   latitude,          1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   longitude,         2)
+X(a, STATIC,   REQUIRED, DOUBLE,   latitude,          1) \
+X(a, STATIC,   REQUIRED, DOUBLE,   longitude,         2)
 #define GeoCoordinate_CALLBACK NULL
 #define GeoCoordinate_DEFAULT NULL
 
@@ -4466,6 +4466,14 @@ typedef struct _DataCommManager {
     char dummy_field;
 } DataCommManager;
 
+typedef struct _DataConfManager { 
+    char dummy_field;
+} DataConfManager;
+
+typedef struct _DataLightManager { 
+    char dummy_field;
+} DataLightManager;
+
 typedef struct _ConfBaseManager { 
     int32_t interval; 
 } ConfBaseManager;
@@ -4491,7 +4499,6 @@ typedef struct _DataLogManager {
 
 typedef struct _DataMissionManager_MissionElement { 
     DataMissionManager_MissionElement_ElementType type; 
-    bool has_coord;
     GeoCoordinate coord; 
     double corridor_width; 
     double valid_dist; 
@@ -4505,8 +4512,7 @@ typedef struct _DataSensorManager_DataBattery {
 } DataSensorManager_DataBattery;
 
 typedef struct _DataSensorManager_DataGps { 
-    bool has_coord;
-    GeoCoordinate coord; /* [ms] wakeup interval */
+    GeoCoordinate coord; 
     float altitude; 
     bool fix; 
     int32_t fix_quality; 
@@ -4524,7 +4530,7 @@ typedef struct _DataSensorManager_DataGps {
 } DataSensorManager_DataGps;
 
 typedef struct _DataSensorManager_DataRadioControl { 
-    bool radio_controlled; 
+    bool radio_controlled; /* [ms] wakeup interval */
 } DataSensorManager_DataRadioControl;
 
 typedef struct _DataWingManager { 
@@ -4532,7 +4538,6 @@ typedef struct _DataWingManager {
 } DataWingManager;
 
 typedef struct _ConfCaptainManager { 
-    bool has_base;
     ConfBaseManager base; 
     float max_upwind; 
     float max_downwind; 
@@ -4540,12 +4545,14 @@ typedef struct _ConfCaptainManager {
 } ConfCaptainManager;
 
 typedef struct _ConfCommManager { 
-    bool has_base;
     ConfBaseManager base; 
 } ConfCommManager;
 
+typedef struct _ConfConfManager { 
+    ConfBaseManager base; 
+} ConfConfManager;
+
 typedef struct _ConfHelmManager { 
-    bool has_base;
     ConfBaseManager base; 
     float ratio; 
     float offset; 
@@ -4553,13 +4560,15 @@ typedef struct _ConfHelmManager {
     float tack_speed; 
 } ConfHelmManager;
 
+typedef struct _ConfLightManager { 
+    ConfBaseManager base; 
+} ConfLightManager;
+
 typedef struct _ConfLogManager { 
-    bool has_base;
     ConfBaseManager base; 
 } ConfLogManager;
 
 typedef struct _ConfMissionManager { 
-    bool has_base;
     ConfBaseManager base; 
     float default_corridor_width; 
     float default_validation_distance; 
@@ -4568,14 +4577,11 @@ typedef struct _ConfMissionManager {
 } ConfMissionManager;
 
 typedef struct _ConfSensorManager { 
-    bool has_base;
     ConfBaseManager base; 
-    bool has_gps;
     ConfSensorManager_ConfGps gps; 
 } ConfSensorManager;
 
 typedef struct _ConfWingManager { 
-    bool has_base;
     ConfBaseManager base; 
     float step; 
     float calib_offset; 
@@ -4588,54 +4594,39 @@ typedef struct _DataMissionManager {
     float dist_to_axis; 
     bool in_corridor; 
     float corridor_angle; 
-    bool has_prev_element;
     DataMissionManager_MissionElement prev_element; 
-    bool has_next_element;
     DataMissionManager_MissionElement next_element; 
     bool setpoint_update_asked; 
 } DataMissionManager;
 
 typedef struct _DataSensorManager { 
-    bool has_gps;
     DataSensorManager_DataGps gps; 
-    bool has_battery;
     DataSensorManager_DataBattery battery; 
-    bool has_radio;
     DataSensorManager_DataRadioControl radio; 
 } DataSensorManager;
 
 typedef struct _Conf { 
-    bool has_mission_manager;
     ConfMissionManager mission_manager; 
-    bool has_log_manager;
     ConfLogManager log_manager; 
-    bool has_helm_manager;
     ConfHelmManager helm_manager; 
-    bool has_wing_manager;
-    ConfHelmManager wing_manager; 
-    bool has_captain_manager;
+    ConfWingManager wing_manager; 
     ConfCaptainManager captain_manager; 
-    bool has_comm_manager;
     ConfCommManager comm_manager; 
-    bool has_sensor_manager;
     ConfSensorManager sensor_manager; 
+    ConfLightManager light_manager; 
+    ConfConfManager config_manager; 
 } Conf;
 
 typedef struct _Data { 
-    bool has_mission_manager;
     DataMissionManager mission_manager; 
-    bool has_log_manager;
     DataLogManager log_manager; 
-    bool has_helm_manager;
     DataHelmManager helm_manager; 
-    bool has_wing_manager;
     DataWingManager wing_manager; 
-    bool has_captain_manager;
     DataCaptainManager captain_manager; 
-    bool has_comm_manager;
     DataCommManager comm_manager; 
-    bool has_sensor_manager;
     DataSensorManager sensor_manager; 
+    DataLightManager light_manager; 
+    DataConfManager config_manager; 
 } Data;
 
 
@@ -4654,50 +4645,58 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define Data_init_default                        {false, DataMissionManager_init_default, false, DataLogManager_init_default, false, DataHelmManager_init_default, false, DataWingManager_init_default, false, DataCaptainManager_init_default, false, DataCommManager_init_default, false, DataSensorManager_init_default}
-#define DataMissionManager_init_default          {0, 0, 0, 0, 0, 0, false, DataMissionManager_MissionElement_init_default, false, DataMissionManager_MissionElement_init_default, 0}
-#define DataMissionManager_MissionElement_init_default {_DataMissionManager_MissionElement_ElementType_MIN, false, GeoCoordinate_init_default, 0, 0, 0, 0, 0}
+#define Data_init_default                        {DataMissionManager_init_default, DataLogManager_init_default, DataHelmManager_init_default, DataWingManager_init_default, DataCaptainManager_init_default, DataCommManager_init_default, DataSensorManager_init_default, DataLightManager_init_default, DataConfManager_init_default}
+#define DataMissionManager_init_default          {0, 0, 0, 0, 0, 0, DataMissionManager_MissionElement_init_default, DataMissionManager_MissionElement_init_default, 0}
+#define DataMissionManager_MissionElement_init_default {_DataMissionManager_MissionElement_ElementType_MIN, GeoCoordinate_init_default, 0, 0, 0, 0, 0}
 #define DataLogManager_init_default              {0}
 #define DataHelmManager_init_default             {0, 0}
 #define DataWingManager_init_default             {0}
 #define DataCaptainManager_init_default          {0, _DataCaptainManager_Behaviour_MIN, 0}
 #define DataCommManager_init_default             {0}
-#define DataSensorManager_init_default           {false, DataSensorManager_DataGps_init_default, false, DataSensorManager_DataBattery_init_default, false, DataSensorManager_DataRadioControl_init_default}
-#define DataSensorManager_DataGps_init_default   {false, GeoCoordinate_init_default, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define DataSensorManager_init_default           {DataSensorManager_DataGps_init_default, DataSensorManager_DataBattery_init_default, DataSensorManager_DataRadioControl_init_default}
+#define DataSensorManager_DataGps_init_default   {GeoCoordinate_init_default, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 #define DataSensorManager_DataBattery_init_default {0}
 #define DataSensorManager_DataRadioControl_init_default {0}
-#define Conf_init_default                        {false, ConfMissionManager_init_default, false, ConfLogManager_init_default, false, ConfHelmManager_init_default, false, ConfHelmManager_init_default, false, ConfCaptainManager_init_default, false, ConfCommManager_init_default, false, ConfSensorManager_init_default}
+#define DataLightManager_init_default            {0}
+#define DataConfManager_init_default             {0}
+#define Conf_init_default                        {ConfMissionManager_init_default, ConfLogManager_init_default, ConfHelmManager_init_default, ConfWingManager_init_default, ConfCaptainManager_init_default, ConfCommManager_init_default, ConfSensorManager_init_default, ConfLightManager_init_default, ConfConfManager_init_default}
 #define ConfBaseManager_init_default             {0}
-#define ConfMissionManager_init_default          {false, ConfBaseManager_init_default, 0, 0, 0, 0}
-#define ConfLogManager_init_default              {false, ConfBaseManager_init_default}
-#define ConfHelmManager_init_default             {false, ConfBaseManager_init_default, 0, 0, 0, 0}
-#define ConfWingManager_init_default             {false, ConfBaseManager_init_default, 0, 0}
-#define ConfCaptainManager_init_default          {false, ConfBaseManager_init_default, 0, 0, 0}
-#define ConfCommManager_init_default             {false, ConfBaseManager_init_default}
-#define ConfSensorManager_init_default           {false, ConfBaseManager_init_default, false, ConfSensorManager_ConfGps_init_default}
+#define ConfMissionManager_init_default          {ConfBaseManager_init_default, 0, 0, 0, 0}
+#define ConfLogManager_init_default              {ConfBaseManager_init_default}
+#define ConfHelmManager_init_default             {ConfBaseManager_init_default, 0, 0, 0, 0}
+#define ConfWingManager_init_default             {ConfBaseManager_init_default, 0, 0}
+#define ConfCaptainManager_init_default          {ConfBaseManager_init_default, 0, 0, 0}
+#define ConfCommManager_init_default             {ConfBaseManager_init_default}
+#define ConfSensorManager_init_default           {ConfBaseManager_init_default, ConfSensorManager_ConfGps_init_default}
 #define ConfSensorManager_ConfGps_init_default   {0}
-#define Data_init_zero                           {false, DataMissionManager_init_zero, false, DataLogManager_init_zero, false, DataHelmManager_init_zero, false, DataWingManager_init_zero, false, DataCaptainManager_init_zero, false, DataCommManager_init_zero, false, DataSensorManager_init_zero}
-#define DataMissionManager_init_zero             {0, 0, 0, 0, 0, 0, false, DataMissionManager_MissionElement_init_zero, false, DataMissionManager_MissionElement_init_zero, 0}
-#define DataMissionManager_MissionElement_init_zero {_DataMissionManager_MissionElement_ElementType_MIN, false, GeoCoordinate_init_zero, 0, 0, 0, 0, 0}
+#define ConfLightManager_init_default            {ConfBaseManager_init_default}
+#define ConfConfManager_init_default             {ConfBaseManager_init_default}
+#define Data_init_zero                           {DataMissionManager_init_zero, DataLogManager_init_zero, DataHelmManager_init_zero, DataWingManager_init_zero, DataCaptainManager_init_zero, DataCommManager_init_zero, DataSensorManager_init_zero, DataLightManager_init_zero, DataConfManager_init_zero}
+#define DataMissionManager_init_zero             {0, 0, 0, 0, 0, 0, DataMissionManager_MissionElement_init_zero, DataMissionManager_MissionElement_init_zero, 0}
+#define DataMissionManager_MissionElement_init_zero {_DataMissionManager_MissionElement_ElementType_MIN, GeoCoordinate_init_zero, 0, 0, 0, 0, 0}
 #define DataLogManager_init_zero                 {0}
 #define DataHelmManager_init_zero                {0, 0}
 #define DataWingManager_init_zero                {0}
 #define DataCaptainManager_init_zero             {0, _DataCaptainManager_Behaviour_MIN, 0}
 #define DataCommManager_init_zero                {0}
-#define DataSensorManager_init_zero              {false, DataSensorManager_DataGps_init_zero, false, DataSensorManager_DataBattery_init_zero, false, DataSensorManager_DataRadioControl_init_zero}
-#define DataSensorManager_DataGps_init_zero      {false, GeoCoordinate_init_zero, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define DataSensorManager_init_zero              {DataSensorManager_DataGps_init_zero, DataSensorManager_DataBattery_init_zero, DataSensorManager_DataRadioControl_init_zero}
+#define DataSensorManager_DataGps_init_zero      {GeoCoordinate_init_zero, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 #define DataSensorManager_DataBattery_init_zero  {0}
 #define DataSensorManager_DataRadioControl_init_zero {0}
-#define Conf_init_zero                           {false, ConfMissionManager_init_zero, false, ConfLogManager_init_zero, false, ConfHelmManager_init_zero, false, ConfHelmManager_init_zero, false, ConfCaptainManager_init_zero, false, ConfCommManager_init_zero, false, ConfSensorManager_init_zero}
+#define DataLightManager_init_zero               {0}
+#define DataConfManager_init_zero                {0}
+#define Conf_init_zero                           {ConfMissionManager_init_zero, ConfLogManager_init_zero, ConfHelmManager_init_zero, ConfWingManager_init_zero, ConfCaptainManager_init_zero, ConfCommManager_init_zero, ConfSensorManager_init_zero, ConfLightManager_init_zero, ConfConfManager_init_zero}
 #define ConfBaseManager_init_zero                {0}
-#define ConfMissionManager_init_zero             {false, ConfBaseManager_init_zero, 0, 0, 0, 0}
-#define ConfLogManager_init_zero                 {false, ConfBaseManager_init_zero}
-#define ConfHelmManager_init_zero                {false, ConfBaseManager_init_zero, 0, 0, 0, 0}
-#define ConfWingManager_init_zero                {false, ConfBaseManager_init_zero, 0, 0}
-#define ConfCaptainManager_init_zero             {false, ConfBaseManager_init_zero, 0, 0, 0}
-#define ConfCommManager_init_zero                {false, ConfBaseManager_init_zero}
-#define ConfSensorManager_init_zero              {false, ConfBaseManager_init_zero, false, ConfSensorManager_ConfGps_init_zero}
+#define ConfMissionManager_init_zero             {ConfBaseManager_init_zero, 0, 0, 0, 0}
+#define ConfLogManager_init_zero                 {ConfBaseManager_init_zero}
+#define ConfHelmManager_init_zero                {ConfBaseManager_init_zero, 0, 0, 0, 0}
+#define ConfWingManager_init_zero                {ConfBaseManager_init_zero, 0, 0}
+#define ConfCaptainManager_init_zero             {ConfBaseManager_init_zero, 0, 0, 0}
+#define ConfCommManager_init_zero                {ConfBaseManager_init_zero}
+#define ConfSensorManager_init_zero              {ConfBaseManager_init_zero, ConfSensorManager_ConfGps_init_zero}
 #define ConfSensorManager_ConfGps_init_zero      {0}
+#define ConfLightManager_init_zero               {ConfBaseManager_init_zero}
+#define ConfConfManager_init_zero                {ConfBaseManager_init_zero}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define ConfBaseManager_interval_tag             1
@@ -4738,11 +4737,13 @@ extern "C" {
 #define ConfCaptainManager_max_downwind_tag      3
 #define ConfCaptainManager_speeping_duration_tag 4
 #define ConfCommManager_base_tag                 1
+#define ConfConfManager_base_tag                 1
 #define ConfHelmManager_base_tag                 1
 #define ConfHelmManager_ratio_tag                2
 #define ConfHelmManager_offset_tag               3
 #define ConfHelmManager_normal_speed_tag         4
 #define ConfHelmManager_tack_speed_tag           5
+#define ConfLightManager_base_tag                1
 #define ConfLogManager_base_tag                  1
 #define ConfMissionManager_base_tag              1
 #define ConfMissionManager_default_corridor_width_tag 2
@@ -4773,6 +4774,8 @@ extern "C" {
 #define Conf_captain_manager_tag                 5
 #define Conf_comm_manager_tag                    6
 #define Conf_sensor_manager_tag                  7
+#define Conf_light_manager_tag                   8
+#define Conf_config_manager_tag                  9
 #define Data_mission_manager_tag                 1
 #define Data_log_manager_tag                     2
 #define Data_helm_manager_tag                    3
@@ -4780,16 +4783,20 @@ extern "C" {
 #define Data_captain_manager_tag                 5
 #define Data_comm_manager_tag                    6
 #define Data_sensor_manager_tag                  7
+#define Data_light_manager_tag                   8
+#define Data_config_manager_tag                  9
 
 /* Struct field encoding specification for nanopb */
 #define Data_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  mission_manager,   1) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  log_manager,       2) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  helm_manager,      3) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  wing_manager,      4) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  captain_manager,   5) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  comm_manager,      6) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  sensor_manager,    7)
+X(a, STATIC,   REQUIRED, MESSAGE,  mission_manager,   1) \
+X(a, STATIC,   REQUIRED, MESSAGE,  log_manager,       2) \
+X(a, STATIC,   REQUIRED, MESSAGE,  helm_manager,      3) \
+X(a, STATIC,   REQUIRED, MESSAGE,  wing_manager,      4) \
+X(a, STATIC,   REQUIRED, MESSAGE,  captain_manager,   5) \
+X(a, STATIC,   REQUIRED, MESSAGE,  comm_manager,      6) \
+X(a, STATIC,   REQUIRED, MESSAGE,  sensor_manager,    7) \
+X(a, STATIC,   REQUIRED, MESSAGE,  light_manager,     8) \
+X(a, STATIC,   REQUIRED, MESSAGE,  config_manager,    9)
 #define Data_CALLBACK NULL
 #define Data_DEFAULT NULL
 #define Data_mission_manager_MSGTYPE DataMissionManager
@@ -4799,54 +4806,56 @@ X(a, STATIC,   OPTIONAL, MESSAGE,  sensor_manager,    7)
 #define Data_captain_manager_MSGTYPE DataCaptainManager
 #define Data_comm_manager_MSGTYPE DataCommManager
 #define Data_sensor_manager_MSGTYPE DataSensorManager
+#define Data_light_manager_MSGTYPE DataLightManager
+#define Data_config_manager_MSGTYPE DataConfManager
 
 #define DataMissionManager_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, FLOAT,    wpt_dist,          1) \
-X(a, STATIC,   SINGULAR, FLOAT,    wpt_angle,         2) \
-X(a, STATIC,   SINGULAR, INT32,    element_index,     3) \
-X(a, STATIC,   SINGULAR, FLOAT,    dist_to_axis,      4) \
-X(a, STATIC,   SINGULAR, BOOL,     in_corridor,       5) \
-X(a, STATIC,   SINGULAR, FLOAT,    corridor_angle,    6) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  prev_element,      7) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  next_element,      8) \
-X(a, STATIC,   SINGULAR, BOOL,     setpoint_update_asked,   9)
+X(a, STATIC,   REQUIRED, FLOAT,    wpt_dist,          1) \
+X(a, STATIC,   REQUIRED, FLOAT,    wpt_angle,         2) \
+X(a, STATIC,   REQUIRED, INT32,    element_index,     3) \
+X(a, STATIC,   REQUIRED, FLOAT,    dist_to_axis,      4) \
+X(a, STATIC,   REQUIRED, BOOL,     in_corridor,       5) \
+X(a, STATIC,   REQUIRED, FLOAT,    corridor_angle,    6) \
+X(a, STATIC,   REQUIRED, MESSAGE,  prev_element,      7) \
+X(a, STATIC,   REQUIRED, MESSAGE,  next_element,      8) \
+X(a, STATIC,   REQUIRED, BOOL,     setpoint_update_asked,   9)
 #define DataMissionManager_CALLBACK NULL
 #define DataMissionManager_DEFAULT NULL
 #define DataMissionManager_prev_element_MSGTYPE DataMissionManager_MissionElement
 #define DataMissionManager_next_element_MSGTYPE DataMissionManager_MissionElement
 
 #define DataMissionManager_MissionElement_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, UENUM,    type,              1) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  coord,             2) \
-X(a, STATIC,   SINGULAR, DOUBLE,   corridor_width,    3) \
-X(a, STATIC,   SINGULAR, DOUBLE,   valid_dist,        4) \
-X(a, STATIC,   SINGULAR, DOUBLE,   angle,             5) \
-X(a, STATIC,   SINGULAR, DOUBLE,   duration,          6) \
-X(a, STATIC,   SINGULAR, BOOL,     ephemeral,         7)
+X(a, STATIC,   REQUIRED, UENUM,    type,              1) \
+X(a, STATIC,   REQUIRED, MESSAGE,  coord,             2) \
+X(a, STATIC,   REQUIRED, DOUBLE,   corridor_width,    3) \
+X(a, STATIC,   REQUIRED, DOUBLE,   valid_dist,        4) \
+X(a, STATIC,   REQUIRED, DOUBLE,   angle,             5) \
+X(a, STATIC,   REQUIRED, DOUBLE,   duration,          6) \
+X(a, STATIC,   REQUIRED, BOOL,     ephemeral,         7)
 #define DataMissionManager_MissionElement_CALLBACK NULL
 #define DataMissionManager_MissionElement_DEFAULT NULL
 #define DataMissionManager_MissionElement_coord_MSGTYPE GeoCoordinate
 
 #define DataLogManager_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, BOOL,     sd_ready,          1)
+X(a, STATIC,   REQUIRED, BOOL,     sd_ready,          1)
 #define DataLogManager_CALLBACK NULL
 #define DataLogManager_DEFAULT NULL
 
 #define DataHelmManager_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, FLOAT,    angle,             1) \
-X(a, STATIC,   SINGULAR, BOOL,     cmd_applied,       2)
+X(a, STATIC,   REQUIRED, FLOAT,    angle,             1) \
+X(a, STATIC,   REQUIRED, BOOL,     cmd_applied,       2)
 #define DataHelmManager_CALLBACK NULL
 #define DataHelmManager_DEFAULT NULL
 
 #define DataWingManager_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, FLOAT,    angle,             1)
+X(a, STATIC,   REQUIRED, FLOAT,    angle,             1)
 #define DataWingManager_CALLBACK NULL
 #define DataWingManager_DEFAULT NULL
 
 #define DataCaptainManager_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, BOOL,     just_wake_up,      1) \
-X(a, STATIC,   SINGULAR, UENUM,    behaviour,         2) \
-X(a, STATIC,   SINGULAR, FLOAT,    helm_order,        3)
+X(a, STATIC,   REQUIRED, BOOL,     just_wake_up,      1) \
+X(a, STATIC,   REQUIRED, UENUM,    behaviour,         2) \
+X(a, STATIC,   REQUIRED, FLOAT,    helm_order,        3)
 #define DataCaptainManager_CALLBACK NULL
 #define DataCaptainManager_DEFAULT NULL
 
@@ -4856,9 +4865,9 @@ X(a, STATIC,   SINGULAR, FLOAT,    helm_order,        3)
 #define DataCommManager_DEFAULT NULL
 
 #define DataSensorManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  gps,               1) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  battery,           2) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  radio,             3)
+X(a, STATIC,   REQUIRED, MESSAGE,  gps,               1) \
+X(a, STATIC,   REQUIRED, MESSAGE,  battery,           2) \
+X(a, STATIC,   REQUIRED, MESSAGE,  radio,             3)
 #define DataSensorManager_CALLBACK NULL
 #define DataSensorManager_DEFAULT NULL
 #define DataSensorManager_gps_MSGTYPE DataSensorManager_DataGps
@@ -4866,119 +4875,145 @@ X(a, STATIC,   OPTIONAL, MESSAGE,  radio,             3)
 #define DataSensorManager_radio_MSGTYPE DataSensorManager_DataRadioControl
 
 #define DataSensorManager_DataGps_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  coord,             1) \
-X(a, STATIC,   SINGULAR, FLOAT,    altitude,          2) \
-X(a, STATIC,   SINGULAR, BOOL,     fix,               3) \
-X(a, STATIC,   SINGULAR, INT32,    fix_quality,       4) \
-X(a, STATIC,   SINGULAR, INT32,    satellites,        5) \
-X(a, STATIC,   SINGULAR, UINT32,   fix_age,           6) \
-X(a, STATIC,   SINGULAR, UINT32,   time,              7) \
-X(a, STATIC,   SINGULAR, UINT32,   date,              8) \
-X(a, STATIC,   SINGULAR, FLOAT,    speed,             9) \
-X(a, STATIC,   SINGULAR, FLOAT,    course,           10) \
-X(a, STATIC,   SINGULAR, DOUBLE,   hdop,             11) \
-X(a, STATIC,   SINGULAR, BOOL,     recent_data,      50) \
-X(a, STATIC,   SINGULAR, FLOAT,    average_course,   51) \
-X(a, STATIC,   SINGULAR, BOOL,     average_course_full,  52) \
-X(a, STATIC,   SINGULAR, BOOL,     ready,            53)
+X(a, STATIC,   REQUIRED, MESSAGE,  coord,             1) \
+X(a, STATIC,   REQUIRED, FLOAT,    altitude,          2) \
+X(a, STATIC,   REQUIRED, BOOL,     fix,               3) \
+X(a, STATIC,   REQUIRED, INT32,    fix_quality,       4) \
+X(a, STATIC,   REQUIRED, INT32,    satellites,        5) \
+X(a, STATIC,   REQUIRED, UINT32,   fix_age,           6) \
+X(a, STATIC,   REQUIRED, UINT32,   time,              7) \
+X(a, STATIC,   REQUIRED, UINT32,   date,              8) \
+X(a, STATIC,   REQUIRED, FLOAT,    speed,             9) \
+X(a, STATIC,   REQUIRED, FLOAT,    course,           10) \
+X(a, STATIC,   REQUIRED, DOUBLE,   hdop,             11) \
+X(a, STATIC,   REQUIRED, BOOL,     recent_data,      50) \
+X(a, STATIC,   REQUIRED, FLOAT,    average_course,   51) \
+X(a, STATIC,   REQUIRED, BOOL,     average_course_full,  52) \
+X(a, STATIC,   REQUIRED, BOOL,     ready,            53)
 #define DataSensorManager_DataGps_CALLBACK NULL
 #define DataSensorManager_DataGps_DEFAULT NULL
 #define DataSensorManager_DataGps_coord_MSGTYPE GeoCoordinate
 
 #define DataSensorManager_DataBattery_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, FLOAT,    voltage,           1)
+X(a, STATIC,   REQUIRED, FLOAT,    voltage,           1)
 #define DataSensorManager_DataBattery_CALLBACK NULL
 #define DataSensorManager_DataBattery_DEFAULT NULL
 
 #define DataSensorManager_DataRadioControl_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, BOOL,     radio_controlled,   1)
+X(a, STATIC,   REQUIRED, BOOL,     radio_controlled,   1)
 #define DataSensorManager_DataRadioControl_CALLBACK NULL
 #define DataSensorManager_DataRadioControl_DEFAULT NULL
 
+#define DataLightManager_FIELDLIST(X, a) \
+
+#define DataLightManager_CALLBACK NULL
+#define DataLightManager_DEFAULT NULL
+
+#define DataConfManager_FIELDLIST(X, a) \
+
+#define DataConfManager_CALLBACK NULL
+#define DataConfManager_DEFAULT NULL
+
 #define Conf_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  mission_manager,   1) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  log_manager,       2) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  helm_manager,      3) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  wing_manager,      4) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  captain_manager,   5) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  comm_manager,      6) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  sensor_manager,    7)
+X(a, STATIC,   REQUIRED, MESSAGE,  mission_manager,   1) \
+X(a, STATIC,   REQUIRED, MESSAGE,  log_manager,       2) \
+X(a, STATIC,   REQUIRED, MESSAGE,  helm_manager,      3) \
+X(a, STATIC,   REQUIRED, MESSAGE,  wing_manager,      4) \
+X(a, STATIC,   REQUIRED, MESSAGE,  captain_manager,   5) \
+X(a, STATIC,   REQUIRED, MESSAGE,  comm_manager,      6) \
+X(a, STATIC,   REQUIRED, MESSAGE,  sensor_manager,    7) \
+X(a, STATIC,   REQUIRED, MESSAGE,  light_manager,     8) \
+X(a, STATIC,   REQUIRED, MESSAGE,  config_manager,    9)
 #define Conf_CALLBACK NULL
 #define Conf_DEFAULT NULL
 #define Conf_mission_manager_MSGTYPE ConfMissionManager
 #define Conf_log_manager_MSGTYPE ConfLogManager
 #define Conf_helm_manager_MSGTYPE ConfHelmManager
-#define Conf_wing_manager_MSGTYPE ConfHelmManager
+#define Conf_wing_manager_MSGTYPE ConfWingManager
 #define Conf_captain_manager_MSGTYPE ConfCaptainManager
 #define Conf_comm_manager_MSGTYPE ConfCommManager
 #define Conf_sensor_manager_MSGTYPE ConfSensorManager
+#define Conf_light_manager_MSGTYPE ConfLightManager
+#define Conf_config_manager_MSGTYPE ConfConfManager
 
 #define ConfBaseManager_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, INT32,    interval,          1)
+X(a, STATIC,   REQUIRED, INT32,    interval,          1)
 #define ConfBaseManager_CALLBACK NULL
 #define ConfBaseManager_DEFAULT NULL
 
 #define ConfMissionManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  base,              1) \
-X(a, STATIC,   SINGULAR, FLOAT,    default_corridor_width,   2) \
-X(a, STATIC,   SINGULAR, FLOAT,    default_validation_distance,   3) \
-X(a, STATIC,   SINGULAR, FLOAT,    start_auto_angle,   4) \
-X(a, STATIC,   SINGULAR, FLOAT,    start_auto_duration,   5)
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
+X(a, STATIC,   REQUIRED, FLOAT,    default_corridor_width,   2) \
+X(a, STATIC,   REQUIRED, FLOAT,    default_validation_distance,   3) \
+X(a, STATIC,   REQUIRED, FLOAT,    start_auto_angle,   4) \
+X(a, STATIC,   REQUIRED, FLOAT,    start_auto_duration,   5)
 #define ConfMissionManager_CALLBACK NULL
 #define ConfMissionManager_DEFAULT NULL
 #define ConfMissionManager_base_MSGTYPE ConfBaseManager
 
 #define ConfLogManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  base,              1)
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1)
 #define ConfLogManager_CALLBACK NULL
 #define ConfLogManager_DEFAULT NULL
 #define ConfLogManager_base_MSGTYPE ConfBaseManager
 
 #define ConfHelmManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  base,              1) \
-X(a, STATIC,   SINGULAR, FLOAT,    ratio,             2) \
-X(a, STATIC,   SINGULAR, FLOAT,    offset,            3) \
-X(a, STATIC,   SINGULAR, FLOAT,    normal_speed,      4) \
-X(a, STATIC,   SINGULAR, FLOAT,    tack_speed,        5)
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
+X(a, STATIC,   REQUIRED, FLOAT,    ratio,             2) \
+X(a, STATIC,   REQUIRED, FLOAT,    offset,            3) \
+X(a, STATIC,   REQUIRED, FLOAT,    normal_speed,      4) \
+X(a, STATIC,   REQUIRED, FLOAT,    tack_speed,        5)
 #define ConfHelmManager_CALLBACK NULL
 #define ConfHelmManager_DEFAULT NULL
 #define ConfHelmManager_base_MSGTYPE ConfBaseManager
 
 #define ConfWingManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  base,              1) \
-X(a, STATIC,   SINGULAR, FLOAT,    step,              2) \
-X(a, STATIC,   SINGULAR, FLOAT,    calib_offset,      3)
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
+X(a, STATIC,   REQUIRED, FLOAT,    step,              2) \
+X(a, STATIC,   REQUIRED, FLOAT,    calib_offset,      3)
 #define ConfWingManager_CALLBACK NULL
 #define ConfWingManager_DEFAULT NULL
 #define ConfWingManager_base_MSGTYPE ConfBaseManager
 
 #define ConfCaptainManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  base,              1) \
-X(a, STATIC,   SINGULAR, FLOAT,    max_upwind,        2) \
-X(a, STATIC,   SINGULAR, FLOAT,    max_downwind,      3) \
-X(a, STATIC,   SINGULAR, FLOAT,    speeping_duration,   4)
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
+X(a, STATIC,   REQUIRED, FLOAT,    max_upwind,        2) \
+X(a, STATIC,   REQUIRED, FLOAT,    max_downwind,      3) \
+X(a, STATIC,   REQUIRED, FLOAT,    speeping_duration,   4)
 #define ConfCaptainManager_CALLBACK NULL
 #define ConfCaptainManager_DEFAULT NULL
 #define ConfCaptainManager_base_MSGTYPE ConfBaseManager
 
 #define ConfCommManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  base,              1)
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1)
 #define ConfCommManager_CALLBACK NULL
 #define ConfCommManager_DEFAULT NULL
 #define ConfCommManager_base_MSGTYPE ConfBaseManager
 
 #define ConfSensorManager_FIELDLIST(X, a) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  base,              1) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  gps,               2)
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
+X(a, STATIC,   REQUIRED, MESSAGE,  gps,               2)
 #define ConfSensorManager_CALLBACK NULL
 #define ConfSensorManager_DEFAULT NULL
 #define ConfSensorManager_base_MSGTYPE ConfBaseManager
 #define ConfSensorManager_gps_MSGTYPE ConfSensorManager_ConfGps
 
 #define ConfSensorManager_ConfGps_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, DOUBLE,   max_valid_hdop,    1)
+X(a, STATIC,   REQUIRED, DOUBLE,   max_valid_hdop,    1)
 #define ConfSensorManager_ConfGps_CALLBACK NULL
 #define ConfSensorManager_ConfGps_DEFAULT NULL
+
+#define ConfLightManager_FIELDLIST(X, a) \
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1)
+#define ConfLightManager_CALLBACK NULL
+#define ConfLightManager_DEFAULT NULL
+#define ConfLightManager_base_MSGTYPE ConfBaseManager
+
+#define ConfConfManager_FIELDLIST(X, a) \
+X(a, STATIC,   REQUIRED, MESSAGE,  base,              1)
+#define ConfConfManager_CALLBACK NULL
+#define ConfConfManager_DEFAULT NULL
+#define ConfConfManager_base_MSGTYPE ConfBaseManager
 
 extern const pb_msgdesc_t Data_msg;
 extern const pb_msgdesc_t DataMissionManager_msg;
@@ -4992,6 +5027,8 @@ extern const pb_msgdesc_t DataSensorManager_msg;
 extern const pb_msgdesc_t DataSensorManager_DataGps_msg;
 extern const pb_msgdesc_t DataSensorManager_DataBattery_msg;
 extern const pb_msgdesc_t DataSensorManager_DataRadioControl_msg;
+extern const pb_msgdesc_t DataLightManager_msg;
+extern const pb_msgdesc_t DataConfManager_msg;
 extern const pb_msgdesc_t Conf_msg;
 extern const pb_msgdesc_t ConfBaseManager_msg;
 extern const pb_msgdesc_t ConfMissionManager_msg;
@@ -5002,6 +5039,8 @@ extern const pb_msgdesc_t ConfCaptainManager_msg;
 extern const pb_msgdesc_t ConfCommManager_msg;
 extern const pb_msgdesc_t ConfSensorManager_msg;
 extern const pb_msgdesc_t ConfSensorManager_ConfGps_msg;
+extern const pb_msgdesc_t ConfLightManager_msg;
+extern const pb_msgdesc_t ConfConfManager_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define Data_fields &Data_msg
@@ -5016,6 +5055,8 @@ extern const pb_msgdesc_t ConfSensorManager_ConfGps_msg;
 #define DataSensorManager_DataGps_fields &DataSensorManager_DataGps_msg
 #define DataSensorManager_DataBattery_fields &DataSensorManager_DataBattery_msg
 #define DataSensorManager_DataRadioControl_fields &DataSensorManager_DataRadioControl_msg
+#define DataLightManager_fields &DataLightManager_msg
+#define DataConfManager_fields &DataConfManager_msg
 #define Conf_fields &Conf_msg
 #define ConfBaseManager_fields &ConfBaseManager_msg
 #define ConfMissionManager_fields &ConfMissionManager_msg
@@ -5026,21 +5067,27 @@ extern const pb_msgdesc_t ConfSensorManager_ConfGps_msg;
 #define ConfCommManager_fields &ConfCommManager_msg
 #define ConfSensorManager_fields &ConfSensorManager_msg
 #define ConfSensorManager_ConfGps_fields &ConfSensorManager_ConfGps_msg
+#define ConfLightManager_fields &ConfLightManager_msg
+#define ConfConfManager_fields &ConfConfManager_msg
 
 /* Maximum encoded size of messages (where known) */
 #define ConfBaseManager_size                     11
 #define ConfCaptainManager_size                  28
 #define ConfCommManager_size                     13
+#define ConfConfManager_size                     13
 #define ConfHelmManager_size                     33
+#define ConfLightManager_size                    13
 #define ConfLogManager_size                      13
 #define ConfMissionManager_size                  33
 #define ConfSensorManager_ConfGps_size           9
 #define ConfSensorManager_size                   24
 #define ConfWingManager_size                     23
-#define Conf_size                                191
+#define Conf_size                                211
 #define DataCaptainManager_size                  9
 #define DataCommManager_size                     0
+#define DataConfManager_size                     0
 #define DataHelmManager_size                     7
+#define DataLightManager_size                    0
 #define DataLogManager_size                      2
 #define DataMissionManager_MissionElement_size   60
 #define DataMissionManager_size                  159
@@ -5049,7 +5096,7 @@ extern const pb_msgdesc_t ConfSensorManager_ConfGps_msg;
 #define DataSensorManager_DataRadioControl_size  2
 #define DataSensorManager_size                   114
 #define DataWingManager_size                     5
-#define Data_size                                311
+#define Data_size                                315
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -5118,6 +5165,12 @@ PB_BIND(DataSensorManager_DataBattery, DataSensorManager_DataBattery, AUTO)
 PB_BIND(DataSensorManager_DataRadioControl, DataSensorManager_DataRadioControl, AUTO)
 
 
+PB_BIND(DataLightManager, DataLightManager, AUTO)
+
+
+PB_BIND(DataConfManager, DataConfManager, AUTO)
+
+
 PB_BIND(Conf, Conf, AUTO)
 
 
@@ -5146,6 +5199,12 @@ PB_BIND(ConfSensorManager, ConfSensorManager, AUTO)
 
 
 PB_BIND(ConfSensorManager_ConfGps, ConfSensorManager_ConfGps, AUTO)
+
+
+PB_BIND(ConfLightManager, ConfLightManager, AUTO)
+
+
+PB_BIND(ConfConfManager, ConfConfManager, AUTO)
 
 
 
