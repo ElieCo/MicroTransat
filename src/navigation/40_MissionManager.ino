@@ -25,7 +25,7 @@ class MissionManager : public BaseManager
       if (GetSensorData.radio.radio_controlled) {
         // Insert an ephemeral element
         if (!m_mission_elements.at(GetMissionData.element_index).ephemeral) {
-          DataMissionManager_MissionElement awa;
+          DataMissionManager_MissionElement awa = getEmptyElement();
           awa.ephemeral = true;
           awa.angle = GetConf.start_auto_angle;
           awa.duration = GetConf.start_auto_duration;
@@ -60,6 +60,19 @@ class MissionManager : public BaseManager
 
     SDfile m_mission_file;
 
+    DataMissionManager_MissionElement getEmptyElement(){
+      DataMissionManager_MissionElement elem;
+      elem.type = DataMissionManager_MissionElement_ElementType_WPT;
+      elem.coord.latitude = 0;
+      elem.coord.longitude = 0;
+      elem.corridor_width = 0;
+      elem.valid_dist = 0;
+      elem.angle = 0;
+      elem.duration = 0;
+      elem.ephemeral = false;
+      return elem;
+    }
+
     void parseMission() {
 
       // Parse the mission file
@@ -70,7 +83,7 @@ class MissionManager : public BaseManager
       for (int i = 0; i < mission.length(); i++) {
 
         if (mission[i].hasOwnProperty("latitude") && mission[i].hasOwnProperty("longitude")) {
-          DataMissionManager_MissionElement wp;
+          DataMissionManager_MissionElement wp = getEmptyElement();
           wp.coord.latitude = mission[i]["latitude"];
           wp.coord.longitude = mission[i]["longitude"];
 
@@ -85,7 +98,7 @@ class MissionManager : public BaseManager
           m_mission_elements.push_back(wp);
         }
         else if (mission[i].hasOwnProperty("angle") && mission[i].hasOwnProperty("duration")) {
-          DataMissionManager_MissionElement awa;
+          DataMissionManager_MissionElement awa = getEmptyElement();
           awa.angle = mission[i]["angle"];
           awa.duration = mission[i]["duration"];
 
