@@ -2,44 +2,10 @@
 
 #define MISSION_FILENAME "mission.txt"
 
-enum MissionElementType { WPT = 0, AWA = 1 };
-
-class MissionElement : public ObjectForDB {
-  public:
-    MissionElement(bool ephemeral = false)
-      : ObjectForDB()
-      , ephemeral(ephemeral)
-    {}
-
-    Coord coord;
-    double corridor_width = -1;
-    double valid_dist = -1;
-
-    double angle = 90;
-    double duration = 30;
-
-    String out = "MissionElement";
-
-    MissionElementType type = WPT;
-
-    bool ephemeral;
-
-    String toString() {
-      String result = "";
-      if (type == WPT) {
-        result += "WPT/";
-        result += String(coord.lat, 7) + "/";
-        result += String(coord.lng, 7) + "/";
-        result += String(corridor_width) + "/";
-        result += String(valid_dist);
-      } else {
-        result += "AWA/";
-        result += String(angle, 7) + "/";
-        result += String(duration, 7) + "/";
-      }
-      return result;
-    }
-};
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->mission_manager
+#define GetConf m_main_conf->mission_manager
 
 class MissionManager : public BaseManager
 {
@@ -50,40 +16,24 @@ class MissionManager : public BaseManager
     void init() {
       m_awa_start_time = 0;
 
-      db_dist_to_wpt.init(m_db, "Wpt_dist", float(0), true);
-      db_angle_to_wpt.init(m_db, "Wpt_angle", float(0), true);
-      db_elem_index.init(m_db, "Elem_index", int(0), true);
-      db_latitude.init(m_db, "Latitude", double(0));
-      db_longitude.init(m_db, "Longitude", double(0));
-      db_dist_to_axis.init(m_db, "Dist_to_axis", float(0), true);
-      db_in_corridor.init(m_db, "In_corridor", true, true);
-      db_corridor_angle.init(m_db, "Corridor_angle", float(0));
-      MissionElement* empty_elem = NULL;
-      db_elem_prev.init(m_db, "Prev_element", empty_elem, true);
-      db_elem_next.init(m_db, "Next_element", empty_elem, true);
-
-      db_radio_controlled.init(m_db, "Radio_controlled", true);
-
-      db_ask_setpoint_update.init(m_db, "Ask_setpoint_update", true);
-
-      bool *sd_ready = m_db->initData("SD_ready", false);
-      *sd_ready = m_mission_file.init(MISSION_FILENAME, *sd_ready);
+      GetLogData.sd_ready = m_mission_file.init(MISSION_FILENAME, GetLogData.sd_ready);
       parseMission();
     }
 
     void go() {
       // If we are radio controlled reset the index to play the first element
-      if (db_radio_controlled.get()) {
+      if (GetSensorData.radio.radio_controlled) {
         // Insert an ephemeral element
-        if (!m_mission_elements.at(db_elem_index.get()).ephemeral) {
-          MissionElement awa = MissionElement(true);
-          awa.angle = m_auto_start_angle;
-          awa.duration = m_auto_start_duration;
-          awa.type = AWA;
-          m_mission_elements.insert(db_elem_index.get(), awa);
+        if (!m_mission_elements.at(GetMissionData.element_index).ephemeral) {
+          DataMissionManager_MissionElement awa = getEmptyElement();
+          awa.ephemeral = true;
+          awa.angle = GetConf.start_auto_angle;
+          awa.duration = GetConf.start_auto_duration;
+          awa.type = DataMissionManager_MissionElement_ElementType_AWA;
+          m_mission_elements.insert(GetMissionData.element_index, awa);
 
-          // Reload the element at db_elem_index.get() place.
-          db_elem_index.add(-1);
+          // Reload the element at GetMissionData.element_index place.
+          GetMissionData.element_index--;
           runNextElement();
         }
 
@@ -95,7 +45,7 @@ class MissionManager : public BaseManager
         if (checkActualElementFinished()) runNextElement();
 
         // Say that the setpoint is updated
-        db_ask_setpoint_update.set(false);
+        GetMissionData.setpoint_update_asked = false;
 
       }
 
@@ -105,34 +55,23 @@ class MissionManager : public BaseManager
 
   private:
 
-    void config() {
-      m_db->getData("Default_corridor_width", m_default_corridor_width);
-      m_db->getData("Default_validation_distance", m_default_validation_distance);
-      m_db->getData("Auto_start_angle", m_auto_start_angle);
-      m_db->getData("Auto_start_duration", m_auto_start_duration);
-    }
-
-    DBData<float> db_dist_to_wpt;
-    DBData<float> db_angle_to_wpt;
-    DBData<MissionElement*> db_elem_prev;
-    DBData<MissionElement*> db_elem_next;
-    DBData<int> db_elem_index;
-    DBData<double> db_latitude;
-    DBData<double> db_longitude;
-    DBData<float> db_dist_to_axis;
-    DBData<bool> db_in_corridor;
-    DBData<float> db_corridor_angle;
-
-    DBData<bool> db_radio_controlled;
-
-    DBData<bool> db_ask_setpoint_update;
-
-    Vector<MissionElement> m_mission_elements;
-    double m_default_validation_distance, m_default_corridor_width;
-    double m_auto_start_angle, m_auto_start_duration;
+    Vector<DataMissionManager_MissionElement> m_mission_elements;
     unsigned long m_awa_start_time;
 
     SDfile m_mission_file;
+
+    DataMissionManager_MissionElement getEmptyElement(){
+      DataMissionManager_MissionElement elem;
+      elem.type = DataMissionManager_MissionElement_ElementType_WPT;
+      elem.coord.latitude = 0;
+      elem.coord.longitude = 0;
+      elem.corridor_width = 0;
+      elem.valid_dist = 0;
+      elem.angle = 0;
+      elem.duration = 0;
+      elem.ephemeral = false;
+      return elem;
+    }
 
     void parseMission() {
 
@@ -144,43 +83,43 @@ class MissionManager : public BaseManager
       for (int i = 0; i < mission.length(); i++) {
 
         if (mission[i].hasOwnProperty("latitude") && mission[i].hasOwnProperty("longitude")) {
-          MissionElement wp;
-          wp.coord.lat = mission[i]["latitude"];
-          wp.coord.lng = mission[i]["longitude"];
+          DataMissionManager_MissionElement wp = getEmptyElement();
+          wp.coord.latitude = mission[i]["latitude"];
+          wp.coord.longitude = mission[i]["longitude"];
 
           if (mission[i].hasOwnProperty("corridor_width")) wp.corridor_width = mission[i]["corridor_width"];
-          else wp.corridor_width = m_default_corridor_width;
+          else wp.corridor_width = GetConf.default_corridor_width;
 
           if (mission[i].hasOwnProperty("validation_distance")) wp.valid_dist = mission[i]["validation_distance"];
-          else wp.valid_dist = m_default_validation_distance;
+          else wp.valid_dist = GetConf.default_validation_distance;
 
-          wp.type = WPT;
+          wp.type = DataMissionManager_MissionElement_ElementType_WPT;
 
           m_mission_elements.push_back(wp);
         }
         else if (mission[i].hasOwnProperty("angle") && mission[i].hasOwnProperty("duration")) {
-          MissionElement awa;
+          DataMissionManager_MissionElement awa = getEmptyElement();
           awa.angle = mission[i]["angle"];
           awa.duration = mission[i]["duration"];
 
-          awa.type = AWA;
+          awa.type = DataMissionManager_MissionElement_ElementType_AWA;
 
           m_mission_elements.push_back(awa);
         }
       }
 
-      db_elem_index.set(0);
-      db_elem_next.set(m_mission_elements.ptrAt(db_elem_index.get()));
-      db_elem_prev.set(m_mission_elements.ptrAt(db_elem_index.get() - 1));
+      GetMissionData.element_index = 0;
+      GetMissionData.next_element = m_mission_elements.at(GetMissionData.element_index);
+      GetMissionData.prev_element = m_mission_elements.at(GetMissionData.element_index - 1);
     }
 
     bool checkActualElementFinished() {
-      MissionElement elem = m_mission_elements.at(db_elem_index.get());
+      DataMissionManager_MissionElement elem = m_mission_elements.at(GetMissionData.element_index);
 
-      if (elem.type == WPT) {
+      if (elem.type == DataMissionManager_MissionElement_ElementType_WPT) {
         // If the distance between the boat and the waypoint is less than *m_valid_wpt* m.
         // Note : we consider that if dist==0 there should be an error.
-        if (db_dist_to_wpt.get() <= elem.valid_dist && db_dist_to_wpt.get() != 0) return true;
+        if (GetMissionData.wpt_dist <= elem.valid_dist && GetMissionData.wpt_dist != 0) return true;
         else return false;
 
       } else {
@@ -197,27 +136,24 @@ class MissionManager : public BaseManager
 
     void runNextElement() {
       // If the element was an ephemeral element, delete it and change the index
-      if (m_mission_elements.at(db_elem_index.get()).ephemeral) {
-        m_mission_elements.removeAt(db_elem_index.get());
-        db_elem_index.add(-1);
-        db_elem_next.set(m_mission_elements.ptrAt(db_elem_index.get()));
+      if (m_mission_elements.at(GetMissionData.element_index).ephemeral) {
+        m_mission_elements.removeAt(GetMissionData.element_index);
+        GetMissionData.element_index--;
+        GetMissionData.next_element = m_mission_elements.at(GetMissionData.element_index);
       }
 
       // Change the index.
-      int next_index = (db_elem_index.get() + 1) % m_mission_elements.size();
-      db_elem_index.set(next_index);
+      int next_index = (GetMissionData.element_index + 1) % m_mission_elements.size();
+      GetMissionData.element_index = next_index;
 
       // Get the new actual element
-      MissionElement *new_elem = m_mission_elements.ptrAt(db_elem_index.get());
+      GetMissionData.next_element = m_mission_elements.at(GetMissionData.element_index);
 
       // Get the prev actual element
-      MissionElement *prev_elem = m_mission_elements.ptrAt(db_elem_index.get() - 1);
-
-      db_elem_prev.set(prev_elem);
-      db_elem_next.set(new_elem);
+      GetMissionData.prev_element = m_mission_elements.at(GetMissionData.element_index - 1);
 
       // Reset start time if it's an AWA element
-      if (db_elem_next.get()->type == AWA) {
+      if (GetMissionData.next_element.type == DataMissionManager_MissionElement_ElementType_AWA) {
         m_awa_start_time = 0;
       }
 
@@ -225,14 +161,14 @@ class MissionManager : public BaseManager
     }
 
     void updateSetpoints() {
-      if (db_elem_next.get()->type == WPT) {
+      if (GetMissionData.next_element.type == DataMissionManager_MissionElement_ElementType_WPT) {
         // Get new distance to waypoint
-        float distanceToWaypoint = get_distance(db_latitude.get(), db_longitude.get(), db_elem_next.get()->coord.lat, db_elem_next.get()->coord.lng);
+        float distanceToWaypoint = get_distance(GetSensorData.gps.coord.latitude, GetSensorData.gps.coord.longitude, GetMissionData.next_element.coord.latitude, GetMissionData.next_element.coord.longitude);
         // Calcul the course to the next waypoint.
-        float angleToWaypoint = get_course(db_latitude.get(), db_longitude.get(), db_elem_next.get()->coord.lat, db_elem_next.get()->coord.lng);
+        float angleToWaypoint = get_course(GetSensorData.gps.coord.latitude, GetSensorData.gps.coord.longitude, GetMissionData.next_element.coord.latitude, GetMissionData.next_element.coord.longitude);
         // Set all this data in the DB.
-        db_dist_to_wpt.set(distanceToWaypoint);
-        db_angle_to_wpt.set(angleToWaypoint);
+        GetMissionData.wpt_dist = distanceToWaypoint;
+        GetMissionData.wpt_angle = angleToWaypoint;
 
         // Check if we are in the corridor
         isInCorridor();
@@ -240,16 +176,16 @@ class MissionManager : public BaseManager
     }
 
     void isInCorridor() {
-      MissionElement *prev = static_cast<MissionElement*>(db_elem_prev.get());
-      MissionElement *next = static_cast<MissionElement*>(db_elem_next.get());
-      float angle_btw_wpt = get_course(prev->coord.lat, prev->coord.lng, next->coord.lat, next->coord.lng);
-      float dist_to_axis = sin(radians(angle_btw_wpt - db_angle_to_wpt.get())) * db_dist_to_wpt.get();
+      DataMissionManager_MissionElement prev = GetMissionData.prev_element;
+      DataMissionManager_MissionElement next = GetMissionData.next_element;
+      float angle_btw_wpt = get_course(prev.coord.latitude, prev.coord.longitude, next.coord.latitude, next.coord.longitude);
+      float dist_to_axis = sin(radians(angle_btw_wpt - GetMissionData.wpt_angle)) * GetMissionData.wpt_dist;
 
-      bool in_corridor = abs(dist_to_axis) <= float(next->corridor_width) / 2;
+      bool in_corridor = abs(dist_to_axis) <= float(next.corridor_width) / 2;
 
-      db_corridor_angle.set(angle_btw_wpt);
-      db_dist_to_axis.set(dist_to_axis);
-      db_in_corridor.set(in_corridor);
+      GetMissionData.corridor_angle = angle_btw_wpt;
+      GetMissionData.dist_to_axis = dist_to_axis;
+      GetMissionData.in_corridor = in_corridor;
     }
 
 };

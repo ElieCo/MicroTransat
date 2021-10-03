@@ -26,10 +26,15 @@ class SDfile
       return true;
     }
     else {
-      print("initialization carte SD : failed");
+      print("initialization SD card: failed");
       m_file_opened = false;
       return false;
     }
+  }
+
+  void write(unsigned char* d, uint32_t s){
+    m_file.write(d, s);
+    m_file.flush();
   }
 
   void write(String line){

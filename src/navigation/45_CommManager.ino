@@ -1,4 +1,8 @@
 
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->comm_manager
+#define GetConf m_main_conf->comm_manager
 
 class CommManager : public BaseManager
 {
@@ -7,8 +11,6 @@ class CommManager : public BaseManager
   ~CommManager(){}
 
   void init(){
-    db_msg_received.init(m_db, "Msg_received", String(""));
-
     m_lora.init();
 
     m_index_log = 0;
@@ -17,12 +19,12 @@ class CommManager : public BaseManager
   void go(){
 
     // check received messages
-    db_msg_received.set(m_lora.receive());
+    String msg = m_lora.receive();
     // Return if there is no message.
-    if (db_msg_received.get().length() <= 0) return;
+    if (msg.length() <= 0) return;
 
     // send message
-    bool send_log = db_msg_received.get().indexOf("log")>= 0;
+    bool send_log = msg.indexOf("log")>= 0;
     if (send_log) {
       if (m_index_log == 0){
         // Send the first part of the message.
@@ -49,14 +51,12 @@ class CommManager : public BaseManager
 
   private:
 
-  DBData<String> db_msg_received;
-
   /**
    * Get a string line with all data which are in th DB.
    * @return line the string with all data in it.
    */
   String getLine(){
-    Map<String, String> data = m_db->getAllData(true);
+    Map<String, String> data; // = m_db->getAllData(true);
     String line = "";
     for (int i = 0; i < data.size(); i++){
       line += data.valueAt(i).c_str();

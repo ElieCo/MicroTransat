@@ -1,27 +1,45 @@
 
-#define BASIC_CONSTRUCTOR(className) className(String name, unsigned long inter = 1000) : BaseManager(name, inter){}
+#define BASIC_CONSTRUCTOR(className) className(Data *data, Conf *conf, String name, unsigned int inter = 1000) : BaseManager(data, conf, name, inter){}
+
+#define GetMainData m_main_data
+#define GetMissionData m_main_data->mission_manager
+#define GetLogData m_main_data->log_manager
+#define GetHelmData m_main_data->helm_manager
+#define GetWingData m_main_data->wing_manager
+#define GetCaptainData m_main_data->captain_manager
+#define GetCommData m_main_data->comm_manager
+#define GetSensorData m_main_data->sensor_manager
+#define GetLightData m_main_data->light_manager
+#define GetConfigData m_main_data->config_manager
+
+#define GetMainConf m_main_conf
+#define GetMissionConf m_main_conf->mission_manager
+#define GetLogConf m_main_conf->log_manager
+#define GetHelmConf m_main_conf->helm_manager
+#define GetWingConf m_main_conf->wing_manager
+#define GetCaptainConf m_main_conf->captain_manager
+#define GetCommConf m_main_conf->comm_manager
+#define GetSensorConf m_main_conf->sensor_manager
+#define GetLightConf m_main_conf->light_manager
+#define GetConfigConf m_main_conf->config_manager
 
 class BaseManager{
 
  public:
 
-  BaseManager(String name = "BaseManager", unsigned long inter = 1000){
+  BaseManager(Data *data, Conf *conf, String name = "BaseManager", unsigned long inter = 1000){
     m_runInterval = inter;
     m_timer = millis() - m_runInterval;
     m_name = name;
+    m_main_data = data;
+    m_main_conf = conf;
   }
   ~BaseManager(){}
 
   void baseInit(){
     print("Init manager:", m_name);
-    
-    double inter = m_runInterval;
-    m_db->getData(m_name, inter);
-    m_runInterval = inter;
-    print("    interval:", inter);
+    print("    interval:", m_runInterval);
 
-    config();
-    
     init();
   }
 
@@ -41,12 +59,8 @@ class BaseManager{
     stop();
   }
 
-  void initInterval(unsigned long interval){
-    m_runInterval = interval;
-  }
-
-  void setDB(DataBase * db){
-    m_db = db;
+  void setInterval(unsigned long inter){
+    m_runInterval = inter;
   }
 
   protected:
@@ -54,11 +68,11 @@ class BaseManager{
   String m_name;
   unsigned long m_timer;
   unsigned long m_runInterval;
-  DataBase * m_db;
+  Data *m_main_data;
+  Conf *m_main_conf;
   
   private:
 
-  virtual void config(){}
   virtual void init(){}
   virtual void go(){}
   virtual void stop(){}

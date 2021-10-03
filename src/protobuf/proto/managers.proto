@@ -1,0 +1,192 @@
+syntax = "proto2";
+
+import "utils.proto";
+
+///////////////////////////////////
+//              Data             //
+///////////////////////////////////
+
+message Data {
+    required DataMissionManager mission_manager = 1;
+    required DataLogManager log_manager = 2;
+    required DataHelmManager helm_manager = 3;
+    required DataWingManager wing_manager = 4;
+    required DataCaptainManager captain_manager = 5;
+    required DataCommManager comm_manager = 6;
+    required DataSensorManager sensor_manager = 7;
+    required DataLightManager light_manager = 8;
+    required DataConfManager config_manager = 9;
+}
+
+message DataMissionManager{
+
+    message MissionElement {
+        enum ElementType {WPT = 0; AWA = 1;}
+
+        required ElementType type = 1;
+
+        required GeoCoordinate coord = 2;
+        required double corridor_width = 3;
+        required double valid_dist = 4;
+
+        required double angle = 5;
+        required double duration = 6;
+
+        required bool ephemeral = 7;
+    }
+
+    required float wpt_dist = 1;
+    required float wpt_angle = 2;
+    required int32 element_index = 3;
+    required float dist_to_axis = 4;
+    required bool in_corridor = 5;
+    required float corridor_angle = 6;
+    required MissionElement prev_element = 7;
+    required MissionElement next_element = 8;
+    required bool setpoint_update_asked = 9;
+}
+
+message DataLogManager {
+    required bool sd_ready = 1;
+}
+
+message DataHelmManager {
+    required float angle = 1;
+    required bool cmd_applied = 2;
+}
+
+message DataWingManager {
+    required float angle = 1;
+}
+
+message DataCaptainManager {
+    enum Behaviour { SLEEP = 0; ACQUISITION = 1; DECIDE = 2; PROCESS = 3; RADIO_CONTROLLED = 4; }
+
+    required bool just_wake_up = 1;
+    required Behaviour behaviour = 2;
+    required float helm_order = 3;
+}
+
+message DataCommManager {
+    //string msg_received = 1;
+}
+
+message DataSensorManager {
+    message DataGps {
+        // Raw data
+        required GeoCoordinate coord = 1;
+        required float altitude = 2;
+        required bool fix = 3;
+        required int32 fix_quality = 4;
+        required int32 satellites = 5;
+        required uint32 fix_age = 6;
+        required uint32 time = 7;
+        required uint32 date = 8;
+        required float speed = 9;
+        required float course = 10;
+        required double hdop = 11;
+
+        // Compute data
+        required bool recent_data = 50;
+        required float average_course = 51;
+        required bool average_course_full = 52;
+        required bool ready = 53;
+    }
+
+    message DataBattery {
+        required float voltage = 1;
+    }
+
+    message DataRadioControl {
+        required bool radio_controlled = 1;
+    }
+
+    required DataGps gps = 1;
+    required DataBattery battery = 2;
+    required DataRadioControl radio = 3;
+}
+
+message DataLightManager {
+}
+
+message DataConfManager {
+}
+
+///////////////////////////////////
+//              Conf             //
+///////////////////////////////////
+
+message Conf{
+    required ConfMissionManager mission_manager = 1;
+    required ConfLogManager log_manager = 2;
+    required ConfHelmManager helm_manager = 3;
+    required ConfWingManager wing_manager = 4;
+    required ConfCaptainManager captain_manager = 5;
+    required ConfCommManager comm_manager = 6;
+    required ConfSensorManager sensor_manager = 7;
+    required ConfLightManager light_manager = 8;
+    required ConfConfManager config_manager = 9;
+}
+
+message ConfBaseManager {
+    required int32 interval = 1; // [ms] wakeup interval
+}
+
+message ConfMissionManager {
+    required ConfBaseManager base = 1;
+    
+    required float default_corridor_width = 2;
+    required float default_validation_distance = 3;
+    required float start_auto_angle = 4;
+    required float start_auto_duration = 5;
+}
+
+message ConfLogManager {
+    required ConfBaseManager base = 1;
+}
+
+message ConfHelmManager {
+    required ConfBaseManager base = 1;
+
+    required float ratio = 2;
+    required float offset = 3;
+    required float normal_speed = 4;
+    required float tack_speed = 5;
+}
+
+message ConfWingManager {
+    required ConfBaseManager base = 1;
+
+    required float step = 2;
+    required float calib_offset = 3;
+}
+
+message ConfCaptainManager {
+    required ConfBaseManager base = 1;
+
+    required float max_upwind = 2;
+    required float max_downwind = 3;
+    required float speeping_duration = 4;
+}
+
+message ConfCommManager {
+    required ConfBaseManager base = 1;
+}
+
+message ConfSensorManager {
+    required ConfBaseManager base = 1;
+
+    message ConfGps {
+        required double max_valid_hdop = 1;
+    }
+
+    required ConfGps gps = 2;
+}
+
+message ConfLightManager {
+    required ConfBaseManager base = 1;
+}
+
+message ConfConfManager {
+    required ConfBaseManager base = 1;
+}
