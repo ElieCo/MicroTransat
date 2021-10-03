@@ -3,15 +3,15 @@ class GlobalManager {
 
 public:
   GlobalManager()
-    : m_configMan("ConfigManager", 10000)
-    , m_missionMan("MissionManager", 1000)
-    , m_logMan("LogManager", 250)
-    , m_helmMan("HelmManager", 250)
-    , m_wingMan("WingManager", 250)
-    , m_commMan("CommManager", 0)
-    , m_sensorsMan("SensorsManager", 0)
-    , m_lightMan("LightManager", 500)
-    , m_captain("Captain", 5000)
+    : m_configMan(&m_data, &m_conf, "ConfigManager")
+    , m_missionMan(&m_data, &m_conf, "MissionManager")
+    , m_logMan(&m_data, &m_conf, "LogManager")
+    , m_helmMan(&m_data, &m_conf, "HelmManager")
+    , m_wingMan(&m_data, &m_conf, "WingManager")
+    , m_commMan(&m_data, &m_conf, "CommManager")
+    , m_sensorsMan(&m_data, &m_conf, "SensorsManager")
+    , m_lightMan(&m_data, &m_conf, "LightManager")
+    , m_captain(&m_data, &m_conf, "Captain")
   {
     m_managers.push_back(&m_configMan);
     m_managers.push_back(&m_missionMan);
@@ -31,11 +31,20 @@ public:
     print("=========== Hello World! ============");
     print("=====================================");
 
-    for (int i = 0; i < m_managers.size(); i++){
-      m_managers.at(i)->setDB(&m_db);
-    }
+    // Load the Conf
+    if (!m_configMan.parseConfig())
+      m_lightMan.alert();
 
-    m_configMan.init();
+    // Set the interval of each manager
+    m_configMan.setInterval(m_conf.config_manager.base.interval);
+    m_missionMan.setInterval(m_conf.mission_manager.base.interval);
+    m_logMan.setInterval(m_conf.log_manager.base.interval);
+    m_helmMan.setInterval(m_conf.helm_manager.base.interval);
+    m_wingMan.setInterval(m_conf.wing_manager.base.interval);
+    m_commMan.setInterval(m_conf.comm_manager.base.interval);
+    m_sensorsMan.setInterval(m_conf.sensor_manager.base.interval);
+    m_lightMan.setInterval(m_conf.light_manager.base.interval);
+    m_captain.setInterval(m_conf.captain_manager.base.interval);
 
     for (int i = 0; i < m_managers.size(); i++){
       m_managers.at(i)->baseInit();
@@ -54,12 +63,9 @@ public:
     }
   }
 
-  DataBase* getDB(){
-    return &m_db;
-  }
-
 private:
-  DataBase m_db;
+  Data m_data;
+  Conf m_conf;
 
   ConfigManager m_configMan;
 

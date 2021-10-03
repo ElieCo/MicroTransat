@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message GeoCoordinate {
+    required double latitude = 1;
+    required double longitude = 2;
+}

@@ -1,5 +1,10 @@
 
 
+#undef GetData
+#undef GetConf
+#define GetData m_main_data->helm_manager
+#define GetConf m_main_conf->helm_manager
+
 class HelmManager : public BaseManager
 {
   public:
@@ -7,22 +12,17 @@ class HelmManager : public BaseManager
   ~HelmManager(){}
 
   void init() {
-    db_helm_angle.init(m_db, "Cmd_helm", float(0), true);
-    db_cmd_applied.init(m_db, "Cmd_helm_applied", true);
-
-    db_reg_cmd.init(m_db, "Regulator_angle", float(0));
-    db_max_upwind.init(m_db, "Max_upwind", double(0));
 
     m_last_time = -1;
 
-    m_servo.init(7, m_helm_ratio, m_helm_offset);
+    m_servo.init(7, GetConf.ratio, GetConf.offset);
   }
 
   void go(){
 
     float angle_speed;
-    if (abs(db_helm_angle.get()) <= db_max_upwind.get()) angle_speed = m_tack_angle_speed;
-    else angle_speed = m_normal_angle_speed;
+    if (abs(GetHelmData.angle) <= GetCaptainConf.max_upwind) angle_speed = GetConf.tack_speed;
+    else angle_speed = GetConf.normal_speed;
 
     // Calcul the time this the last time.
     int time = millis();
@@ -31,50 +31,35 @@ class HelmManager : public BaseManager
     m_last_time = time;
 
     // Find the new helm command angle.
-    if (db_reg_cmd.get() != db_helm_angle.get()) {
+    if (GetCaptainData.helm_order != GetHelmData.angle) {
 
       // Calcul the step in degrees to do.
       float step = angle_speed * diff/1000.0;
 
-      if ( db_reg_cmd.get() > db_helm_angle.get() + step ) {
-        db_helm_angle.add(step);
-      } else if ( db_reg_cmd.get() < db_helm_angle.get() - step ) {
-        db_helm_angle.add(-step);
+      if (GetCaptainData.helm_order > GetHelmData.angle + step) {
+        GetHelmData.angle += step;
+      } else if (GetCaptainData.helm_order < GetHelmData.angle - step) {
+        GetHelmData.angle -= step;
       } else {
-        db_helm_angle.set(db_reg_cmd.get());
+        GetHelmData.angle = GetCaptainData.helm_order;
       }
 
       cmd_helm();
     }
 
-    db_cmd_applied.set(db_helm_angle.get() == db_reg_cmd.get());
-
+    GetHelmData.cmd_applied = (GetHelmData.angle == GetCaptainData.helm_order);
   }
 
   void stop(){}
 
   private:
 
-  void config(){
-    m_db->getData("Helm_ratio", m_helm_ratio);
-    m_db->getData("Helm_offset", m_helm_offset);
-    m_db->getData("Helm_normal_speed", m_normal_angle_speed);
-    m_db->getData("Helm_tack_speed", m_tack_angle_speed);
-  }
-
-  DBData<float> db_reg_cmd;
-  DBData<double> db_max_upwind;
-  DBData<float> db_helm_angle;
-  DBData<bool> db_cmd_applied;
-
-  double m_normal_angle_speed, m_tack_angle_speed; // deg/s
-  double m_helm_ratio, m_helm_offset;
   int m_last_time;
 
   ServoMotor m_servo;
 
   void cmd_helm(){
     // Command the servo-motor.
-    m_servo.write(db_helm_angle.get());
+    m_servo.write(GetHelmData.angle);
   }
 };
