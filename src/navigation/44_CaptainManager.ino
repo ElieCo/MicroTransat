@@ -12,6 +12,7 @@ class Captain : public BaseManager
 
     void init() {
       m_behaviour = DataCaptainManager_Behaviour_ACQUISITION;
+      m_sleeping_duration = GetConf.sleeping_duration
     }
 
     void go() {
@@ -46,7 +47,7 @@ class Captain : public BaseManager
 
     DataCaptainManager_Behaviour m_behaviour;
 
-    float m_prev_average_course;
+    float m_sleeping_duration;
 
     void stateSleep() {
       // Sleep
@@ -54,11 +55,11 @@ class Captain : public BaseManager
       static int timer = -1;
       if (timer == -1) timer = millis();
       else {
-        if (millis() - timer > GetConf.speeping_duration) {
+        if (millis() - timer > m_sleeping_duration) {
           timer = -1;
 
           // Reset the sleeping duration to default
-          m_sleeping_duration = m_default_sleeping_duration;
+          m_sleeping_duration = GetConf.sleeping_duration;
 
           // Say that we just wake up.
           GetCaptainData.just_wake_up = true;
@@ -163,6 +164,9 @@ class Captain : public BaseManager
     }
 
     double commandForAWA() {
+      // Set the sleeping duration to the AWA duration
+      m_sleeping_duration = 1000 * GetMissionData.next_element.duration;
+
       // Get awa cmd
       float new_reg = GetMissionData.next_element.angle;
       from180to180(new_reg);

@@ -63,7 +63,7 @@ def getLineDic(data, conf):
 
     dico = {
         "datetime" : str(gps_data.date) + "_" + str(gps_data.time),
-        
+
         "wpt_dist": mission_data.wpt_dist,
         "wpt_angle": mission_data.wpt_angle,
         "element_index": mission_data.element_index,
@@ -139,7 +139,7 @@ def getLineDic(data, conf):
         "captain_interval" : captain_conf.base.interval,
         "max_upwind" : captain_conf.max_upwind,
         "max_downwind" : captain_conf.max_downwind,
-        "speeping_duration" : captain_conf.speeping_duration,
+        "sleeping_duration" : captain_conf.sleeping_duration,
 
         "comm_interval" : comm_conf.base.interval,
 
@@ -152,7 +152,7 @@ def getLineDic(data, conf):
     }
 
     #print(dico["prev_element_valid_dist"])
-    
+
     # Turn all value into str
     for key in dico.keys():
         if type(dico[key]) == bool:
@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
     l_bin = f.read(4)
     while len(l_bin):
-        
+
         l, = struct.unpack("I", l_bin)
         data_bin = f.read(l)
 

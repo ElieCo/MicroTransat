@@ -168,7 +168,7 @@ message ConfCaptainManager {
 
     required float max_upwind = 2;
     required float max_downwind = 3;
-    required float speeping_duration = 4;
+    required float sleeping_duration = 4;
     required float too_far_for_tack = 5;
 }
 

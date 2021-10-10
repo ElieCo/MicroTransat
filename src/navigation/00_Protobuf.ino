@@ -4542,7 +4542,7 @@ typedef struct _ConfCaptainManager {
     ConfBaseManager base; 
     float max_upwind; 
     float max_downwind; 
-    float speeping_duration; 
+    float sleeping_duration; 
     float too_far_for_tack; 
 } ConfCaptainManager;
 
@@ -4739,7 +4739,7 @@ extern "C" {
 #define ConfCaptainManager_base_tag              1
 #define ConfCaptainManager_max_upwind_tag        2
 #define ConfCaptainManager_max_downwind_tag      3
-#define ConfCaptainManager_speeping_duration_tag 4
+#define ConfCaptainManager_sleeping_duration_tag 4
 #define ConfCaptainManager_too_far_for_tack_tag  5
 #define ConfCommManager_base_tag                 1
 #define ConfConfManager_base_tag                 1
@@ -4987,7 +4987,7 @@ X(a, STATIC,   REQUIRED, FLOAT,    calib_offset,      3)
 X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
 X(a, STATIC,   REQUIRED, FLOAT,    max_upwind,        2) \
 X(a, STATIC,   REQUIRED, FLOAT,    max_downwind,      3) \
-X(a, STATIC,   REQUIRED, FLOAT,    speeping_duration,   4) \
+X(a, STATIC,   REQUIRED, FLOAT,    sleeping_duration,   4) \
 X(a, STATIC,   REQUIRED, FLOAT,    too_far_for_tack,   5)
 #define ConfCaptainManager_CALLBACK NULL
 #define ConfCaptainManager_DEFAULT NULL

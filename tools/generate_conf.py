@@ -37,7 +37,7 @@ conf.wing_manager.calib_offset = 0
 conf.captain_manager.base.interval = 100
 conf.captain_manager.max_upwind = 45
 conf.captain_manager.max_downwind = 130
-conf.captain_manager.speeping_duration = 15000
+conf.captain_manager.sleeping_duration = 15000
 
 conf.comm_manager.base.interval = 0
 
