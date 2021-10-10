@@ -12,7 +12,7 @@ class Captain : public BaseManager
 
     void init() {
       m_behaviour = DataCaptainManager_Behaviour_ACQUISITION;
-      m_sleeping_duration = GetConf.sleeping_duration
+      m_sleeping_duration = GetConf.sleeping_duration;
     }
 
     void go() {
@@ -98,7 +98,7 @@ class Captain : public BaseManager
         // Change the behaviour.
         m_behaviour = DataCaptainManager_Behaviour_ACQUISITION;
         // Ask to update the setpoint.
-        GetData.setpoint_update_asked = true;
+        GetMissionData.setpoint_update_asked = true;
 
       } else {
         // Set the regulator angle command.

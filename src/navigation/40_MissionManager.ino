@@ -29,11 +29,10 @@ class MissionManager : public BaseManager
         }
       } else {
         // If asked by the Captain, add an AWA element
-        if (m_main_data->mission_manager.ask_add_awa_angle != 0.0) {
-          addAwa(m_main_data->mission_manager.ask_add_awa_angle, GetConf.awa_tack_duration);
-          m_main_data->mission_manager.ask_add_awa_angle = 0.0;
+        if (GetCaptainData.ask_add_awa_angle != 0.0) {
+          addAwa(GetCaptainData.ask_add_awa_angle, GetConf.awa_tack_duration);
+          GetCaptainData.ask_add_awa_angle = 0.0;
         }
-      }
 
         // Update setpoints
         updateSetpoints();
@@ -183,24 +182,6 @@ class MissionManager : public BaseManager
       GetMissionData.corridor_angle = angle_btw_wpt;
       GetMissionData.dist_to_axis = dist_to_axis;
       GetMissionData.in_corridor = in_corridor;
-    }
-
-    // Create, add and run a ephemeral AWA mission element
-    void addAwa(double angle, double duration){
-      // Create a AWA missin element
-      MissionElement awa = MissionElement(true);
-      awa.type = AWA;
-
-      // Set parameters
-      awa.angle = angle;
-      awa.duration = duration;
-
-      // Add it to the list at the right place
-      m_mission_elements.insert(db_elem_index.get(), awa);
-
-      // Reload the element at db_elem_index.get() place.
-      db_elem_index.add(-1);
-      runNextElement();
     }
 
     // Create, add and run a ephemeral AWA mission element

@@ -36,8 +36,8 @@
     },
     "maxUpwind": 45.0,
     "maxDownwind": 130.0,
-    "speepingDuration": 15000.0,
-    "tooFarForTack": 75
+    "sleepingDuration": 15000.0,
+    "tooFarForTack": 75.0
   },
   "commManager": {
     "base": {

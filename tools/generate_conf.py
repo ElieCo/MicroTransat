@@ -21,6 +21,7 @@ conf.mission_manager.default_corridor_width = 40
 conf.mission_manager.default_validation_distance = 15
 conf.mission_manager.start_auto_angle = 90
 conf.mission_manager.start_auto_duration = 10
+conf.mission_manager.awa_tack_duration = 10
 
 conf.log_manager.base.interval = 500
 
@@ -38,6 +39,7 @@ conf.captain_manager.base.interval = 100
 conf.captain_manager.max_upwind = 45
 conf.captain_manager.max_downwind = 130
 conf.captain_manager.sleeping_duration = 15000
+conf.captain_manager.too_far_for_tack = 75
 
 conf.comm_manager.base.interval = 0
 
