@@ -4486,6 +4486,7 @@ typedef struct _DataCaptainManager { /* string msg_received = 1; */
     bool just_wake_up; 
     DataCaptainManager_Behaviour behaviour; 
     float helm_order; 
+    float ask_add_awa_angle; 
 } DataCaptainManager;
 
 typedef struct _DataHelmManager { 
@@ -4542,6 +4543,7 @@ typedef struct _ConfCaptainManager {
     float max_upwind; 
     float max_downwind; 
     float speeping_duration; 
+    float too_far_for_tack; 
 } ConfCaptainManager;
 
 typedef struct _ConfCommManager { 
@@ -4574,6 +4576,7 @@ typedef struct _ConfMissionManager {
     float default_validation_distance; 
     float start_auto_angle; 
     float start_auto_duration; 
+    float awa_tack_duration; 
 } ConfMissionManager;
 
 typedef struct _ConfSensorManager { 
@@ -4651,7 +4654,7 @@ extern "C" {
 #define DataLogManager_init_default              {0}
 #define DataHelmManager_init_default             {0, 0}
 #define DataWingManager_init_default             {0}
-#define DataCaptainManager_init_default          {0, _DataCaptainManager_Behaviour_MIN, 0}
+#define DataCaptainManager_init_default          {0, _DataCaptainManager_Behaviour_MIN, 0, 0}
 #define DataCommManager_init_default             {0}
 #define DataSensorManager_init_default           {DataSensorManager_DataGps_init_default, DataSensorManager_DataBattery_init_default, DataSensorManager_DataRadioControl_init_default}
 #define DataSensorManager_DataGps_init_default   {GeoCoordinate_init_default, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -4661,11 +4664,11 @@ extern "C" {
 #define DataConfManager_init_default             {0}
 #define Conf_init_default                        {ConfMissionManager_init_default, ConfLogManager_init_default, ConfHelmManager_init_default, ConfWingManager_init_default, ConfCaptainManager_init_default, ConfCommManager_init_default, ConfSensorManager_init_default, ConfLightManager_init_default, ConfConfManager_init_default}
 #define ConfBaseManager_init_default             {0}
-#define ConfMissionManager_init_default          {ConfBaseManager_init_default, 0, 0, 0, 0}
+#define ConfMissionManager_init_default          {ConfBaseManager_init_default, 0, 0, 0, 0, 0}
 #define ConfLogManager_init_default              {ConfBaseManager_init_default}
 #define ConfHelmManager_init_default             {ConfBaseManager_init_default, 0, 0, 0, 0}
 #define ConfWingManager_init_default             {ConfBaseManager_init_default, 0, 0}
-#define ConfCaptainManager_init_default          {ConfBaseManager_init_default, 0, 0, 0}
+#define ConfCaptainManager_init_default          {ConfBaseManager_init_default, 0, 0, 0, 0}
 #define ConfCommManager_init_default             {ConfBaseManager_init_default}
 #define ConfSensorManager_init_default           {ConfBaseManager_init_default, ConfSensorManager_ConfGps_init_default}
 #define ConfSensorManager_ConfGps_init_default   {0}
@@ -4677,7 +4680,7 @@ extern "C" {
 #define DataLogManager_init_zero                 {0}
 #define DataHelmManager_init_zero                {0, 0}
 #define DataWingManager_init_zero                {0}
-#define DataCaptainManager_init_zero             {0, _DataCaptainManager_Behaviour_MIN, 0}
+#define DataCaptainManager_init_zero             {0, _DataCaptainManager_Behaviour_MIN, 0, 0}
 #define DataCommManager_init_zero                {0}
 #define DataSensorManager_init_zero              {DataSensorManager_DataGps_init_zero, DataSensorManager_DataBattery_init_zero, DataSensorManager_DataRadioControl_init_zero}
 #define DataSensorManager_DataGps_init_zero      {GeoCoordinate_init_zero, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -4687,11 +4690,11 @@ extern "C" {
 #define DataConfManager_init_zero                {0}
 #define Conf_init_zero                           {ConfMissionManager_init_zero, ConfLogManager_init_zero, ConfHelmManager_init_zero, ConfWingManager_init_zero, ConfCaptainManager_init_zero, ConfCommManager_init_zero, ConfSensorManager_init_zero, ConfLightManager_init_zero, ConfConfManager_init_zero}
 #define ConfBaseManager_init_zero                {0}
-#define ConfMissionManager_init_zero             {ConfBaseManager_init_zero, 0, 0, 0, 0}
+#define ConfMissionManager_init_zero             {ConfBaseManager_init_zero, 0, 0, 0, 0, 0}
 #define ConfLogManager_init_zero                 {ConfBaseManager_init_zero}
 #define ConfHelmManager_init_zero                {ConfBaseManager_init_zero, 0, 0, 0, 0}
 #define ConfWingManager_init_zero                {ConfBaseManager_init_zero, 0, 0}
-#define ConfCaptainManager_init_zero             {ConfBaseManager_init_zero, 0, 0, 0}
+#define ConfCaptainManager_init_zero             {ConfBaseManager_init_zero, 0, 0, 0, 0}
 #define ConfCommManager_init_zero                {ConfBaseManager_init_zero}
 #define ConfSensorManager_init_zero              {ConfBaseManager_init_zero, ConfSensorManager_ConfGps_init_zero}
 #define ConfSensorManager_ConfGps_init_zero      {0}
@@ -4704,6 +4707,7 @@ extern "C" {
 #define DataCaptainManager_just_wake_up_tag      1
 #define DataCaptainManager_behaviour_tag         2
 #define DataCaptainManager_helm_order_tag        3
+#define DataCaptainManager_ask_add_awa_angle_tag 4
 #define DataHelmManager_angle_tag                1
 #define DataHelmManager_cmd_applied_tag          2
 #define DataLogManager_sd_ready_tag              1
@@ -4736,6 +4740,7 @@ extern "C" {
 #define ConfCaptainManager_max_upwind_tag        2
 #define ConfCaptainManager_max_downwind_tag      3
 #define ConfCaptainManager_speeping_duration_tag 4
+#define ConfCaptainManager_too_far_for_tack_tag  5
 #define ConfCommManager_base_tag                 1
 #define ConfConfManager_base_tag                 1
 #define ConfHelmManager_base_tag                 1
@@ -4750,6 +4755,7 @@ extern "C" {
 #define ConfMissionManager_default_validation_distance_tag 3
 #define ConfMissionManager_start_auto_angle_tag  4
 #define ConfMissionManager_start_auto_duration_tag 5
+#define ConfMissionManager_awa_tack_duration_tag 6
 #define ConfSensorManager_base_tag               1
 #define ConfSensorManager_gps_tag                2
 #define ConfWingManager_base_tag                 1
@@ -4855,7 +4861,8 @@ X(a, STATIC,   REQUIRED, FLOAT,    angle,             1)
 #define DataCaptainManager_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, BOOL,     just_wake_up,      1) \
 X(a, STATIC,   REQUIRED, UENUM,    behaviour,         2) \
-X(a, STATIC,   REQUIRED, FLOAT,    helm_order,        3)
+X(a, STATIC,   REQUIRED, FLOAT,    helm_order,        3) \
+X(a, STATIC,   REQUIRED, FLOAT,    ask_add_awa_angle,   4)
 #define DataCaptainManager_CALLBACK NULL
 #define DataCaptainManager_DEFAULT NULL
 
@@ -4946,7 +4953,8 @@ X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
 X(a, STATIC,   REQUIRED, FLOAT,    default_corridor_width,   2) \
 X(a, STATIC,   REQUIRED, FLOAT,    default_validation_distance,   3) \
 X(a, STATIC,   REQUIRED, FLOAT,    start_auto_angle,   4) \
-X(a, STATIC,   REQUIRED, FLOAT,    start_auto_duration,   5)
+X(a, STATIC,   REQUIRED, FLOAT,    start_auto_duration,   5) \
+X(a, STATIC,   REQUIRED, FLOAT,    awa_tack_duration,   6)
 #define ConfMissionManager_CALLBACK NULL
 #define ConfMissionManager_DEFAULT NULL
 #define ConfMissionManager_base_MSGTYPE ConfBaseManager
@@ -4979,7 +4987,8 @@ X(a, STATIC,   REQUIRED, FLOAT,    calib_offset,      3)
 X(a, STATIC,   REQUIRED, MESSAGE,  base,              1) \
 X(a, STATIC,   REQUIRED, FLOAT,    max_upwind,        2) \
 X(a, STATIC,   REQUIRED, FLOAT,    max_downwind,      3) \
-X(a, STATIC,   REQUIRED, FLOAT,    speeping_duration,   4)
+X(a, STATIC,   REQUIRED, FLOAT,    speeping_duration,   4) \
+X(a, STATIC,   REQUIRED, FLOAT,    too_far_for_tack,   5)
 #define ConfCaptainManager_CALLBACK NULL
 #define ConfCaptainManager_DEFAULT NULL
 #define ConfCaptainManager_base_MSGTYPE ConfBaseManager
@@ -5072,18 +5081,18 @@ extern const pb_msgdesc_t ConfConfManager_msg;
 
 /* Maximum encoded size of messages (where known) */
 #define ConfBaseManager_size                     11
-#define ConfCaptainManager_size                  28
+#define ConfCaptainManager_size                  33
 #define ConfCommManager_size                     13
 #define ConfConfManager_size                     13
 #define ConfHelmManager_size                     33
 #define ConfLightManager_size                    13
 #define ConfLogManager_size                      13
-#define ConfMissionManager_size                  33
+#define ConfMissionManager_size                  38
 #define ConfSensorManager_ConfGps_size           9
 #define ConfSensorManager_size                   24
 #define ConfWingManager_size                     23
-#define Conf_size                                211
-#define DataCaptainManager_size                  9
+#define Conf_size                                221
+#define DataCaptainManager_size                  14
 #define DataCommManager_size                     0
 #define DataConfManager_size                     0
 #define DataHelmManager_size                     7
@@ -5096,7 +5105,7 @@ extern const pb_msgdesc_t ConfConfManager_msg;
 #define DataSensorManager_DataRadioControl_size  2
 #define DataSensorManager_size                   114
 #define DataWingManager_size                     5
-#define Data_size                                315
+#define Data_size                                320
 
 #ifdef __cplusplus
 } /* extern "C" */

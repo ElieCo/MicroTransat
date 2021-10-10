@@ -25,17 +25,15 @@ class MissionManager : public BaseManager
       if (GetSensorData.radio.radio_controlled) {
         // Insert an ephemeral element
         if (!m_mission_elements.at(GetMissionData.element_index).ephemeral) {
-          DataMissionManager_MissionElement awa = getEmptyElement();
-          awa.ephemeral = true;
-          awa.angle = GetConf.start_auto_angle;
-          awa.duration = GetConf.start_auto_duration;
-          awa.type = DataMissionManager_MissionElement_ElementType_AWA;
-          m_mission_elements.insert(GetMissionData.element_index, awa);
-
-          // Reload the element at GetMissionData.element_index place.
-          GetMissionData.element_index--;
-          runNextElement();
+          addAwa(GetConf.start_auto_angle, GetConf.start_auto_duration);
         }
+      } else {
+        // If asked by the Captain, add an AWA element
+        if (m_main_data->mission_manager.ask_add_awa_angle != 0.0) {
+          addAwa(m_main_data->mission_manager.ask_add_awa_angle, GetConf.awa_tack_duration);
+          m_main_data->mission_manager.ask_add_awa_angle = 0.0;
+        }
+      }
 
         // Update setpoints
         updateSetpoints();
@@ -204,5 +202,21 @@ class MissionManager : public BaseManager
       db_elem_index.add(-1);
       runNextElement();
     }
+
+    // Create, add and run a ephemeral AWA mission element
+    void addAwa(double angle, double duration){
+      // Create a AWA mission element
+      DataMissionManager_MissionElement awa = getEmptyElement();
+      awa.ephemeral = true;
+      awa.angle = angle;
+      awa.duration = duration;
+      awa.type = DataMissionManager_MissionElement_ElementType_AWA;
+      m_mission_elements.insert(GetMissionData.element_index, awa);
+
+      // Reload the element at GetMissionData.element_index place.
+      GetMissionData.element_index--;
+      runNextElement();
+    }
+
 
 };

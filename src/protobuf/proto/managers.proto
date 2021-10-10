@@ -65,6 +65,7 @@ message DataCaptainManager {
     required bool just_wake_up = 1;
     required Behaviour behaviour = 2;
     required float helm_order = 3;
+    required float ask_add_awa_angle = 4;
 }
 
 message DataCommManager {
@@ -134,11 +135,12 @@ message ConfBaseManager {
 
 message ConfMissionManager {
     required ConfBaseManager base = 1;
-    
+
     required float default_corridor_width = 2;
     required float default_validation_distance = 3;
     required float start_auto_angle = 4;
     required float start_auto_duration = 5;
+    required float awa_tack_duration = 6;
 }
 
 message ConfLogManager {
@@ -167,6 +169,7 @@ message ConfCaptainManager {
     required float max_upwind = 2;
     required float max_downwind = 3;
     required float speeping_duration = 4;
+    required float too_far_for_tack = 5;
 }
 
 message ConfCommManager {

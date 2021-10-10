@@ -84,16 +84,31 @@ class Captain : public BaseManager
 
     void stateDecide() {
 
+      // Decide of the command
+      double cmd = 0;
       if (GetMissionData.next_element.type == DataMissionManager_MissionElement_ElementType_WPT)
-        commandForWPT();
+        cmd = commandForWPT();
       else
         cmd = commandForAWA();
 
-      // make sure to wait that the helm manager process
-      GetHelmData.cmd_applied = false;
+      if (checkViolentTack(cmd)){
+        // Force to update the setpoint
 
-      // Change the behaviour.
-      m_behaviour = DataCaptainManager_Behaviour_PROCESS;
+        // Change the behaviour.
+        m_behaviour = DataCaptainManager_Behaviour_ACQUISITION;
+        // Ask to update the setpoint.
+        GetData.setpoint_update_asked = true;
+
+      } else {
+        // Set the regulator angle command.
+        GetData.helm_order = cmd;
+
+        // Make sure to wait that the helm manager process
+        GetHelmData.cmd_applied = false;
+
+        // Change the behaviour.
+        m_behaviour = DataCaptainManager_Behaviour_PROCESS;
+      }
     }
 
     void stateProcess() {
@@ -109,7 +124,7 @@ class Captain : public BaseManager
       }
     }
 
-    void commandForWPT() {
+    double commandForWPT() {
       // Calculate the angle to the next waypoint
       float angleToWaypoint = get_course(GetSensorData.gps.coord.latitude, GetSensorData.gps.coord.longitude, GetMissionData.next_element.coord.latitude, GetMissionData.next_element.coord.longitude);
 
@@ -140,15 +155,14 @@ class Captain : public BaseManager
       if (abs(new_reg) < GetConf.max_upwind) new_reg = sign * GetConf.max_upwind;
       if (abs(new_reg) > GetConf.max_downwind) new_reg = sign * GetConf.max_downwind;
 
-      
+
       //print("Captain:", GetConf.max_downwind, GetConf.max_upwind);
 
 
-      // Set in the DB the regulator angle.
-      GetCaptainData.helm_order = new_reg;
+      return new_reg;
     }
 
-    void commandForAWA() {
+    double commandForAWA() {
       // Get awa cmd
       float new_reg = GetMissionData.next_element.angle;
       from180to180(new_reg);
@@ -160,23 +174,22 @@ class Captain : public BaseManager
       if (abs(new_reg) < GetConf.max_upwind) new_reg = sign * GetConf.max_upwind;
       if (abs(new_reg) > GetConf.max_downwind) new_reg = sign * GetConf.max_downwind;
 
-      // Set in the DB the regulator angle.
-      GetCaptainData.helm_order = new_reg;
+      return new_reg;
     }
 
     bool checkViolentTack(double new_cmd){
       // Check if we try to do a tack while we are far away from the wind
 
       // Get actual command
-      double actual_cmd = db_reg_cmd.get();
+      double actual_cmd = GetData.helm_order;
 
       // Check if we are far away from the wind and if we have to do a tack.
-      bool is_far_away = abs(actual_cmd) > m_too_far_for_tack;
+      bool is_far_away = abs(actual_cmd) > GetConf.too_far_for_tack;
       bool have_to_tack = (actual_cmd / new_cmd) < 0; //if they don't have the same sign
 
       if (is_far_away && have_to_tack){
         int sign = actual_cmd < 0 ? -1 : 1;
-        db_ask_add_awa_angle.set(sign * m_max_upwind);
+        GetData.ask_add_awa_angle = sign * GetConf.max_upwind;
         return true;
       }
 

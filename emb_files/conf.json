@@ -6,7 +6,8 @@
     "defaultCorridorWidth": 40.0,
     "defaultValidationDistance": 15.0,
     "startAutoAngle": 90.0,
-    "startAutoDuration": 10.0
+    "startAutoDuration": 10.0,
+    "awaTackDuration": 10.0
   },
   "logManager": {
     "base": {
@@ -35,7 +36,8 @@
     },
     "maxUpwind": 45.0,
     "maxDownwind": 130.0,
-    "speepingDuration": 15000.0
+    "speepingDuration": 15000.0,
+    "tooFarForTack": 75
   },
   "commManager": {
     "base": {

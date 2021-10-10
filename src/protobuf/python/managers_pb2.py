@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\x0emanagers.proto\x1a\x0butils.proto\"\x80\x03\n\x04\x44\x61ta\x12,\n\x0fmission_manager\x18\x01 \x02(\x0b\x32\x13.DataMissionManager\x12$\n\x0blog_manager\x18\x02 \x02(\x0b\x32\x0f.DataLogManager\x12&\n\x0chelm_manager\x18\x03 \x02(\x0b\x32\x10.DataHelmManager\x12&\n\x0cwing_manager\x18\x04 \x02(\x0b\x32\x10.DataWingManager\x12,\n\x0f\x63\x61ptain_manager\x18\x05 \x02(\x0b\x32\x13.DataCaptainManager\x12&\n\x0c\x63omm_manager\x18\x06 \x02(\x0b\x32\x10.DataCommManager\x12*\n\x0esensor_manager\x18\x07 \x02(\x0b\x32\x12.DataSensorManager\x12(\n\rlight_manager\x18\x08 \x02(\x0b\x32\x11.DataLightManager\x12(\n\x0e\x63onfig_manager\x18\t \x02(\x0b\x32\x10.DataConfManager\"\x97\x04\n\x12\x44\x61taMissionManager\x12\x10\n\x08wpt_dist\x18\x01 \x02(\x02\x12\x11\n\twpt_angle\x18\x02 \x02(\x02\x12\x15\n\relement_index\x18\x03 \x02(\x05\x12\x14\n\x0c\x64ist_to_axis\x18\x04 \x02(\x02\x12\x13\n\x0bin_corridor\x18\x05 \x02(\x08\x12\x16\n\x0e\x63orridor_angle\x18\x06 \x02(\x02\x12\x38\n\x0cprev_element\x18\x07 \x02(\x0b\x32\".DataMissionManager.MissionElement\x12\x38\n\x0cnext_element\x18\x08 \x02(\x0b\x32\".DataMissionManager.MissionElement\x12\x1d\n\x15setpoint_update_asked\x18\t \x02(\x08\x1a\xee\x01\n\x0eMissionElement\x12<\n\x04type\x18\x01 \x02(\x0e\x32..DataMissionManager.MissionElement.ElementType\x12\x1d\n\x05\x63oord\x18\x02 \x02(\x0b\x32\x0e.GeoCoordinate\x12\x16\n\x0e\x63orridor_width\x18\x03 \x02(\x01\x12\x12\n\nvalid_dist\x18\x04 \x02(\x01\x12\r\n\x05\x61ngle\x18\x05 \x02(\x01\x12\x10\n\x08\x64uration\x18\x06 \x02(\x01\x12\x11\n\tephemeral\x18\x07 \x02(\x08\"\x1f\n\x0b\x45lementType\x12\x07\n\x03WPT\x10\x00\x12\x07\n\x03\x41WA\x10\x01\"\"\n\x0e\x44\x61taLogManager\x12\x10\n\x08sd_ready\x18\x01 \x02(\x08\"5\n\x0f\x44\x61taHelmManager\x12\r\n\x05\x61ngle\x18\x01 \x02(\x02\x12\x13\n\x0b\x63md_applied\x18\x02 \x02(\x08\" \n\x0f\x44\x61taWingManager\x12\r\n\x05\x61ngle\x18\x01 \x02(\x02\"\xc8\x01\n\x12\x44\x61taCaptainManager\x12\x14\n\x0cjust_wake_up\x18\x01 \x02(\x08\x12\x30\n\tbehaviour\x18\x02 \x02(\x0e\x32\x1d.DataCaptainManager.Behaviour\x12\x12\n\nhelm_order\x18\x03 \x02(\x02\"V\n\tBehaviour\x12\t\n\x05SLEEP\x10\x00\x12\x0f\n\x0b\x41\x43QUISITION\x10\x01\x12\n\n\x06\x44\x45\x43IDE\x10\x02\x12\x0b\n\x07PROCESS\x10\x03\x12\x14\n\x10RADIO_CONTROLLED\x10\x04\"\x11\n\x0f\x44\x61taCommManager\"\x95\x04\n\x11\x44\x61taSensorManager\x12\'\n\x03gps\x18\x01 \x02(\x0b\x32\x1a.DataSensorManager.DataGps\x12/\n\x07\x62\x61ttery\x18\x02 \x02(\x0b\x32\x1e.DataSensorManager.DataBattery\x12\x32\n\x05radio\x18\x03 \x02(\x0b\x32#.DataSensorManager.DataRadioControl\x1a\xa3\x02\n\x07\x44\x61taGps\x12\x1d\n\x05\x63oord\x18\x01 \x02(\x0b\x32\x0e.GeoCoordinate\x12\x10\n\x08\x61ltitude\x18\x02 \x02(\x02\x12\x0b\n\x03\x66ix\x18\x03 \x02(\x08\x12\x13\n\x0b\x66ix_quality\x18\x04 \x02(\x05\x12\x12\n\nsatellites\x18\x05 \x02(\x05\x12\x0f\n\x07\x66ix_age\x18\x06 \x02(\r\x12\x0c\n\x04time\x18\x07 \x02(\r\x12\x0c\n\x04\x64\x61te\x18\x08 \x02(\r\x12\r\n\x05speed\x18\t \x02(\x02\x12\x0e\n\x06\x63ourse\x18\n \x02(\x02\x12\x0c\n\x04hdop\x18\x0b \x02(\x01\x12\x13\n\x0brecent_data\x18\x32 \x02(\x08\x12\x16\n\x0e\x61verage_course\x18\x33 \x02(\x02\x12\x1b\n\x13\x61verage_course_full\x18\x34 \x02(\x08\x12\r\n\x05ready\x18\x35 \x02(\x08\x1a\x1e\n\x0b\x44\x61taBattery\x12\x0f\n\x07voltage\x18\x01 \x02(\x02\x1a,\n\x10\x44\x61taRadioControl\x12\x18\n\x10radio_controlled\x18\x01 \x02(\x08\"\x12\n\x10\x44\x61taLightManager\"\x11\n\x0f\x44\x61taConfManager\"\x80\x03\n\x04\x43onf\x12,\n\x0fmission_manager\x18\x01 \x02(\x0b\x32\x13.ConfMissionManager\x12$\n\x0blog_manager\x18\x02 \x02(\x0b\x32\x0f.ConfLogManager\x12&\n\x0chelm_manager\x18\x03 \x02(\x0b\x32\x10.ConfHelmManager\x12&\n\x0cwing_manager\x18\x04 \x02(\x0b\x32\x10.ConfWingManager\x12,\n\x0f\x63\x61ptain_manager\x18\x05 \x02(\x0b\x32\x13.ConfCaptainManager\x12&\n\x0c\x63omm_manager\x18\x06 \x02(\x0b\x32\x10.ConfCommManager\x12*\n\x0esensor_manager\x18\x07 \x02(\x0b\x32\x12.ConfSensorManager\x12(\n\rlight_manager\x18\x08 \x02(\x0b\x32\x11.ConfLightManager\x12(\n\x0e\x63onfig_manager\x18\t \x02(\x0b\x32\x10.ConfConfManager\"#\n\x0f\x43onfBaseManager\x12\x10\n\x08interval\x18\x01 \x02(\x05\"\xb0\x01\n\x12\x43onfMissionManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\x1e\n\x16\x64\x65\x66\x61ult_corridor_width\x18\x02 \x02(\x02\x12#\n\x1b\x64\x65\x66\x61ult_validation_distance\x18\x03 \x02(\x02\x12\x18\n\x10start_auto_angle\x18\x04 \x02(\x02\x12\x1b\n\x13start_auto_duration\x18\x05 \x02(\x02\"0\n\x0e\x43onfLogManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\"z\n\x0f\x43onfHelmManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\r\n\x05ratio\x18\x02 \x02(\x02\x12\x0e\n\x06offset\x18\x03 \x02(\x02\x12\x14\n\x0cnormal_speed\x18\x04 \x02(\x02\x12\x12\n\ntack_speed\x18\x05 \x02(\x02\"U\n\x0f\x43onfWingManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\x0c\n\x04step\x18\x02 \x02(\x02\x12\x14\n\x0c\x63\x61lib_offset\x18\x03 \x02(\x02\"y\n\x12\x43onfCaptainManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\x12\n\nmax_upwind\x18\x02 \x02(\x02\x12\x14\n\x0cmax_downwind\x18\x03 \x02(\x02\x12\x19\n\x11speeping_duration\x18\x04 \x02(\x02\"1\n\x0f\x43onfCommManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\"\x7f\n\x11\x43onfSensorManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\'\n\x03gps\x18\x02 \x02(\x0b\x32\x1a.ConfSensorManager.ConfGps\x1a!\n\x07\x43onfGps\x12\x16\n\x0emax_valid_hdop\x18\x01 \x02(\x01\"2\n\x10\x43onfLightManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\"1\n\x0f\x43onfConfManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager')
+  serialized_pb=_b('\n\x0emanagers.proto\x1a\x0butils.proto\"\x80\x03\n\x04\x44\x61ta\x12,\n\x0fmission_manager\x18\x01 \x02(\x0b\x32\x13.DataMissionManager\x12$\n\x0blog_manager\x18\x02 \x02(\x0b\x32\x0f.DataLogManager\x12&\n\x0chelm_manager\x18\x03 \x02(\x0b\x32\x10.DataHelmManager\x12&\n\x0cwing_manager\x18\x04 \x02(\x0b\x32\x10.DataWingManager\x12,\n\x0f\x63\x61ptain_manager\x18\x05 \x02(\x0b\x32\x13.DataCaptainManager\x12&\n\x0c\x63omm_manager\x18\x06 \x02(\x0b\x32\x10.DataCommManager\x12*\n\x0esensor_manager\x18\x07 \x02(\x0b\x32\x12.DataSensorManager\x12(\n\rlight_manager\x18\x08 \x02(\x0b\x32\x11.DataLightManager\x12(\n\x0e\x63onfig_manager\x18\t \x02(\x0b\x32\x10.DataConfManager\"\x97\x04\n\x12\x44\x61taMissionManager\x12\x10\n\x08wpt_dist\x18\x01 \x02(\x02\x12\x11\n\twpt_angle\x18\x02 \x02(\x02\x12\x15\n\relement_index\x18\x03 \x02(\x05\x12\x14\n\x0c\x64ist_to_axis\x18\x04 \x02(\x02\x12\x13\n\x0bin_corridor\x18\x05 \x02(\x08\x12\x16\n\x0e\x63orridor_angle\x18\x06 \x02(\x02\x12\x38\n\x0cprev_element\x18\x07 \x02(\x0b\x32\".DataMissionManager.MissionElement\x12\x38\n\x0cnext_element\x18\x08 \x02(\x0b\x32\".DataMissionManager.MissionElement\x12\x1d\n\x15setpoint_update_asked\x18\t \x02(\x08\x1a\xee\x01\n\x0eMissionElement\x12<\n\x04type\x18\x01 \x02(\x0e\x32..DataMissionManager.MissionElement.ElementType\x12\x1d\n\x05\x63oord\x18\x02 \x02(\x0b\x32\x0e.GeoCoordinate\x12\x16\n\x0e\x63orridor_width\x18\x03 \x02(\x01\x12\x12\n\nvalid_dist\x18\x04 \x02(\x01\x12\r\n\x05\x61ngle\x18\x05 \x02(\x01\x12\x10\n\x08\x64uration\x18\x06 \x02(\x01\x12\x11\n\tephemeral\x18\x07 \x02(\x08\"\x1f\n\x0b\x45lementType\x12\x07\n\x03WPT\x10\x00\x12\x07\n\x03\x41WA\x10\x01\"\"\n\x0e\x44\x61taLogManager\x12\x10\n\x08sd_ready\x18\x01 \x02(\x08\"5\n\x0f\x44\x61taHelmManager\x12\r\n\x05\x61ngle\x18\x01 \x02(\x02\x12\x13\n\x0b\x63md_applied\x18\x02 \x02(\x08\" \n\x0f\x44\x61taWingManager\x12\r\n\x05\x61ngle\x18\x01 \x02(\x02\"\xe3\x01\n\x12\x44\x61taCaptainManager\x12\x14\n\x0cjust_wake_up\x18\x01 \x02(\x08\x12\x30\n\tbehaviour\x18\x02 \x02(\x0e\x32\x1d.DataCaptainManager.Behaviour\x12\x12\n\nhelm_order\x18\x03 \x02(\x02\x12\x19\n\x11\x61sk_add_awa_angle\x18\x04 \x02(\x02\"V\n\tBehaviour\x12\t\n\x05SLEEP\x10\x00\x12\x0f\n\x0b\x41\x43QUISITION\x10\x01\x12\n\n\x06\x44\x45\x43IDE\x10\x02\x12\x0b\n\x07PROCESS\x10\x03\x12\x14\n\x10RADIO_CONTROLLED\x10\x04\"\x11\n\x0f\x44\x61taCommManager\"\x95\x04\n\x11\x44\x61taSensorManager\x12\'\n\x03gps\x18\x01 \x02(\x0b\x32\x1a.DataSensorManager.DataGps\x12/\n\x07\x62\x61ttery\x18\x02 \x02(\x0b\x32\x1e.DataSensorManager.DataBattery\x12\x32\n\x05radio\x18\x03 \x02(\x0b\x32#.DataSensorManager.DataRadioControl\x1a\xa3\x02\n\x07\x44\x61taGps\x12\x1d\n\x05\x63oord\x18\x01 \x02(\x0b\x32\x0e.GeoCoordinate\x12\x10\n\x08\x61ltitude\x18\x02 \x02(\x02\x12\x0b\n\x03\x66ix\x18\x03 \x02(\x08\x12\x13\n\x0b\x66ix_quality\x18\x04 \x02(\x05\x12\x12\n\nsatellites\x18\x05 \x02(\x05\x12\x0f\n\x07\x66ix_age\x18\x06 \x02(\r\x12\x0c\n\x04time\x18\x07 \x02(\r\x12\x0c\n\x04\x64\x61te\x18\x08 \x02(\r\x12\r\n\x05speed\x18\t \x02(\x02\x12\x0e\n\x06\x63ourse\x18\n \x02(\x02\x12\x0c\n\x04hdop\x18\x0b \x02(\x01\x12\x13\n\x0brecent_data\x18\x32 \x02(\x08\x12\x16\n\x0e\x61verage_course\x18\x33 \x02(\x02\x12\x1b\n\x13\x61verage_course_full\x18\x34 \x02(\x08\x12\r\n\x05ready\x18\x35 \x02(\x08\x1a\x1e\n\x0b\x44\x61taBattery\x12\x0f\n\x07voltage\x18\x01 \x02(\x02\x1a,\n\x10\x44\x61taRadioControl\x12\x18\n\x10radio_controlled\x18\x01 \x02(\x08\"\x12\n\x10\x44\x61taLightManager\"\x11\n\x0f\x44\x61taConfManager\"\x80\x03\n\x04\x43onf\x12,\n\x0fmission_manager\x18\x01 \x02(\x0b\x32\x13.ConfMissionManager\x12$\n\x0blog_manager\x18\x02 \x02(\x0b\x32\x0f.ConfLogManager\x12&\n\x0chelm_manager\x18\x03 \x02(\x0b\x32\x10.ConfHelmManager\x12&\n\x0cwing_manager\x18\x04 \x02(\x0b\x32\x10.ConfWingManager\x12,\n\x0f\x63\x61ptain_manager\x18\x05 \x02(\x0b\x32\x13.ConfCaptainManager\x12&\n\x0c\x63omm_manager\x18\x06 \x02(\x0b\x32\x10.ConfCommManager\x12*\n\x0esensor_manager\x18\x07 \x02(\x0b\x32\x12.ConfSensorManager\x12(\n\rlight_manager\x18\x08 \x02(\x0b\x32\x11.ConfLightManager\x12(\n\x0e\x63onfig_manager\x18\t \x02(\x0b\x32\x10.ConfConfManager\"#\n\x0f\x43onfBaseManager\x12\x10\n\x08interval\x18\x01 \x02(\x05\"\xcb\x01\n\x12\x43onfMissionManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\x1e\n\x16\x64\x65\x66\x61ult_corridor_width\x18\x02 \x02(\x02\x12#\n\x1b\x64\x65\x66\x61ult_validation_distance\x18\x03 \x02(\x02\x12\x18\n\x10start_auto_angle\x18\x04 \x02(\x02\x12\x1b\n\x13start_auto_duration\x18\x05 \x02(\x02\x12\x19\n\x11\x61wa_tack_duration\x18\x06 \x02(\x02\"0\n\x0e\x43onfLogManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\"z\n\x0f\x43onfHelmManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\r\n\x05ratio\x18\x02 \x02(\x02\x12\x0e\n\x06offset\x18\x03 \x02(\x02\x12\x14\n\x0cnormal_speed\x18\x04 \x02(\x02\x12\x12\n\ntack_speed\x18\x05 \x02(\x02\"U\n\x0f\x43onfWingManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\x0c\n\x04step\x18\x02 \x02(\x02\x12\x14\n\x0c\x63\x61lib_offset\x18\x03 \x02(\x02\"\x93\x01\n\x12\x43onfCaptainManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\x12\n\nmax_upwind\x18\x02 \x02(\x02\x12\x14\n\x0cmax_downwind\x18\x03 \x02(\x02\x12\x19\n\x11speeping_duration\x18\x04 \x02(\x02\x12\x18\n\x10too_far_for_tack\x18\x05 \x02(\x02\"1\n\x0f\x43onfCommManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\"\x7f\n\x11\x43onfSensorManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\x12\'\n\x03gps\x18\x02 \x02(\x0b\x32\x1a.ConfSensorManager.ConfGps\x1a!\n\x07\x43onfGps\x12\x16\n\x0emax_valid_hdop\x18\x01 \x02(\x01\"2\n\x10\x43onfLightManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager\"1\n\x0f\x43onfConfManager\x12\x1e\n\x04\x62\x61se\x18\x01 \x02(\x0b\x32\x10.ConfBaseManager')
   ,
   dependencies=[utils__pb2.DESCRIPTOR,])
 
@@ -77,8 +77,8 @@ _DATACAPTAINMANAGER_BEHAVIOUR = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1196,
-  serialized_end=1282,
+  serialized_start=1223,
+  serialized_end=1309,
 )
 _sym_db.RegisterEnumDescriptor(_DATACAPTAINMANAGER_BEHAVIOUR)
 
@@ -458,6 +458,13 @@ _DATACAPTAINMANAGER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='ask_add_awa_angle', full_name='DataCaptainManager.ask_add_awa_angle', index=3,
+      number=4, type=2, cpp_type=6, label=2,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -472,7 +479,7 @@ _DATACAPTAINMANAGER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=1082,
-  serialized_end=1282,
+  serialized_end=1309,
 )
 
 
@@ -495,8 +502,8 @@ _DATACOMMMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1284,
-  serialized_end=1301,
+  serialized_start=1311,
+  serialized_end=1328,
 )
 
 
@@ -624,8 +631,8 @@ _DATASENSORMANAGER_DATAGPS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1468,
-  serialized_end=1759,
+  serialized_start=1495,
+  serialized_end=1786,
 )
 
 _DATASENSORMANAGER_DATABATTERY = _descriptor.Descriptor(
@@ -654,8 +661,8 @@ _DATASENSORMANAGER_DATABATTERY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1761,
-  serialized_end=1791,
+  serialized_start=1788,
+  serialized_end=1818,
 )
 
 _DATASENSORMANAGER_DATARADIOCONTROL = _descriptor.Descriptor(
@@ -684,8 +691,8 @@ _DATASENSORMANAGER_DATARADIOCONTROL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1793,
-  serialized_end=1837,
+  serialized_start=1820,
+  serialized_end=1864,
 )
 
 _DATASENSORMANAGER = _descriptor.Descriptor(
@@ -728,8 +735,8 @@ _DATASENSORMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1304,
-  serialized_end=1837,
+  serialized_start=1331,
+  serialized_end=1864,
 )
 
 
@@ -752,8 +759,8 @@ _DATALIGHTMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1839,
-  serialized_end=1857,
+  serialized_start=1866,
+  serialized_end=1884,
 )
 
 
@@ -776,8 +783,8 @@ _DATACONFMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1859,
-  serialized_end=1876,
+  serialized_start=1886,
+  serialized_end=1903,
 )
 
 
@@ -863,8 +870,8 @@ _CONF = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1879,
-  serialized_end=2263,
+  serialized_start=1906,
+  serialized_end=2290,
 )
 
 
@@ -894,8 +901,8 @@ _CONFBASEMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2265,
-  serialized_end=2300,
+  serialized_start=2292,
+  serialized_end=2327,
 )
 
 
@@ -941,6 +948,13 @@ _CONFMISSIONMANAGER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='awa_tack_duration', full_name='ConfMissionManager.awa_tack_duration', index=5,
+      number=6, type=2, cpp_type=6, label=2,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -953,8 +967,8 @@ _CONFMISSIONMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2303,
-  serialized_end=2479,
+  serialized_start=2330,
+  serialized_end=2533,
 )
 
 
@@ -984,8 +998,8 @@ _CONFLOGMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2481,
-  serialized_end=2529,
+  serialized_start=2535,
+  serialized_end=2583,
 )
 
 
@@ -1043,8 +1057,8 @@ _CONFHELMMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2531,
-  serialized_end=2653,
+  serialized_start=2585,
+  serialized_end=2707,
 )
 
 
@@ -1088,8 +1102,8 @@ _CONFWINGMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2655,
-  serialized_end=2740,
+  serialized_start=2709,
+  serialized_end=2794,
 )
 
 
@@ -1128,6 +1142,13 @@ _CONFCAPTAINMANAGER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='too_far_for_tack', full_name='ConfCaptainManager.too_far_for_tack', index=4,
+      number=5, type=2, cpp_type=6, label=2,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -1140,8 +1161,8 @@ _CONFCAPTAINMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2742,
-  serialized_end=2863,
+  serialized_start=2797,
+  serialized_end=2944,
 )
 
 
@@ -1171,8 +1192,8 @@ _CONFCOMMMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2865,
-  serialized_end=2914,
+  serialized_start=2946,
+  serialized_end=2995,
 )
 
 
@@ -1202,8 +1223,8 @@ _CONFSENSORMANAGER_CONFGPS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3010,
-  serialized_end=3043,
+  serialized_start=3091,
+  serialized_end=3124,
 )
 
 _CONFSENSORMANAGER = _descriptor.Descriptor(
@@ -1239,8 +1260,8 @@ _CONFSENSORMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2916,
-  serialized_end=3043,
+  serialized_start=2997,
+  serialized_end=3124,
 )
 
 
@@ -1270,8 +1291,8 @@ _CONFLIGHTMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3045,
-  serialized_end=3095,
+  serialized_start=3126,
+  serialized_end=3176,
 )
 
 
@@ -1301,8 +1322,8 @@ _CONFCONFMANAGER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3097,
-  serialized_end=3146,
+  serialized_start=3178,
+  serialized_end=3227,
 )
 
 _DATA.fields_by_name['mission_manager'].message_type = _DATAMISSIONMANAGER
