@@ -20,7 +20,7 @@ class LightManager : public BaseManager
   void go(){
     // Blink faster if we are in emergency
     if (m_emergency)
-      m_runInterval = 0;
+      m_runInterval = 50;
     
     // Led on if the gps is ready.
     // Led binking if not.
