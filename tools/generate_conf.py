@@ -23,7 +23,7 @@ conf.mission_manager.start_auto_angle = 90
 conf.mission_manager.start_auto_duration = 10
 conf.mission_manager.awa_tack_duration = 10
 
-conf.log_manager.base.interval = 500
+conf.log_manager.base.interval = 1000
 
 conf.helm_manager.base.interval = 100
 conf.helm_manager.ratio = -0.56
@@ -32,11 +32,11 @@ conf.helm_manager.normal_speed = 20
 conf.helm_manager.tack_speed = 90
 
 conf.wing_manager.base.interval = 100
-conf.wing_manager.step = 10
+conf.wing_manager.step = 15
 conf.wing_manager.calib_offset = 0
 
 conf.captain_manager.base.interval = 100
-conf.captain_manager.max_upwind = 45
+conf.captain_manager.max_upwind = 35
 conf.captain_manager.max_downwind = 130
 conf.captain_manager.sleeping_duration = 15000
 conf.captain_manager.too_far_for_tack = 75
